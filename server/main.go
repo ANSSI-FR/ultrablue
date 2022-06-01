@@ -44,18 +44,24 @@ func main() {
 
 		log(1, "Starting device enrollment")
 		/*
-		 * TODO:
-		 * 1. Generate an AES key and an initial IV
-		 * 2. Create and display a QR code with MAC / AES key / IV in cbor format
-		 * 3. Store the AES key (and the IV) in the most secure way we can (to determine)
-		 */
+			TODO:
+			1. Generate an AES key and an initial IV
+			2. Create and display a QR code with MAC / AES key / IV in cbor format
+			3. Store the AES key (and the IV) in the most secure way we can (to determine)
+		*/
 	}
 
 	log(1, "Creating ultrablue service")
 	ultrablueSvc := ble.NewService(ultrablueSvcUUID)
 
 	log(1, "Adding characteristics to ultrablue service")
-	// TODO: Register characteristics
+	if *enroll {
+		ultrablueSvc.AddCharacteristic(registrationChr())
+	}
+	ultrablueSvc.AddCharacteristic(authenticationChr())
+	ultrablueSvc.AddCharacteristic(credentialActivationChr())
+	ultrablueSvc.AddCharacteristic(attestationChr())
+	ultrablueSvc.AddCharacteristic(responseChr())
 
 	log(1, "Binding ultrablue service to BLE HCI")
 	if err = ble.AddService(ultrablueSvc); err != nil {

@@ -27,8 +27,8 @@ func usage(erl bool) {
 }
 
 /*
- * Logs a formatted message if the global @loglevel is >= than @level
- */
+	log displays a formatted message if the global @loglevel is >= than @level
+*/
 func log(level int, log ...interface{}) {
 	if *loglevel >= level {
 		switch level {
@@ -48,8 +48,8 @@ func log(level int, log ...interface{}) {
 }
 
 /*
-* Logs an error in red, with a "Fatal error: " prefix
- */
+	Logs an error in red, with a "Fatal error: " prefix
+*/
 func logErr(err error) {
 	fmt.Println(colorRed+"Fatal error:", err.Error()+colorReset)
 }
