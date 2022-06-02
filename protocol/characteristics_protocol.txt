@@ -1,0 +1,46 @@
+// participants
+participantgroup #lightblue **Attester**
+participant TPM
+participant CPU
+end
+participant Verifier
+
+
+// Registration
+TPM<->CPU: Generate AES 128 bit key and IV
+CPU <<-#gray>> Verifier:      AES key, IV and MAC address
+group #red registrationChr
+CPU <->TPM: createek()
+CPU-#0000ff:1>Verifier: <background:#yellow>EkPub, EkCert
+parallel
+Verifier -> Verifier: Store new Attester object\n(MAC address, AES key, EkPub, EkCert)
+CPU->CPU:        Store new Verifier object\n       (MAC address, AES key)
+parallel off
+end
+
+// Attestation
+group #red authenticationChr
+CPU<-CPU: Generate IV + nonce
+CPU-#0000ff:1>Verifier: IV, <background:#yellow>encrypted nonce
+Verifier-#0000ff:1>CPU: decrypted nonce
+CPU->CPU: nonce comparison
+end
+group #red credActivationChr
+CPU<->TPM: tpm2_createak()
+CPU-#0000ff:1>Verifier: <background:#yellow>AkName
+Verifier -> Verifier: Generate credential secret\ntpm2_makecredential(secret, AkName, EkPub)
+Verifier-#0000ff:1>CPU: <background:#yellow> credential_blob
+CPU<->TPM: tpm2_activatecredential(credential_blob)
+CPU-#0000ff:1>Verifier: <background:#yellow>decrypted credential secret
+end
+group #red attestationChr
+
+Verifier->Verifier: Generate anti replay nonce
+Verifier-#0000ff:1>CPU: <background:#yellow> nonce
+CPU<->TPM:tpm2_quote()
+CPU-#0000ff:1>Verifier: <background:#yellow>secret / quotes / event_log
+end
+group #red responseChr
+Verifier->Verifier: 1. nonce comparison\n2. Quotes signature verification\n3. Event log replay\n4. PCR digest comparisons\n5. Security policy
+Verifier--#0000ff:1>CPU: <background:#orange>Attestation response
+end
