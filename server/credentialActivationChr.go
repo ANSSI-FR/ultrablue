@@ -9,8 +9,9 @@ import (
 	- Generating and sending an attestation key (AK) to the verifier
 	- Proving him than it comes from the attester's TPM he trusts
 */
-func credentialActivationChr() *ble.Characteristic {
+func credentialActivationChr(errc chan error) *ble.Characteristic {
 
+	log(2, "credActivationChr")
 	chr := ble.NewCharacteristic(credentialActivationChrUUID)
 
 	// TODO: HandleRead (1) - Generate and send an attestation key

@@ -12,8 +12,9 @@ import (
 	When authenticated, the other characteristics will be made available, and all
 	the messages will be encrypted with AES GCM
 */
-func authenticationChr() *ble.Characteristic {
+func authenticationChr(errc chan error) *ble.Characteristic {
 
+	log(2, "authenticationChr")
 	chr := ble.NewCharacteristic(authenticationChrUUID)
 
 	// TODO: HandleRead - Generate an IV and a nonce, and send the IV in clear text, plus the nonce,

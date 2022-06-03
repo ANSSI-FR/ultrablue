@@ -9,8 +9,9 @@ import (
 	device, to complete it's registration phase.
 	This characteristic will only be registered if the enroll flag is set.
 */
-func registrationChr() *ble.Characteristic {
+func registrationChr(cerr chan error) *ble.Characteristic {
 
+	log(2, "registrationChr")
 	chr := ble.NewCharacteristic(registrationChrUUID)
 
 	// TODO: HandleRead - Send the EkPub, and the EkCert

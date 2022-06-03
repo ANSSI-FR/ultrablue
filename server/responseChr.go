@@ -9,8 +9,9 @@ import (
 	the attestation succeeds.
 	If a secret is sent back it is then used to extend a PCR.
 */
-func responseChr() *ble.Characteristic {
+func responseChr(errc chan error, rspc chan int) *ble.Characteristic {
 
+	log(2, "responseChr")
 	chr := ble.NewCharacteristic(responseChrUUID)
 
 	// TODO: HandleWrite - Read the attestation response and extend the 9th PCR

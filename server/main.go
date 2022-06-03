@@ -37,10 +37,8 @@ func main() {
 		logErr(err)
 		return
 	}
-	defer device.Stop()
-
-	log(1, "Setting device as default one for future BLE communications")
 	ble.SetDefaultDevice(device)
+	defer device.Stop()
 
 	if *enroll {
 		log(1, "Generating registration QR code")
@@ -64,28 +62,35 @@ func main() {
 		fmt.Println(qrcode)
 	}
 
-	log(1, "Creating ultrablue service")
+	log(1, "Registering ultrablue service")
 	ultrablueSvc := ble.NewService(ultrablueSvcUUID)
 
-	log(1, "Adding characteristics to ultrablue service")
-	if *enroll {
-		ultrablueSvc.AddCharacteristic(registrationChr())
-	}
-	ultrablueSvc.AddCharacteristic(authenticationChr())
-	ultrablueSvc.AddCharacteristic(credentialActivationChr())
-	ultrablueSvc.AddCharacteristic(attestationChr())
-	ultrablueSvc.AddCharacteristic(responseChr())
+	errc := make(chan error)
+	rspc := make(chan int)
 
-	log(1, "Binding ultrablue service to BLE HCI")
+	if *enroll {
+		ultrablueSvc.AddCharacteristic(registrationChr(errc))
+	}
+	ultrablueSvc.AddCharacteristic(authenticationChr(errc))
+	ultrablueSvc.AddCharacteristic(credentialActivationChr(errc))
+	ultrablueSvc.AddCharacteristic(attestationChr(errc))
+	ultrablueSvc.AddCharacteristic(responseChr(errc, rspc))
+
 	if err = ble.AddService(ultrablueSvc); err != nil {
 		logErr(err)
 		return
 	}
 
-	log(1, "Start advertising ultrablue service and it's characteristics")
+	log(1, "Start advertising")
 	ctx := ble.WithSigHandler(context.WithCancel(context.Background()))
-	if err = ble.AdvertiseNameAndServices(ctx, "Ultrablue server", ultrablueSvc.UUID); err != nil {
+	go ble.AdvertiseNameAndServices(ctx, "Ultrablue server", ultrablueSvc.UUID)
+
+	select {
+	case <-ctx.Done():
+		logErr(ctx.Err())
+	case err := <-errc:
 		logErr(err)
-		return
+	case <-rspc:
+		log(1, "Attestation succeeded")
 	}
 }
