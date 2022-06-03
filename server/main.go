@@ -4,6 +4,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+
 	"github.com/go-ble/ble"
 	"github.com/go-ble/ble/linux"
 	"github.com/go-ble/ble/linux/hci/evt"
@@ -41,14 +43,25 @@ func main() {
 	ble.SetDefaultDevice(device)
 
 	if *enroll {
+		log(1, "Generating registration QR code")
 
-		log(1, "Starting device enrollment")
-		/*
-			TODO:
-			1. Generate an AES key and an initial IV
-			2. Create and display a QR code with MAC / AES key / IV in cbor format
-			3. Store the AES key (and the IV) in the most secure way we can (to determine)
-		*/
+		key, iv, err := generateAES128KeyWithIV()
+		if err != nil {
+			logErr(err)
+			return
+		}
+		log(2, "AES key:", key)
+		log(2, "IV:", iv)
+
+		mac := device.Address().String()
+		log(2, "HCI's MAC address:", mac)
+
+		qrcode, err := generateRegistrationQR(key, iv, mac)
+		if err != nil {
+			logErr(err)
+			return
+		}
+		fmt.Println(qrcode)
 	}
 
 	log(1, "Creating ultrablue service")
