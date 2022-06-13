@@ -1,30 +1,29 @@
 package main
 
 import (
-	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 
+	"github.com/google/go-tpm/tpm2"
 	"github.com/skip2/go-qrcode"
 )
 
 /*
-	generateAES128KeyWithIV generates and returns an AES 128 bits key,
-	and a 128 bits IV.
+	getTPMRandom gets @size random bytes from the TPM.
+	This function is used to generate AES keys and IVs.
 */
-func generateAES128KeyWithIV() ([]byte, []byte, error) {
-	key := make([]byte, 32)
-	iv := make([]byte, 32)
+func getTPMRandom(size uint16) ([]byte, error) {
+	rwc, err := tpm2.OpenTPM()
+	if err != nil {
+		return nil, err
+	}
+	defer rwc.Close()
 
-	_, err := rand.Read(key)
+	rbytes, err := tpm2.GetRandom(rwc, size)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	_, err = rand.Read(iv)
-	if err != nil {
-		return nil, nil, err
-	}
-	return key, iv, nil
+	return rbytes, nil
 }
 
 /*

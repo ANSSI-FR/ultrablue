@@ -43,13 +43,12 @@ func main() {
 	if *enroll {
 		log(1, "Generating registration QR code")
 
-		key, iv, err := generateAES128KeyWithIV()
+		rbytes, err := getTPMRandom(32)
 		if err != nil {
 			logErr(err)
 			return
 		}
-		log(2, "AES key:", key)
-		log(2, "IV:", iv)
+		key, iv := rbytes[0:16], rbytes[16:32]
 
 		mac := device.Address().String()
 		log(2, "HCI's MAC address:", mac)
