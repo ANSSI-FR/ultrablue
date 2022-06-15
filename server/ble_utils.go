@@ -42,3 +42,25 @@ func sendBLEPacket(off *int, msg []byte, mtu int, rsp ble.ResponseWriter) (bool,
 	*off += copied
 	return (*off == len(msg)), nil
 }
+
+/*
+	recvBLEPacket reads a BLE packet in the @req buffer, and appends it
+	in the final @out message.
+	If *@size is zero (meaning it is the first packet's message),
+	recvBLEPacket first reads the size, prefix and update the size.
+	Note that if a protocol message is fixed length, and the sender don't
+	put the size at the message start, *@size must be set manually before
+	the first recvBLEPacket call.
+
+	Returns true if the whole message has been received, false otherwise.
+*/
+func recvBLEPacket(out *[]byte, size *int, req ble.Request) bool {
+	var offset int
+
+	if *size == 0 && len(req.Data()) >= 4 {
+		*size = int(binary.LittleEndian.Uint32(req.Data()[0:4]))
+		offset = 4
+	}
+	*out = append(*out, req.Data()[offset:]...)
+	return (len(*out) == *size)
+}
