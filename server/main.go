@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 ANSSI
+// SPDX-License-Identifier: Apache-2.0
+
 // The ultrablue-server program starts the Ultrablue server side application.
 package main
 
