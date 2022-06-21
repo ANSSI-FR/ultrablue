@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/go-ble/ble"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -17,7 +18,7 @@ import (
 */
 func authenticationChr(errc chan error) *ble.Characteristic {
 
-	log(2, "authenticationChr")
+	logrus.Debug("Creating new characteristic: authenticationChr")
 	chr := ble.NewCharacteristic(authenticationChrUUID)
 
 	// TODO: HandleRead - Generate an IV and a nonce, and send the IV in clear text, plus the nonce,

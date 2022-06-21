@@ -12,6 +12,31 @@ import (
 )
 
 /*
+   usage prints informations to guide the user at the
+   start of the program.
+*/
+func usage(erl bool) {
+	var yellow = "\033[33m"
+	var reset = "\033[0m"
+
+	if erl {
+		fmt.Println(yellow + `To enroll a new verifier device:
+
+   1. Install the Ultrablue application on your smartphone
+   2. From it, push the + button on the top-right corner
+   3. Scan the following QR code
+` + reset)
+	} else {
+		fmt.Println(yellow + `To perform the attestation:
+
+   1. Open the Ultrablue application on an enrolled device
+   2. Find this computer in the list of known attesters
+   3. Tap the play button
+` + reset)
+	}
+}
+
+/*
 	getTPMRandom gets @size random bytes from the TPM.
 	This function is used to generate AES keys and IVs.
 */
@@ -39,9 +64,7 @@ func getTPMRandom(size uint16) ([]byte, error) {
 func generateRegistrationQR(key, iv []byte, mac string) (string, error) {
 
 	ek := base64.StdEncoding.EncodeToString(key)
-	log(2, "encoded AES key:", ek)
 	ei := base64.StdEncoding.EncodeToString(iv)
-	log(2, "encoded IV:", ei)
 
 	qr, err := qrcode.New(fmt.Sprintf("%s\n%s\n%s\n", ek, ei, mac), qrcode.Low)
 	if err != nil {

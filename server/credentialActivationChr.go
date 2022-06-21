@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/go-ble/ble"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 */
 func credentialActivationChr(errc chan error) *ble.Characteristic {
 
-	log(2, "credActivationChr")
+	logrus.Debug("Creating new characteristic: credActivationChr")
 	chr := ble.NewCharacteristic(credentialActivationChrUUID)
 
 	// TODO: HandleRead (1) - Generate and send an attestation key

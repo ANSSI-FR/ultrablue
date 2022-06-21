@@ -12,59 +12,67 @@ import (
 	"github.com/go-ble/ble"
 	"github.com/go-ble/ble/linux"
 	"github.com/go-ble/ble/linux/hci/evt"
+	"github.com/sirupsen/logrus"
 )
 
 // Command line arguments (global variables)
 var (
 	tpmPath  = flag.String("tpm", "/dev/tpm0", "Path of the TPM device to use")
 	enroll   = flag.Bool("enroll", false, "Must be true for a first time attestation")
-	loglevel = flag.Int("loglevel", 1, "Indicates the level of logging, between 0 (no logs) and 2 (verbose)")
+	loglevel = flag.Int("loglevel", 0, "Indicates the level of logging, 0 is the minimum, 2 is the maximum")
 )
 
+func initLogger(loglevel int) {
+	switch loglevel {
+	case 1:
+		logrus.SetLevel(logrus.InfoLevel)
+	case 2:
+		logrus.SetLevel(logrus.DebugLevel)
+	default:
+		logrus.SetLevel(logrus.ErrorLevel)
+	}
+}
+
 func onConnection(evt evt.LEConnectionComplete) {
-	log(1, "New device connection")
+	logrus.Info("New device connection")
 }
 
 func onDisconnection(evt evt.DisconnectionComplete) {
-	log(1, "Device disconnection")
+	logrus.Info("Device disconnection")
 }
 
 func main() {
 	flag.Parse()
-	log(0, "Starting Ultrablue server")
 	usage(*enroll)
+	initLogger(*loglevel)
 
-	log(1, "Opening the default HCI device")
+	logrus.Info("Opening the default HCI device")
 	device, err := linux.NewDevice(ble.OptConnectHandler(onConnection), ble.OptDisconnectHandler(onDisconnection))
 	if err != nil {
-		logErr(err)
-		return
+		logrus.Fatal(err)
 	}
 	ble.SetDefaultDevice(device)
 	defer device.Stop()
 
 	if *enroll {
-		log(1, "Generating registration QR code")
+		logrus.Info("Generating registration QR code")
 
 		rbytes, err := getTPMRandom(32)
 		if err != nil {
-			logErr(err)
-			return
+			logrus.Fatal(err)
 		}
 		key, iv := rbytes[0:16], rbytes[16:32]
 
 		mac := device.Address().String()
-		log(2, "HCI's MAC address:", mac)
 
 		qrcode, err := generateRegistrationQR(key, iv, mac)
 		if err != nil {
-			logErr(err)
-			return
+			logrus.Fatal(err)
 		}
 		fmt.Println(qrcode)
 	}
 
-	log(1, "Registering ultrablue service")
+	logrus.Info("Registering ultrablue service and characteristics")
 	ultrablueSvc := ble.NewService(ultrablueSvcUUID)
 
 	errc := make(chan error)
@@ -79,20 +87,19 @@ func main() {
 	ultrablueSvc.AddCharacteristic(responseChr(errc, rspc))
 
 	if err = ble.AddService(ultrablueSvc); err != nil {
-		logErr(err)
-		return
+		logrus.Fatal(err)
 	}
 
-	log(1, "Start advertising")
+	logrus.Info("Start advertising")
 	ctx := ble.WithSigHandler(context.WithCancel(context.Background()))
 	go ble.AdvertiseNameAndServices(ctx, "Ultrablue server", ultrablueSvc.UUID)
 
 	select {
 	case <-ctx.Done():
-		logErr(ctx.Err())
+		logrus.Fatal(ctx.Err())
 	case err := <-errc:
-		logErr(err)
+		logrus.Fatal(err)
 	case <-rspc:
-		log(1, "Attestation succeeded")
+		logrus.Info("Attestation succeeded")
 	}
 }

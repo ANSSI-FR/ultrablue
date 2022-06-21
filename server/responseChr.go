@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/go-ble/ble"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 */
 func responseChr(errc chan error, rspc chan int) *ble.Characteristic {
 
-	log(2, "responseChr")
+	logrus.Debug("Creating new characteristic: responseChr")
 	chr := ble.NewCharacteristic(responseChrUUID)
 
 	// TODO: HandleWrite - Read the attestation response and extend the 9th PCR

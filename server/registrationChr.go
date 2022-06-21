@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/go-ble/ble"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 */
 func registrationChr(cerr chan error) *ble.Characteristic {
 
-	log(2, "registrationChr")
+	logrus.Debug("Creating new characteristic: registrationChr")
 	chr := ble.NewCharacteristic(registrationChrUUID)
 
 	// TODO: HandleRead - Send the EkPub, and the EkCert

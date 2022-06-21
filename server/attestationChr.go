@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/go-ble/ble"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -13,7 +14,7 @@ import (
 */
 func attestationChr(errc chan error) *ble.Characteristic {
 
-	log(2, "attestationChr")
+	logrus.Debug("Creating new characteristic: attestationChr")
 	chr := ble.NewCharacteristic(attestationChrUUID)
 
 	// TODO: HandleWrite - Get a nonce generated on the verifier side, to avoid
