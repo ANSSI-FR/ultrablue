@@ -1,7 +1,35 @@
 // SPDX-FileCopyrightText: 2022 ANSSI
 // SPDX-License-Identifier: Apache-2.0
 
-// The ultrablue-server program starts the Ultrablue server side application.
+/*
+	ARCHITECTURE
+
+	Ultrablue is a client-server application, that operates over
+	Bluetooth Low Energy. This tool acts as the server.
+	Each step of the protocol is implemented in a characteristic,
+	and the client must read/write on those characteristic
+	successively to perform the remote attestation.
+	The protocol diagram can be found in the README.md file.
+
+	Characteristics implementation details:
+
+		- Each characteristic is declared in its own file, ending with Chr.go.
+
+		- As the chunking of the packets is not handled by the ble package,
+		each characteristic maintains its state in the context associated
+		with the connection.
+		It's up to the client to read/write enough times to complete the
+		operation, the server can't drive the communicatin and send every
+		chunks in a for loop.
+		TODO: the server should disconnect the client if it does not follow the expected steps of the protocol
+
+		- The r/w handlers of the characteristics runs in a goroutine, thus
+		errors/success are transmitted to the main routine through channels.
+
+	Note: The server only accepts one simulteanous client.
+*/
+
+// ultrablue-server
 package main
 
 import (
@@ -52,6 +80,7 @@ func main() {
 		logrus.Fatal(err)
 	}
 	ble.SetDefaultDevice(device)
+	device.SetCentralRole()
 	defer device.Stop()
 
 	if *enroll {
