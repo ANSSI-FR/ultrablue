@@ -90,6 +90,9 @@ func getConnectionState(conn ble.Conn) *State {
 		ctx := context.WithValue(connCtx, stateKey, s)
 		conn.SetContext(ctx)
 		connCtx = ctx
+		// Start the attestation protocol that runs in a goroutine
+		// and reads/receives messages through the channel.
+		go ultrablueProtocol(s.ch)
 	}
 	return connCtx.Value(stateKey).(*State)
 }

@@ -44,3 +44,5 @@ When started, the Ultrablue server will do serveral things:
 - **Dashed arrow:** An optional message.
 - **Yellow highlighted text:** An AES encrypted message
 - **Orange highlighted text:** A message encrypted with the EkPub
+
+TODO: Document CBOR encoding, of each message.
