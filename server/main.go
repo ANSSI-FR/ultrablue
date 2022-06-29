@@ -74,27 +74,27 @@ func usage(erl bool) {
 
 	Ultrablue is a client-server application, that operates over
 	Bluetooth Low Energy. This tool acts as the server.
-	The client has the full control over the conversation, thus we
-	implemented some sort of control inversion, with go-routines,
-	channels and objects as follow:
+	Each step of the protocol is implemented in a characteristic,
+	and the client must read/write on those characteristic
+	successively to perform the remote attestation.
+	The protocol diagram can be found in the README.md file.
 
-		- A characteristic is exposed and will handle the read/write
-		operations of the client and the chunking of the packets. It will
-		read/write on a message channel once an operation is complete.
-		The goal of the characteristic is to abstract the BLE transport layer.
+	Characteristics implementation details:
 
-		- A protocol function that will implement the protocol logic. It will
-		be started as a go-routine, each time a new client read or write on the
-		characteristic for the first time.
+		- Each characteristic is declared in its own file, ending with Chr.go.
 
-		- A state structure that contains everything the characteristic and the
-		protocol routines needs to know about the client connection to work
-		together.
+		- As the chunking of the packets is not handled by the ble package,
+		each characteristic maintains its state in the context associated
+		with the connection.
+		It's up to the client to read/write enough times to complete the
+		operation, the server can't drive the communicatin and send every
+		chunks in a for loop.
+		TODO: the server should disconnect the client if it does not follow the expected steps of the protocol
 
-	NOTES:
+		- The r/w handlers of the characteristics runs in a goroutine, thus
+		errors/success are transmitted to the main routine through channels.
 
-		- The server only accepts one simulteanous client.
-		- The protocol diagram can be found in the README.md file.
+	Note: The server only accepts one simulteanous client.
 */
 
 func main() {
@@ -112,6 +112,7 @@ func main() {
 
 	logrus.Info("Registering ultrablue service and characteristic")
 	ultrablueSvc := ble.NewService(ultrablueSvcUUID)
+	ultrablueSvc.AddCharacteristic(UltrablueChr(*mtu))
 	if err := ble.AddService(ultrablueSvc); err != nil {
 		logrus.Fatal(err)
 	}

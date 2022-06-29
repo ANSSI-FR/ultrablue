@@ -38,12 +38,13 @@ func TestSendBLEPacket_OneShot(t *testing.T) {
 		var msg = make([]byte, c.msglen)
 		rand.Read(msg)
 
-		result, err := sendBLEPacket(&c.offset, msg, c.mtu, rw)
+		err := sendBLEPacket(&c.offset, msg, c.mtu, rw)
 		if err != nil {
 			t.Errorf("[%s]: %s", c.name, err)
 		}
-		if result != c.expected {
-			t.Errorf("[%s]: expected: %t, got: %t (msg length: %d, offset: %d, MTU: %d)", c.name, c.expected, result, c.msglen, c.offset, c.mtu)
+		var complete bool = (c.offset == c.msglen)
+		if complete != c.expected {
+			t.Errorf("[%s]: expected: %t, got: %t (msg length: %d, offset: %d, MTU: %d)", c.name, c.expected, complete, c.msglen, c.offset, c.mtu)
 		}
 	}
 }
@@ -70,12 +71,12 @@ func TestSendBLEPacket_RealCases(t *testing.T) {
 		rand.Read(msg)
 
 		for true {
-			complete, err := sendBLEPacket(&offset, msg, c.mtu, rw)
+			err := sendBLEPacket(&offset, msg, c.mtu, rw)
 			result += 1
 			if err != nil {
 				t.Errorf("[%s]: %s", c.name, err)
 			}
-			if complete {
+			if c.msglen == offset {
 				break
 			}
 		}
@@ -129,9 +130,13 @@ func TestRecvBLEPacket_OneShot(t *testing.T) {
 		var req = ble.NewRequest(nil, msg, 0)
 		var buf = make([]byte, 0)
 
-		result := recvBLEPacket(&buf, &c.readlen, req)
-		if result != c.expected {
-			t.Errorf("[%s] - read: %d, msglen: %d | expected: %t, got %t", c.desc, c.readlen, c.msglen, c.expected, result)
+		err := recvBLEPacket(&buf, &c.readlen, req)
+		if err != nil {
+			t.Error(err)
+		}
+		var complete bool = len(buf) == c.readlen
+		if complete != c.expected {
+			t.Errorf("[%s] - read: %d, msglen: %d | expected: %t, got %t", c.desc, c.readlen, c.msglen, c.expected, complete)
 		}
 		if len(buf) != c.msglen {
 			t.Errorf("[%s] - expected msg of length %d, got %d", c.desc, c.msglen, len(buf))
@@ -162,12 +167,13 @@ func TestRecvBLEPacket_With_SendBLEPacket(t *testing.T) {
 		for counter = 0; completewr == false; counter++ {
 			requestBuffer := bytes.NewBuffer(make([]byte, 0, mtu))
 			rw := ble.NewResponseWriter(requestBuffer)
-			cwr, err := sendBLEPacket(&off, msg, mtu, rw)
+			err := sendBLEPacket(&off, msg, mtu, rw)
 			if err != nil {
 				t.Fatal(err)
 			}
-			completewr = cwr
-			completerd = recvBLEPacket(&out, &ml, ble.NewRequest(nil, requestBuffer.Bytes(), 0))
+			completewr = off == msglen
+			err = recvBLEPacket(&out, &ml, ble.NewRequest(nil, requestBuffer.Bytes(), 0))
+			completerd = len(out) == msglen
 		}
 
 		// Test read completeness
