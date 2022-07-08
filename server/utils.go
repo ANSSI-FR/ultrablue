@@ -6,8 +6,27 @@ package main
 import (
 	"fmt"
 
+	"github.com/google/go-tpm/tpm2"
 	"github.com/skip2/go-qrcode"
 )
+
+/*
+   getTPMRandom gets @size random bytes from the TPM.
+   This function is used to generate AES keys and IVs.
+*/
+func getTPMRandom(size uint16) ([]byte, error) {
+	rwc, err := tpm2.OpenTPM()
+	if err != nil {
+		return nil, err
+	}
+	defer rwc.Close()
+
+	rbytes, err := tpm2.GetRandom(rwc, size)
+	if err != nil {
+		return nil, err
+	}
+	return rbytes, nil
+}
 
 /*
 	generateQRCode generates a QR code containing the
