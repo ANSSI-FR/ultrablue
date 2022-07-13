@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavHostController
+import androidx.navigation.findNavController
 import com.example.ultrablue.ConnData
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -25,7 +27,6 @@ class DeviceListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.action_bar, menu)
-        activity?.title = "Your devices"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -57,6 +58,14 @@ class DeviceListFragment : Fragment() {
             .show()
     }
 
+    /*
+        When receiving QR code data, this function chekcs for potential
+        errors, which can be:
+            - Scanning error
+            - Invalid received data
+        If an error occurred, an alert is displayed.
+        Otherwise, we navigate to the protocol fragment.
+     */
     private fun onQRCodeScannerResult(result: QRResult) {
         when(result) {
             is QRResult.QRSuccess -> {
@@ -65,7 +74,8 @@ class DeviceListFragment : Fragment() {
                 if (cd == null) {
                     showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_invalid_message))
                 } else {
-                    Log.d("DEBUG", "Found registration data: ${cd.getAddr()}")
+                    val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
+                    nc.navigate(R.id.action_deviceListFragment_to_protocolFragment)
                 }
             }
             is QRResult.QRError ->
