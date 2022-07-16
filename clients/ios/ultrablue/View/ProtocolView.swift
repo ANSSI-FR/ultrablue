@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct ProtocolView: View {
+    var device: Device?
+    
     var body: some View {
         Text("Protocol View")
+            .navigationBarTitle(device != nil ? "Attestation" : "Enrollment", displayMode: .inline)
     }
 }
 

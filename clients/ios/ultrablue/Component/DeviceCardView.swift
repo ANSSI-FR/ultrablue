@@ -14,19 +14,22 @@ struct FlatLinkStyle: ButtonStyle {
 }
 
 struct DeviceCardView: View {
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var showProtocolView = false
     @State private var showDeviceView = false
+        
+    var device: Device
     
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
-                Text("Device Name")
+                Text(device.name!)
                     .font(.system(size: 24))
                     .foregroundColor(Color(UIColor.label))
                     .bold()
                     .padding(.leading, 20)
                     .padding(.top, 20)
-                Text("6f:3b:ff:0a:82:6c")
+                Text(device.addr!)
                     .font(.system(size: 16))
                     .foregroundColor(Color(UIColor.label))
                     .padding(.bottom, 20)
@@ -63,10 +66,10 @@ struct DeviceCardView: View {
                 showDeviceInfo()
             }
         }
-        NavigationLink(destination: ProtocolView(), isActive: $showProtocolView) {
+        NavigationLink(destination: ProtocolView(device: device), isActive: $showProtocolView) {
             EmptyView()
         }
-        NavigationLink(destination: DeviceView(), isActive: $showDeviceView) {
+        NavigationLink(destination: DeviceView(device: device), isActive: $showDeviceView) {
             EmptyView()
         }
     }
@@ -82,12 +85,18 @@ struct DeviceCardView: View {
     }
     
     private func deleteDevice() {
-        print("delete device")
+        viewContext.delete(device)
+        do {
+            try viewContext.save()
+        } catch {
+            // TODO: Show an alert
+            print("Failed to delete device")
+        }
     }
 }
 
 struct DeviceCardView_Previews: PreviewProvider {
     static var previews: some View {
-        DeviceCardView()
+        DeviceCardView(device: Device())
     }
 }

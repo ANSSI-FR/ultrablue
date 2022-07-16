@@ -11,9 +11,9 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Device.id, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Item>
+    private var devices: FetchedResults<Device>
 
     var body: some View {
         TabView {

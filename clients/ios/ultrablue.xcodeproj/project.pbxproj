@@ -13,6 +13,7 @@
 		263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A328820CCD005E6A2D /* DeviceListView.swift */; };
 		263212A828820DD2005E6A2D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A728820DD2005E6A2D /* SettingsView.swift */; };
 		265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD372882B30C001A25CD /* ProtocolView.swift */; };
+		265FCD3E28831927001A25CD /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD3D28831927001A25CD /* Name.swift */; };
 		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
 		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
 		269650A82879E02E00A6C399 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 269650A72879E02E00A6C399 /* Assets.xcassets */; };
@@ -47,6 +48,7 @@
 		263212A328820CCD005E6A2D /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
 		263212A728820DD2005E6A2D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		265FCD372882B30C001A25CD /* ProtocolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolView.swift; sourceTree = "<group>"; };
+		265FCD3D28831927001A25CD /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
 		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
 		269650A52879E02900A6C399 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -107,6 +109,14 @@
 			path = Component;
 			sourceTree = "<group>";
 		};
+		265FCD3C288318D9001A25CD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				265FCD3D28831927001A25CD /* Name.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		269650972879E02900A6C399 = {
 			isa = PBXGroup;
 			children = (
@@ -130,6 +140,7 @@
 		269650A22879E02900A6C399 /* ultrablue */ = {
 			isa = PBXGroup;
 			children = (
+				265FCD3C288318D9001A25CD /* Model */,
 				263212A628820D2A005E6A2D /* Component */,
 				263212A528820CD7005E6A2D /* View */,
 				269650A32879E02900A6C399 /* ultrablueApp.swift */,
@@ -306,6 +317,7 @@
 				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
 				263212A828820DD2005E6A2D /* SettingsView.swift in Sources */,
 				269650AD2879E02E00A6C399 /* Persistence.swift in Sources */,
+				265FCD3E28831927001A25CD /* Name.swift in Sources */,
 				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
 				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
 				269650A62879E02900A6C399 /* ContentView.swift in Sources */,
