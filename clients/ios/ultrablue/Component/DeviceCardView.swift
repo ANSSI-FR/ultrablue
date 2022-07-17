@@ -23,14 +23,14 @@ struct DeviceCardView: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
-                Text(device.name!)
+                Text(device.name ?? "")
                     .font(.system(size: 24))
                     .foregroundColor(Color(UIColor.label))
                     .bold()
                     .padding(.leading, 20)
                     .padding(.top, 20)
                     .padding(.bottom, 2)
-                Text(device.addr!)
+                Text(device.addr ?? "")
                     .font(.system(size: 16))
                     .foregroundColor(Color(UIColor.label))
                     .padding(.bottom, 10)

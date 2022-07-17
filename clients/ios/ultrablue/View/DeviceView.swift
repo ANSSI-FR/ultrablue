@@ -14,9 +14,11 @@ struct DeviceView: View {
     var body: some View {
         ScrollView {
             VStack {
-                ContentCard(title: "name", content: device.name!)
+                ContentCard(title: "name", content: device.name ?? "")
                     .padding(.bottom, 10)
-                ContentCard(title: "address", content: device.addr!.trimmingCharacters(in: .newlines))
+                ContentCard(title: "address", content: (device.addr ?? "").trimmingCharacters(in: .newlines))
+                    .padding(.bottom, 10)
+                ContentCard(title: "PCR policy", content: Policy(device.pcrpolicy).toString())
                     .padding(.bottom, 10)
                 ContentCard(title: "Endorsement key", content: "N/A")
                     .padding(.bottom, 10)
@@ -35,7 +37,7 @@ struct DeviceView: View {
                     Image(systemName: "pencil")
                 })
                 .sheet(isPresented: $isEditing, content: {
-                    DeviceEditView(newName: device.name!, device: device)
+                    DeviceEditView(newName: device.name!, device: device, policy: Policy(device.pcrpolicy).toBoolArray())
                 })
             }
         }

@@ -59,6 +59,7 @@ struct DeviceListView: View {
                 device.id = UUID()
                 device.addr = result.string
                 device.name = Name.generate()
+                device.pcrpolicy = Policy(.strict).value
                 do {
                     try viewContext.save()
                 } catch {

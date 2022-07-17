@@ -17,6 +17,9 @@
 		265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD4228832BA0001A25CD /* ContentCard.swift */; };
 		2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9F92883F18A009BBB4A /* DeviceEditView.swift */; };
 		2679B9FD2884200F009BBB4A /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 2679B9FC2884200F009BBB4A /* Introspect */; };
+		2679B9FF288444BF009BBB4A /* Policy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9FE288444BF009BBB4A /* Policy.swift */; };
+		2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0028845A14009BBB4A /* PCREntryCard.swift */; };
+		2679BA0328845E38009BBB4A /* PCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0228845E37009BBB4A /* PCR.swift */; };
 		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
 		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
 		269650A82879E02E00A6C399 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 269650A72879E02E00A6C399 /* Assets.xcassets */; };
@@ -54,6 +57,9 @@
 		265FCD3D28831927001A25CD /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
 		265FCD4228832BA0001A25CD /* ContentCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCard.swift; sourceTree = "<group>"; };
 		2679B9F92883F18A009BBB4A /* DeviceEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEditView.swift; sourceTree = "<group>"; };
+		2679B9FE288444BF009BBB4A /* Policy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Policy.swift; sourceTree = "<group>"; };
+		2679BA0028845A14009BBB4A /* PCREntryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCREntryCard.swift; sourceTree = "<group>"; };
+		2679BA0228845E37009BBB4A /* PCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCR.swift; sourceTree = "<group>"; };
 		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
 		269650A52879E02900A6C399 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -113,6 +119,7 @@
 			children = (
 				2632129F28807355005E6A2D /* DeviceCardView.swift */,
 				265FCD4228832BA0001A25CD /* ContentCard.swift */,
+				2679BA0028845A14009BBB4A /* PCREntryCard.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -121,6 +128,8 @@
 			isa = PBXGroup;
 			children = (
 				265FCD3D28831927001A25CD /* Name.swift */,
+				2679B9FE288444BF009BBB4A /* Policy.swift */,
+				2679BA0228845E37009BBB4A /* PCR.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -324,6 +333,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */,
+				2679BA0328845E38009BBB4A /* PCR.swift in Sources */,
 				265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */,
 				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
 				263212A828820DD2005E6A2D /* SettingsView.swift in Sources */,
@@ -331,9 +341,11 @@
 				265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */,
 				265FCD3E28831927001A25CD /* Name.swift in Sources */,
 				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
+				2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */,
 				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
 				269650A62879E02900A6C399 /* ContentView.swift in Sources */,
 				269650B02879E02E00A6C399 /* ultrablue.xcdatamodeld in Sources */,
+				2679B9FF288444BF009BBB4A /* Policy.swift in Sources */,
 				269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -4,8 +4,9 @@
         <attribute name="addr" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="pcrpolicy" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <elements>
-        <element name="Device" positionX="-45" positionY="9" width="128" height="74"/>
+        <element name="Device" positionX="-45" positionY="9" width="128" height="89"/>
     </elements>
 </model>
