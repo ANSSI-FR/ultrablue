@@ -14,6 +14,9 @@
 		263212A828820DD2005E6A2D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A728820DD2005E6A2D /* SettingsView.swift */; };
 		265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD372882B30C001A25CD /* ProtocolView.swift */; };
 		265FCD3E28831927001A25CD /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD3D28831927001A25CD /* Name.swift */; };
+		265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD4228832BA0001A25CD /* ContentCard.swift */; };
+		2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9F92883F18A009BBB4A /* DeviceEditView.swift */; };
+		2679B9FD2884200F009BBB4A /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 2679B9FC2884200F009BBB4A /* Introspect */; };
 		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
 		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
 		269650A82879E02E00A6C399 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 269650A72879E02E00A6C399 /* Assets.xcassets */; };
@@ -49,6 +52,8 @@
 		263212A728820DD2005E6A2D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		265FCD372882B30C001A25CD /* ProtocolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolView.swift; sourceTree = "<group>"; };
 		265FCD3D28831927001A25CD /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
+		265FCD4228832BA0001A25CD /* ContentCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCard.swift; sourceTree = "<group>"; };
+		2679B9F92883F18A009BBB4A /* DeviceEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEditView.swift; sourceTree = "<group>"; };
 		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
 		269650A52879E02900A6C399 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -69,6 +74,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2632129C287DD6FF005E6A2D /* CodeScanner in Frameworks */,
+				2679B9FD2884200F009BBB4A /* Introspect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +103,7 @@
 				263212A328820CCD005E6A2D /* DeviceListView.swift */,
 				263212A728820DD2005E6A2D /* SettingsView.swift */,
 				265FCD372882B30C001A25CD /* ProtocolView.swift */,
+				2679B9F92883F18A009BBB4A /* DeviceEditView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -105,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				2632129F28807355005E6A2D /* DeviceCardView.swift */,
+				265FCD4228832BA0001A25CD /* ContentCard.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -195,6 +203,7 @@
 			name = ultrablue;
 			packageProductDependencies = (
 				2632129B287DD6FF005E6A2D /* CodeScanner */,
+				2679B9FC2884200F009BBB4A /* Introspect */,
 			);
 			productName = ultrablue;
 			productReference = 269650A02879E02900A6C399 /* ultrablue.app */;
@@ -270,6 +279,7 @@
 			mainGroup = 269650972879E02900A6C399;
 			packageReferences = (
 				2632129A287DD6FF005E6A2D /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				2679B9FB2884200F009BBB4A /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = 269650A12879E02900A6C399 /* Products */;
 			projectDirPath = "";
@@ -313,10 +323,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */,
 				265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */,
 				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
 				263212A828820DD2005E6A2D /* SettingsView.swift in Sources */,
 				269650AD2879E02E00A6C399 /* Persistence.swift in Sources */,
+				265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */,
 				265FCD3E28831927001A25CD /* Name.swift in Sources */,
 				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
 				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
@@ -659,6 +671,14 @@
 				kind = branch;
 			};
 		};
+		2679B9FB2884200F009BBB4A /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -666,6 +686,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2632129A287DD6FF005E6A2D /* XCRemoteSwiftPackageReference "CodeScanner" */;
 			productName = CodeScanner;
+		};
+		2679B9FC2884200F009BBB4A /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2679B9FB2884200F009BBB4A /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -18,7 +18,7 @@ struct DeviceCardView: View {
     @State private var showProtocolView = false
     @State private var showDeviceView = false
         
-    var device: Device
+    @StateObject var device: Device
     
     var body: some View {
         HStack(alignment: .top) {
@@ -29,10 +29,11 @@ struct DeviceCardView: View {
                     .bold()
                     .padding(.leading, 20)
                     .padding(.top, 20)
+                    .padding(.bottom, 2)
                 Text(device.addr!)
                     .font(.system(size: 16))
                     .foregroundColor(Color(UIColor.label))
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 10)
                     .padding(.leading, 20)
             }
             Spacer()
@@ -60,11 +61,8 @@ struct DeviceCardView: View {
                 Image(systemName: "trash.fill")
             }
         }
-        .hoverEffect(.highlight)
         .onTapGesture {
-            withAnimation(.linear) {
-                showDeviceInfo()
-            }
+            showDeviceInfo()
         }
         NavigationLink(destination: ProtocolView(device: device), isActive: $showProtocolView) {
             EmptyView()
@@ -75,12 +73,10 @@ struct DeviceCardView: View {
     }
     
     private func runAttestation() {
-        print("run attestation")
         self.showProtocolView = true
     }
     
     private func showDeviceInfo() {
-        print("show device info")
         self.showDeviceView = true
     }
     
