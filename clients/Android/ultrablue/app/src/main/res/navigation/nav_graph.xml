@@ -22,7 +22,13 @@
         android:id="@+id/protocolFragment"
         android:name="com.example.ultrablue.fragments.ProtocolFragment"
         android:label="@string/fragment_protocol_label"
-        tools:layout="@layout/fragment_protocol"/>
+        tools:layout="@layout/fragment_protocol">
+        <argument
+            android:name="device"
+            app:argType="com.example.ultrablue.database.Device"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
     <fragment
         android:id="@+id/deviceFragment"
         android:name="com.example.ultrablue.fragments.DeviceFragment"
