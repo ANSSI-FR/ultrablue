@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Ultrablue</string>
     <string name="enroll_action_bar_item_title">Enroll</string>
+    <string name="qrcode_scanner_subtitle">Scan the registration QR code from ultrablue-server application</string>
 </resources>
