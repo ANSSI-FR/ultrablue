@@ -1,0 +1,76 @@
+package com.example.ultrablue
+
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.constraintlayout.utils.widget.ImageFilterButton
+import androidx.recyclerview.widget.RecyclerView
+import com.example.ultrablue.database.Device
+
+/*
+    Allows to dispatch clicks on specific ViewHolder CardView, and handle them
+    from the fragment that contains the recyclerview (DeviceListFragment).
+ */
+interface ItemClickListener {
+
+    // Which section of the CardView has been clicked.
+    enum class Target {
+        ATTESTATION_BUTTON, DETAILS_BUTTON, CARD_VIEW
+    }
+
+    fun onClick(id: Target, device: Device)
+}
+
+/*
+    This Adapter manages a list of DeviceViewCards (defined in the res/layout folder).
+    It derives from a RecyclerView Adapter for optimisation reasons.
+ */
+class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DeviceAdapter.ViewHolder>() {
+    // The list of registered devices to display.
+    private var deviceList = emptyList<Device>()
+
+    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+        var nameTextView: TextView = itemView.findViewById(R.id.device_name)
+        var addrTextView: TextView = itemView.findViewById(R.id.device_addr)
+        val attestationButton: ImageButton = itemView.findViewById(R.id.attestation_button)
+        var detailsButton: ImageButton = itemView.findViewById(R.id.details_button)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.device_card_view, parent, false)
+        return ViewHolder(view)
+    }
+
+    // Instantiate a specific DeviceViewCard.
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val device = deviceList[position]
+
+        holder.nameTextView.text = device.name
+        holder.addrTextView.text = device.addr
+
+        holder.itemView.setOnClickListener {
+            itemClickListener.onClick(ItemClickListener.Target.CARD_VIEW, device)
+        }
+        holder.attestationButton.setOnClickListener {
+            itemClickListener.onClick(ItemClickListener.Target.ATTESTATION_BUTTON, device)
+        }
+        holder.detailsButton.setOnClickListener {
+            itemClickListener.onClick(ItemClickListener.Target.DETAILS_BUTTON, device)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return deviceList.size
+    }
+
+    fun setRegisteredDevices(devices: List<Device>) {
+        this.deviceList = devices
+        notifyDataSetChanged()
+    }
+}
