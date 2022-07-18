@@ -1,14 +1,18 @@
 package com.example.ultrablue.fragments
 
 import android.app.AlertDialog
-import com.example.ultrablue.R
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import androidx.navigation.findNavController
 import com.example.ultrablue.ConnData
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.ultrablue.*
+import com.example.ultrablue.database.Device
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat
@@ -17,18 +21,25 @@ import io.github.g00fy2.quickie.config.ScannerConfig
 /*
 * This fragment displays a list of registered devices.
 * */
-class DeviceListFragment : Fragment() {
+class DeviceListFragment : Fragment(), ItemClickListener {
     private val scanner = registerForActivityResult(ScanCustomCode(), ::onQRCodeScannerResult)
+    private var viewModel: DeviceViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_device_list, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpDeviceRecyclerView(view)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.action_bar, menu)
     }
 
+    // Handles clicks on action bar items.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             // The + button has been clicked
@@ -37,6 +48,14 @@ class DeviceListFragment : Fragment() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // Handle clicks on a specific device card.
+    override fun onClick(id: ItemClickListener.Target, device: Device) {
+        when (id) {
+            ItemClickListener.Target.ATTESTATION_BUTTON -> Log.d("DEBUG", "Start attestation for device ${device.uid}")
+            ItemClickListener.Target.CARD_VIEW, ItemClickListener.Target.DETAILS_BUTTON -> Log.d("DEBUG", "Show device details for device ${device.uid}")
         }
     }
 
@@ -84,5 +103,16 @@ class DeviceListFragment : Fragment() {
                 showErrorPopup("Missing camera permission", getString(R.string.qrcode_error_camera_permission_message))
             is QRResult.QRUserCanceled -> { }
         }
+    }
+
+    private fun setUpDeviceRecyclerView(view: View) {
+        val recyclerview = view.findViewById<RecyclerView>(R.id.recyclerview)
+        val adapter = DeviceAdapter(this)
+        recyclerview.layoutManager = LinearLayoutManager(requireContext())
+        viewModel = (activity as MainActivity).viewModel
+        viewModel?.allDevices?.observe(viewLifecycleOwner, Observer { items ->
+            adapter.setRegisteredDevices(items)
+        })
+        recyclerview.adapter = adapter
     }
 }
