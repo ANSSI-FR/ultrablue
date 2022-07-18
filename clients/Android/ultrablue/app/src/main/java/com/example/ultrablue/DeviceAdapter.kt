@@ -1,14 +1,18 @@
 package com.example.ultrablue
 
-import android.util.TypedValue
+import android.R.attr.button
+import android.R.attr.radius
+import android.R.attr.strokeWidth
+import android.R.color
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.constraintlayout.utils.widget.ImageFilterButton
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ultrablue.database.Device
 
@@ -20,7 +24,7 @@ interface ItemClickListener {
 
     // Which section of the CardView has been clicked.
     enum class Target {
-        ATTESTATION_BUTTON, DETAILS_BUTTON, CARD_VIEW
+        ATTESTATION_BUTTON, TRASH_BUTTON, CARD_VIEW
     }
 
     fun onClick(id: Target, device: Device)
@@ -38,7 +42,7 @@ class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Ada
         var nameTextView: TextView = itemView.findViewById(R.id.device_name)
         var addrTextView: TextView = itemView.findViewById(R.id.device_addr)
         val attestationButton: ImageButton = itemView.findViewById(R.id.attestation_button)
-        var detailsButton: ImageButton = itemView.findViewById(R.id.details_button)
+        var trashButton: ImageButton = itemView.findViewById(R.id.trash_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,11 +61,50 @@ class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Ada
         holder.itemView.setOnClickListener {
             itemClickListener.onClick(ItemClickListener.Target.CARD_VIEW, device)
         }
+        // Add a visual effect on each DeviceCardView tap, canceled on release.
+        holder.itemView.setOnTouchListener {view, motionEvent ->
+            val elevationDelta = 10
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> view.elevation -= elevationDelta
+                MotionEvent.ACTION_UP -> {
+                    view.elevation += elevationDelta
+                    view.performClick()
+                }
+                MotionEvent.ACTION_CANCEL -> view.elevation += elevationDelta
+            }
+            true
+        }
+
         holder.attestationButton.setOnClickListener {
             itemClickListener.onClick(ItemClickListener.Target.ATTESTATION_BUTTON, device)
         }
-        holder.detailsButton.setOnClickListener {
-            itemClickListener.onClick(ItemClickListener.Target.DETAILS_BUTTON, device)
+        // Change the button color on tap, and revert it on release.
+        holder.attestationButton.setOnTouchListener {view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_play_solid_selected)
+                MotionEvent.ACTION_UP -> {
+                    view.setBackgroundResource(R.drawable.ic_play_solid)
+                    view.performClick()
+                }
+                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_play_solid)
+            }
+            true
+        }
+
+        holder.trashButton.setOnClickListener {
+            itemClickListener.onClick(ItemClickListener.Target.TRASH_BUTTON, device)
+        }
+        // Change the button color on tap, and revert it on release.
+        holder.trashButton.setOnTouchListener {view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_trash_solid_selected)
+                MotionEvent.ACTION_UP -> {
+                    view.setBackgroundResource(R.drawable.ic_trash_solid)
+                    view.performClick()
+                }
+                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_trash_solid)
+            }
+            true
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
@@ -54,8 +55,13 @@ class DeviceListFragment : Fragment(), ItemClickListener {
     // Handle clicks on a specific device card.
     override fun onClick(id: ItemClickListener.Target, device: Device) {
         when (id) {
+            ItemClickListener.Target.CARD_VIEW -> {
+                val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
+                val bundle = bundleOf("device" to device)
+                nc.navigate(R.id.action_deviceListFragment_to_deviceFragment, bundle)
+            }
             ItemClickListener.Target.ATTESTATION_BUTTON -> Log.d("DEBUG", "Start attestation for device ${device.uid}")
-            ItemClickListener.Target.CARD_VIEW, ItemClickListener.Target.DETAILS_BUTTON -> Log.d("DEBUG", "Show device details for device ${device.uid}")
+            ItemClickListener.Target.TRASH_BUTTON -> Log.d("DEBUG", "Delete device ${device.uid}")
         }
     }
 

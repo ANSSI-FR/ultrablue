@@ -43,22 +43,20 @@
 
         <ImageButton
             android:id="@+id/attestation_button"
-            android:layout_width="20dp"
-            android:layout_height="26dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             app:layout_constraintRight_toRightOf="parent"
             android:background="@drawable/ic_play_solid"
-            android:backgroundTint="@color/teal_700"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/details_button"
+            android:id="@+id/trash_button"
             android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_height="23dp"
             android:layout_marginTop="20dp"
             app:layout_constraintRight_toRightOf="parent"
-            android:background="@drawable/ic_magnifying_glass_solid"
-            android:backgroundTint="@color/teal_700"
+            android:background="@drawable/ic_trash_solid"
             app:layout_constraintTop_toBottomOf="@id/attestation_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
