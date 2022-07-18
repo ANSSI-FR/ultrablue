@@ -30,4 +30,8 @@ class DeviceViewModel(application: Application): AndroidViewModel(application) {
     fun delete(device: Device) = viewModelScope.launch {
         repo.delete(device)
     }
+
+    fun rename(device: Device, name: String) {
+        repo.setName(device, name)
+    }
 }

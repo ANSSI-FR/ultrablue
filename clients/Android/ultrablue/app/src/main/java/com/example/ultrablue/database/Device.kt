@@ -10,6 +10,6 @@ import java.io.Serializable
 data class Device (
     @PrimaryKey(autoGenerate = true)
     val uid: Int,
-    val name: String, // user-defined device name
+    var name: String, // user-defined device name
     val addr: String, // MAC address
 ) : Serializable

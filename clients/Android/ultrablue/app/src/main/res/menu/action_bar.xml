@@ -6,4 +6,10 @@
         android:icon="@drawable/ic_plus_solid"
         app:showAsAction="always"
     />
+    <item
+        android:title="@string/edit_action_bar_item_title"
+        android:id="@+id/action_edit"
+        android:icon="@drawable/ic_pen_solid"
+        app:showAsAction="always"
+        />
 </menu>

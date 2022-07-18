@@ -33,12 +33,18 @@ class DeviceListFragment : Fragment(), ItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = (activity as MainActivity).viewModel
         setUpDeviceRecyclerView(view)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.action_bar, menu)
     }
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.findItem(R.id.action_edit).isVisible = false
+        super.onPrepareOptionsMenu(menu)
+    }
+
 
     // Handles clicks on action bar items.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -60,8 +66,23 @@ class DeviceListFragment : Fragment(), ItemClickListener {
                 val bundle = bundleOf("device" to device)
                 nc.navigate(R.id.action_deviceListFragment_to_deviceFragment, bundle)
             }
-            ItemClickListener.Target.ATTESTATION_BUTTON -> Log.d("DEBUG", "Start attestation for device ${device.uid}")
-            ItemClickListener.Target.TRASH_BUTTON -> Log.d("DEBUG", "Delete device ${device.uid}")
+            ItemClickListener.Target.ATTESTATION_BUTTON  -> {
+                val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
+                val bundle = bundleOf("device" to device)
+                nc.navigate(R.id.action_deviceListFragment_to_protocolFragment, bundle)
+            }
+            ItemClickListener.Target.TRASH_BUTTON  -> {
+                val alertDialogBuilder = AlertDialog.Builder(activity)
+                // TODO: Extract string to app resources
+                alertDialogBuilder
+                    .setTitle("Delete")
+                    .setMessage("Are you sure you want to delete ${device.name}?\nThis action is irreversible.")
+                    .setPositiveButton("Delete") { _, _ ->
+                        viewModel?.delete(device)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
         }
     }
 
@@ -115,7 +136,6 @@ class DeviceListFragment : Fragment(), ItemClickListener {
         val recyclerview = view.findViewById<RecyclerView>(R.id.recyclerview)
         val adapter = DeviceAdapter(this)
         recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        viewModel = (activity as MainActivity).viewModel
         viewModel?.allDevices?.observe(viewLifecycleOwner, Observer { items ->
             adapter.setRegisteredDevices(items)
         })
