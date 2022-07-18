@@ -2,4 +2,8 @@
     <string name="app_name">Ultrablue</string>
     <string name="enroll_action_bar_item_title">Enroll</string>
     <string name="qrcode_scanner_subtitle">Scan the registration QR code from ultrablue-server application</string>
+    <string name="qrcode_error_camera_permission_message">You must grant the camera permission for ultrablue.\n\nultrablue > App info > Permissions </string>
+    <string name="qrcode_error_failure_message">An error occurred while reading the QR code.</string>
+    <string name="qrcode_error_invalid_message">Oops, this QR code is not recognized. Please scan a valid registration QR code</string>
+
 </resources>
