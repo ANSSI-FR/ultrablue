@@ -1,11 +1,11 @@
-package com.example.ultrablue.fragments
+package fr.gouv.ssi.ultrablue.fragments
 
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import com.example.ultrablue.MainActivity
-import com.example.ultrablue.R
-import com.example.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.MainActivity
+import fr.gouv.ssi.ultrablue.R
+import fr.gouv.ssi.ultrablue.database.Device
 
 /*
     This fragment performs the Ultrablue attestation protocol.

@@ -1,4 +1,4 @@
-package com.example.ultrablue.fragments
+package fr.gouv.ssi.ultrablue.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -9,11 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import androidx.navigation.findNavController
-import com.example.ultrablue.ConnData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ultrablue.*
-import com.example.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.*
+import fr.gouv.ssi.ultrablue.database.Device
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat

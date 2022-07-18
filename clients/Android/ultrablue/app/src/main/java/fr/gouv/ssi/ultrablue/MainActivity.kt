@@ -1,4 +1,4 @@
-package com.example.ultrablue
+package fr.gouv.ssi.ultrablue
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
