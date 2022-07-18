@@ -1,4 +1,4 @@
-package com.example.ultrablue.database
+package fr.gouv.ssi.ultrablue.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

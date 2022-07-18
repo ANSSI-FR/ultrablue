@@ -8,7 +8,8 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.ultrablue"
+        applicationId "fr.gouv.ssi.ultrablue"
+        namespace "fr.gouv.ssi.ultrablue"
         minSdk 30
         targetSdk 32
         versionCode 1

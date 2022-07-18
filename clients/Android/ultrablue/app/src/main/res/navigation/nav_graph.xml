@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/deviceListFragment"
-        android:name="com.example.ultrablue.fragments.DeviceListFragment"
+        android:name="fr.gouv.ssi.ultrablue.fragments.DeviceListFragment"
         android:label="@string/fragment_device_list_label"
         tools:layout="@layout/fragment_device_list">
         <action
@@ -20,22 +20,22 @@
     </fragment>
     <fragment
         android:id="@+id/protocolFragment"
-        android:name="com.example.ultrablue.fragments.ProtocolFragment"
+        android:name="fr.gouv.ssi.ultrablue.fragments.ProtocolFragment"
         android:label="@string/fragment_protocol_label"
         tools:layout="@layout/fragment_protocol">
         <argument
             android:name="device"
-            app:argType="com.example.ultrablue.database.Device"
+            app:argType="fr.gouv.ssi.ultrablue.database.Device"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/deviceFragment"
-        android:name="com.example.ultrablue.fragments.DeviceFragment"
+        android:name="fr.gouv.ssi.ultrablue.fragments.DeviceFragment"
         android:label="@string/fragment_device_label"
         tools:layout="@layout/fragment_device" >
         <argument
             android:name="device"
-            app:argType="com.example.ultrablue.database.Device" />
+            app:argType="fr.gouv.ssi.ultrablue.database.Device" />
     </fragment>
 </navigation>

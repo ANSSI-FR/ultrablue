@@ -1,4 +1,4 @@
-package com.example.ultrablue.database
+package fr.gouv.ssi.ultrablue.database
 
 import android.content.Context
 import androidx.room.Database

@@ -1,11 +1,11 @@
-package com.example.ultrablue
+package fr.gouv.ssi.ultrablue
 
 import android.annotation.SuppressLint
 import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.database.Device
 
 /*
     Allows to dispatch clicks on specific ViewHolder CardView, and handle them

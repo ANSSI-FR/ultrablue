@@ -1,12 +1,12 @@
-package com.example.ultrablue
+package fr.gouv.ssi.ultrablue
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.ultrablue.database.AppDatabase
-import com.example.ultrablue.database.Device
-import com.example.ultrablue.database.DeviceRepository
+import fr.gouv.ssi.ultrablue.database.AppDatabase
+import fr.gouv.ssi.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.database.DeviceRepository
 import kotlinx.coroutines.launch
 
 /*

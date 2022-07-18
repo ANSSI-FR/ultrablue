@@ -1,4 +1,4 @@
-package com.example.ultrablue.fragments
+package fr.gouv.ssi.ultrablue.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -6,10 +6,10 @@ import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.ultrablue.DeviceViewModel
-import com.example.ultrablue.MainActivity
-import com.example.ultrablue.R
-import com.example.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.DeviceViewModel
+import fr.gouv.ssi.ultrablue.MainActivity
+import fr.gouv.ssi.ultrablue.R
+import fr.gouv.ssi.ultrablue.database.Device
 
 /*
     This fragment displays the details about a specific Device.
