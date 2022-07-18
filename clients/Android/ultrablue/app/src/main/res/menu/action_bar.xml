@@ -4,12 +4,12 @@
         android:title="@string/enroll_action_bar_item_title"
         android:id="@+id/action_add"
         android:icon="@drawable/ic_plus_solid"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
     />
     <item
         android:title="@string/edit_action_bar_item_title"
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_pen_solid"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         />
 </menu>
