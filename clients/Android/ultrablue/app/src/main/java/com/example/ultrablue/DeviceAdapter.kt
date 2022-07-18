@@ -1,16 +1,7 @@
 package com.example.ultrablue
 
-import android.R.attr.button
-import android.R.attr.radius
-import android.R.attr.strokeWidth
-import android.R.color
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.annotation.SuppressLint
+import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +25,7 @@ interface ItemClickListener {
     This Adapter manages a list of DeviceViewCards (defined in the res/layout folder).
     It derives from a RecyclerView Adapter for optimisation reasons.
  */
-class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DeviceAdapter.ViewHolder>() {
+class DeviceAdapter(private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DeviceAdapter.ViewHolder>() {
     // The list of registered devices to display.
     private var deviceList = emptyList<Device>()
 
@@ -52,6 +43,7 @@ class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Ada
     }
 
     // Instantiate a specific DeviceViewCard.
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val device = deviceList[position]
 
@@ -112,6 +104,7 @@ class DeviceAdapter(val itemClickListener: ItemClickListener) : RecyclerView.Ada
         return deviceList.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setRegisteredDevices(devices: List<Device>) {
         this.deviceList = devices
         notifyDataSetChanged()

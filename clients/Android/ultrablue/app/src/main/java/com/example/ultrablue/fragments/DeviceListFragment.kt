@@ -115,15 +115,14 @@ class DeviceListFragment : Fragment(), ItemClickListener {
     private fun onQRCodeScannerResult(result: QRResult) {
         when(result) {
             is QRResult.QRSuccess -> {
-                val cd: ConnData?
-                cd = ConnData.parse(result.content.rawValue)
-                if (cd == null) {
-                    showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_invalid_message))
-                } else {
+                if (isMACAddressValid(result.content.rawValue)) {
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
                     nc.navigate(R.id.action_deviceListFragment_to_protocolFragment)
+                } else {
+                    showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_invalid_message))
                 }
             }
+            // TODO: Extract strings to resources
             is QRResult.QRError ->
                 showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_failure_message))
             is QRResult.QRMissingPermission ->

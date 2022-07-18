@@ -10,5 +10,8 @@
     <string name="fragment_device_list_label">Your devices</string>
     <string name="fragment_protocol_label">Protocol</string>
     <string name="fragment_device_label">Device</string>
+    <string name="attestation_button_desc">Attestation button</string>
+    <string name="delete_button_desc">Delete button</string>
+    <string name="address_title">Address:</string>
 
 </resources>
