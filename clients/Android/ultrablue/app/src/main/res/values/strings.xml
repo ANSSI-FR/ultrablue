@@ -6,7 +6,8 @@
     <string name="qrcode_error_failure_message">An error occurred while reading the QR code.</string>
     <string name="qrcode_error_invalid_message">Oops, this QR code is not recognized. Please scan a valid registration QR code</string>
 
-    <string name="fragment_device_list_title">Your devices</string>
-    <string name="fragment_protocol_title">Protocol</string>
+    <string name="fragment_device_list_label">Your devices</string>
+    <string name="fragment_protocol_label">Protocol</string>
+    <string name="fragment_device_label">Device</string>
 
 </resources>

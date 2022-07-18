@@ -5,15 +5,19 @@
       <map>
         <entry key="../../Android/Sdk/platforms/android-32/data/res/layout/activity_list_item.xml" value="0.175" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2645" />
+        <entry key="app/src/main/res/drawable-v24/ic_trash_solid.xml" value="0.1295" />
+        <entry key="app/src/main/res/drawable-v24/ic_trash_solid_selected.xml" value="0.1295" />
         <entry key="app/src/main/res/drawable/attestation_button.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2645" />
         <entry key="app/src/main/res/drawable/ic_magnifying_glass_solid.xml" value="0.3065" />
         <entry key="app/src/main/res/drawable/ic_play_solid.xml" value="0.3065" />
+        <entry key="app/src/main/res/drawable/ic_play_solid_selected.xml" value="0.175" />
         <entry key="app/src/main/res/drawable/ic_plus_solid.xml" value="0.2645" />
         <entry key="app/src/main/res/drawable/ic_trash_solid.xml" value="0.3065" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16041666666666668" />
-        <entry key="app/src/main/res/layout/device_card_view.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/device_card_view.xml" value="0.14814814814814814" />
         <entry key="app/src/main/res/layout/fragment_attester_list.xml" value="0.3453125" />
+        <entry key="app/src/main/res/layout/fragment_device.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_device_list.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/fragment_protocol.xml" value="0.3458333333333333" />
         <entry key="app/src/main/res/menu/action_bar.xml" value="0.3458333333333333" />
