@@ -6,7 +6,7 @@ import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import fr.gouv.ssi.ultrablue.DeviceViewModel
+import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 import fr.gouv.ssi.ultrablue.MainActivity
 import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
