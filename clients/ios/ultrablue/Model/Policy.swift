@@ -79,6 +79,8 @@ class Policy {
         for i in 0..<10 {
             if self.isPCRSet(index: i) {
                 pcrs.append(String(i))
+            } else {
+                pcrs.append("-")
             }
         }
         return pcrs.joined(separator: "  ")

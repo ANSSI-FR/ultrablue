@@ -31,7 +31,7 @@ struct DeviceCardView: View {
                     .padding(.top, 20)
                     .padding(.bottom, 2)
                 Text(device.addr ?? "")
-                    .font(.system(size: 16))
+                    .font(.system(size: 16, design: .monospaced))
                     .foregroundColor(Color(UIColor.label))
                     .padding(.bottom, 10)
                     .padding(.leading, 20)

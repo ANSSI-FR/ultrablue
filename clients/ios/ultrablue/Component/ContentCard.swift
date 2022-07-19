@@ -18,8 +18,9 @@ struct ContentCard: View {
                     .padding([.top, .leading], 10)
                 Text(content)
                     .foregroundColor(.accentColor)
-                    .font(.system(size: 22))
-                    .padding([.bottom, .leading], 10)
+                    .font(.system(size: 18, design: .monospaced))
+                    .padding([.leading, .bottom], 10)
+                    .padding(.top, 1)
             }
             Spacer()
         }
