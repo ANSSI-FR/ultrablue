@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2609421128870DC400C800EB /* LoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2609421028870DC400C800EB /* LoggerView.swift */; };
 		2632129C287DD6FF005E6A2D /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 2632129B287DD6FF005E6A2D /* CodeScanner */; };
 		263212A028807355005E6A2D /* DeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2632129F28807355005E6A2D /* DeviceCardView.swift */; };
 		263212A228820CBD005E6A2D /* DeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A128820CBD005E6A2D /* DeviceView.swift */; };
@@ -29,6 +30,9 @@
 		269650BA2879E02E00A6C399 /* ultrablueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650B92879E02E00A6C399 /* ultrablueTests.swift */; };
 		269650C42879E02E00A6C399 /* ultrablueUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650C32879E02E00A6C399 /* ultrablueUITests.swift */; };
 		269650C62879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650C52879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift */; };
+		26C934F328919E060064EEB7 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C934F228919E060064EEB7 /* String.swift */; };
+		26E01D2A2885CFD5003A5EA6 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01D292885CFD5003A5EA6 /* Logger.swift */; };
+		26E01D2C2885D6F3003A5EA6 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01D2B2885D6F3003A5EA6 /* LogView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2609421028870DC400C800EB /* LoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerView.swift; sourceTree = "<group>"; };
 		2632129F28807355005E6A2D /* DeviceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCardView.swift; sourceTree = "<group>"; };
 		263212A128820CBD005E6A2D /* DeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceView.swift; sourceTree = "<group>"; };
 		263212A328820CCD005E6A2D /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
@@ -72,6 +77,9 @@
 		269650BF2879E02E00A6C399 /* ultrablueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ultrablueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650C32879E02E00A6C399 /* ultrablueUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueUITests.swift; sourceTree = "<group>"; };
 		269650C52879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		26C934F228919E060064EEB7 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = String.swift; path = ../../String.swift; sourceTree = "<group>"; };
+		26E01D292885CFD5003A5EA6 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		26E01D2B2885D6F3003A5EA6 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +128,8 @@
 				2632129F28807355005E6A2D /* DeviceCardView.swift */,
 				265FCD4228832BA0001A25CD /* ContentCard.swift */,
 				2679BA0028845A14009BBB4A /* PCREntryCard.swift */,
+				26E01D2B2885D6F3003A5EA6 /* LogView.swift */,
+				2609421028870DC400C800EB /* LoggerView.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -127,9 +137,11 @@
 		265FCD3C288318D9001A25CD /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				26C934F228919E060064EEB7 /* String.swift */,
 				265FCD3D28831927001A25CD /* Name.swift */,
 				2679B9FE288444BF009BBB4A /* Policy.swift */,
 				2679BA0228845E37009BBB4A /* PCR.swift */,
+				26E01D292885CFD5003A5EA6 /* Logger.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -332,16 +344,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26C934F328919E060064EEB7 /* String.swift in Sources */,
 				2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */,
 				2679BA0328845E38009BBB4A /* PCR.swift in Sources */,
 				265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */,
 				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
 				263212A828820DD2005E6A2D /* SettingsView.swift in Sources */,
 				269650AD2879E02E00A6C399 /* Persistence.swift in Sources */,
+				26E01D2A2885CFD5003A5EA6 /* Logger.swift in Sources */,
 				265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */,
 				265FCD3E28831927001A25CD /* Name.swift in Sources */,
+				26E01D2C2885D6F3003A5EA6 /* LogView.swift in Sources */,
 				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
 				2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */,
+				2609421128870DC400C800EB /* LoggerView.swift in Sources */,
 				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
 				269650A62879E02900A6C399 /* ContentView.swift in Sources */,
 				269650B02879E02E00A6C399 /* ultrablue.xcdatamodeld in Sources */,

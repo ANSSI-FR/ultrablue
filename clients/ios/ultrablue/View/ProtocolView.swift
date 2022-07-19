@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct ProtocolView: View {
+    @State var logger = Logger()
     var device: Device?
     
     var body: some View {
-        Text("Protocol View")
-            .navigationBarTitle(device != nil ? "Attestation" : "Enrollment", displayMode: .inline)
+        LoggerView(logger: $logger)
     }
 }
 
 struct ProtocolView_Previews: PreviewProvider {
     static var previews: some View {
-        ProtocolView()
+        ProtocolView(device: nil)
     }
 }
