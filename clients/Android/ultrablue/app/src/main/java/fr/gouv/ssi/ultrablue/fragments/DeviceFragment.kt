@@ -50,7 +50,7 @@ class DeviceFragment : Fragment() {
                 nameField.setPadding(30, 30, 30, 30)
                 val alertDialogBuilder = AlertDialog.Builder(activity)
                 alertDialogBuilder
-                    .setTitle("Choose new device name") //TODO: Use resources
+                    .setTitle(R.string.rename_device_dialog_title)
                     .setView(nameField)
                     .setPositiveButton("Ok") { _, _ ->
                         device?.let {

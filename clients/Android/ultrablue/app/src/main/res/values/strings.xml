@@ -4,8 +4,10 @@
     <string name="edit_action_bar_item_title">Edit</string>
     <string name="qrcode_scanner_subtitle">Scan the registration QR code from ultrablue-server application</string>
     <string name="qrcode_error_camera_permission_message">You must grant the camera permission for ultrablue.\n\nultrablue > App info > Permissions </string>
+    <string name="qrcode_error_camera_permission_title">Missing camera permission</string>
     <string name="qrcode_error_failure_message">An error occurred while reading the QR code.</string>
     <string name="qrcode_error_invalid_message">Oops, this QR code is not recognized. Please scan a valid registration QR code</string>
+    <string name="qrcode_error_invalid_title">Invalid QR code</string>
 
     <string name="fragment_device_list_label">Your devices</string>
     <string name="fragment_protocol_label">Protocol</string>
@@ -13,5 +15,12 @@
     <string name="attestation_button_desc">Attestation button</string>
     <string name="delete_button_desc">Delete button</string>
     <string name="address_title">Address:</string>
+
+    <string name="rename_device_dialog_title">Choose new device name</string>
+    <string name="delete_device_dialog_title">Delete</string>
+    <string name="delete_device_dialog_body">"Are you sure you want to delete %s\nThis action is irreversible."</string>
+
+    <string name="delete_label">delete</string>
+    <string name="cancel_label">cancel</string>
 
 </resources>
