@@ -2,7 +2,6 @@ package fr.gouv.ssi.ultrablue.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.gouv.ssi.ultrablue.*
 import fr.gouv.ssi.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat
@@ -113,15 +113,16 @@ class DeviceListFragment : Fragment(), ItemClickListener {
     private fun onQRCodeScannerResult(result: QRResult) {
         when(result) {
             is QRResult.QRSuccess -> {
-                if (isMACAddressValid(result.content.rawValue)) {
+                if (isMACAddressValid(result.content.rawValue.trim())) {
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
-                    nc.navigate(R.id.action_deviceListFragment_to_protocolFragment)
+                    val bundle = bundleOf("address" to result.content.rawValue.trim())
+                    nc.navigate(R.id.action_deviceListFragment_to_protocolFragment, bundle)
                 } else {
-                    showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_invalid_message))
+                    showErrorPopup(getString(R.string.qrcode_error_invalid_title), getString(R.string.qrcode_error_invalid_message))
                 }
             }
             is QRResult.QRError ->
-                showErrorPopup(getString(R.string.qrcode_error_invalid_title), getString(R.string.qrcode_error_failure_message))
+                showErrorPopup(getString(R.string.qrcode_error_failure_title), getString(R.string.qrcode_error_failure_message))
             is QRResult.QRMissingPermission ->
                 showErrorPopup(getString(R.string.qrcode_error_camera_permission_title), getString(R.string.qrcode_error_camera_permission_message))
             is QRResult.QRUserCanceled -> { }

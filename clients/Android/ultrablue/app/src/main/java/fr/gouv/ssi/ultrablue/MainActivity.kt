@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
