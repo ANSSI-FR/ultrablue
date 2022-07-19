@@ -1,4 +1,4 @@
-package fr.gouv.ssi.ultrablue
+package fr.gouv.ssi.ultrablue.database
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
