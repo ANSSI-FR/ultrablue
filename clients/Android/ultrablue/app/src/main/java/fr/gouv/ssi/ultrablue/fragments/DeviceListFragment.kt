@@ -72,14 +72,13 @@ class DeviceListFragment : Fragment(), ItemClickListener {
             }
             ItemClickListener.Target.TRASH_BUTTON  -> {
                 val alertDialogBuilder = AlertDialog.Builder(activity)
-                // TODO: Extract string to app resources
                 alertDialogBuilder
-                    .setTitle("Delete")
-                    .setMessage("Are you sure you want to delete ${device.name}?\nThis action is irreversible.")
-                    .setPositiveButton("Delete") { _, _ ->
+                    .setTitle(R.string.delete_device_dialog_title)
+                    .setMessage(getString(R.string.delete_device_dialog_body, device.name))
+                    .setPositiveButton(R.string.delete_label) { _, _ ->
                         viewModel?.delete(device)
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.cancel_label, null)
                     .show()
             }
         }
@@ -121,11 +120,10 @@ class DeviceListFragment : Fragment(), ItemClickListener {
                     showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_invalid_message))
                 }
             }
-            // TODO: Extract strings to resources
             is QRResult.QRError ->
-                showErrorPopup("Invalid QR code", getString(R.string.qrcode_error_failure_message))
+                showErrorPopup(getString(R.string.qrcode_error_invalid_title), getString(R.string.qrcode_error_failure_message))
             is QRResult.QRMissingPermission ->
-                showErrorPopup("Missing camera permission", getString(R.string.qrcode_error_camera_permission_message))
+                showErrorPopup(getString(R.string.qrcode_error_camera_permission_title), getString(R.string.qrcode_error_camera_permission_message))
             is QRResult.QRUserCanceled -> { }
         }
     }
