@@ -22,6 +22,6 @@
     <string name="delete_device_dialog_body">"Are you sure you want to delete %s\nThis action is irreversible."</string>
 
     <string name="delete_label">delete</string>
-    <string name="cancel_label">cancel</string>
+    <string name="cancel_label">Cancel</string>
 
 </resources>
