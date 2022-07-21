@@ -37,9 +37,5 @@
         <argument
             android:name="device"
             app:argType="fr.gouv.ssi.ultrablue.database.Device" />
-        <argument
-            android:name="address"
-            app:argType="string"
-            app:nullable="true" />
     </fragment>
 </navigation>
