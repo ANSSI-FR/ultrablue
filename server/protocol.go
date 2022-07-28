@@ -5,8 +5,10 @@ package main
 
 import (
 	"bytes"
+	"crypto/rsa"
 	"errors"
 	"os"
+	"reflect"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/google/go-attestation/attest"
@@ -80,6 +82,22 @@ func recvMsg[T any](obj *T, ch chan []byte) error {
 	again.
 */
 
+type EK struct {
+	Cert []byte
+	N    []byte
+	E    int
+}
+
+func parseAttestEK(ek *attest.EK) (EK, error) {
+	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
+		return EK{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
+	}
+	var c = ek.Certificate.Raw
+	var n = ek.Public.(*rsa.PublicKey).N.Bytes()
+	var e = ek.Public.(*rsa.PublicKey).E
+	return EK{c, n, e}, nil
+}
+
 func registration(ch chan []byte, tpm *attest.TPM) error {
 	logrus.Info("Retrieving EK pub and EK cert")
 	eks, err := tpm.EKs()
@@ -88,9 +106,15 @@ func registration(ch chan []byte, tpm *attest.TPM) error {
 		return err
 	}
 	logrus.Info("Sending EK pub and EK cert")
+
 	// Any key should do the job in principle, use the first one
 	// as we expect it to include a certificate.
-	err = sendMsg(&eks[0], ch)
+	ek, err := parseAttestEK(&eks[0])
+	if err != nil {
+		close(ch)
+		return nil
+	}
+	err = sendMsg(ek, ch)
 	if err != nil {
 		return err
 	}

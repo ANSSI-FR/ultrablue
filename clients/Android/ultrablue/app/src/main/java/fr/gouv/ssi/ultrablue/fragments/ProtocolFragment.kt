@@ -148,8 +148,8 @@ class ProtocolFragment : Fragment() {
                         logger?.push(PLog(dataLen))
                     } else {
                         data += bytes
-                        logger?.update(data.size)
                     }
+                    logger?.update(data.size)
 
                     if (data.size < dataLen) {
                         gatt.readCharacteristic(characteristic)
@@ -231,13 +231,14 @@ class ProtocolFragment : Fragment() {
         askForLocationPermission(onSuccess = {
         val btAdapter = getBluetoothAdapter()
         turnBluetoothOn(btAdapter, onSuccess = {
-        scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { device ->
-        connectToDevice(device, onSuccess = { gatt ->
+        scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
+        connectToDevice(btDevice, onSuccess = { gatt ->
         requestMTU(gatt, MTU, onSuccess = {
         searchForUltrablueService(gatt, onServiceFound = { service ->
         val chr = service.getCharacteristic(ultrablueChrUUID)
         // TODO: Introduce protocol.start
         protocol = UltrablueProtocol(
+            (activity as MainActivity), device,
             readMsg = { tag ->
                 logger?.push(Log("Getting $tag"))
                 gatt.readCharacteristic(chr)
@@ -245,7 +246,12 @@ class ProtocolFragment : Fragment() {
             writeMsg = { tag, msg ->
                 val prepended = intToByteArray(msg.size) + msg
                 if (prepended.size > MTU) {
-                    logger?.push(CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false))
+                    logger?.push(
+                        CLog(
+                            "$tag doesn't fit in one packet: message size = ${prepended.size}",
+                            false
+                        )
+                    )
                 } else {
                     logger?.push(Log("Sending $tag"))
                     chr.value = prepended
@@ -409,6 +415,6 @@ class ProtocolFragment : Fragment() {
             bytes[i] = (n and 0xffff).toByte()
             n = n ushr 8
         }
-        return bytes
+        return bytes.reversedArray() // To get it in little endian
     }
 }
