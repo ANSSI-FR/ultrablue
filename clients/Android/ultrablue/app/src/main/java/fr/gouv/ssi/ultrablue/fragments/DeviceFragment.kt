@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import fr.gouv.ssi.ultrablue.database.DeviceViewModel
@@ -68,6 +67,7 @@ class DeviceFragment : Fragment() {
         tv.text = "${device?.addr}"
     }
 
+    // Present a popup allowing the user to rename the device.
     private fun showDeviceRenamingDialog() {
         val nameField = EditText(requireContext())
         nameField.hint = "name"
@@ -92,10 +92,13 @@ class DeviceFragment : Fragment() {
         Fragment methods
      */
 
+    // Checking the validity of a device name.
+    // Currently length based, but could be improved, e.g. by only accepting alphanumeric characters
     private fun isNameValid(name: String) : Boolean {
         return name.length in 4..12
     }
 
+    // Change the device name in the database.
     private fun renameDevice(dev: Device, name: String) {
         dev.name = name
         viewModel?.rename(dev, name)
