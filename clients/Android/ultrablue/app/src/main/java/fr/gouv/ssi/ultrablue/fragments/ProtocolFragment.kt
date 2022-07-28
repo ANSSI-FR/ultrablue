@@ -21,10 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import fr.gouv.ssi.ultrablue.*
 import fr.gouv.ssi.ultrablue.database.Device
-import fr.gouv.ssi.ultrablue.model.Logger
-import fr.gouv.ssi.ultrablue.model.Log
-import fr.gouv.ssi.ultrablue.model.CLog
-import fr.gouv.ssi.ultrablue.model.PLog
+import fr.gouv.ssi.ultrablue.model.*
 import java.util.*
 
 const val MTU = 512
@@ -50,6 +47,8 @@ val ultrablueChrUUID: UUID = UUID.fromString("ebee1790-50b3-4943-8396-16c0b7231c
 class ProtocolFragment : Fragment() {
     private var state = State.ENROLLMENT
     private var logger: Logger? = null
+
+    private var protocol: UltrablueProtocol? = null
 
     // Timer related variables
     // Limit some tasks duration, to avoid waiting forever
@@ -87,7 +86,6 @@ class ProtocolFragment : Fragment() {
     }
 
     // Asks the user to grant location permission if not already granted.
-    // To enhance readability, we set onLocationPermissionGrantedCallback later.
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -142,34 +140,39 @@ class ProtocolFragment : Fragment() {
             super.onCharacteristicRead(gatt, characteristic, status)
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                val bytes = characteristic.value
-                if (dataLen == 0 && bytes.size >= 4) {
-                    dataLen = byteArrayToInt(bytes.take(4))
-                    data = bytes.drop(4).toByteArray()
-                    logger?.push(PLog(dataLen))
-                } else if (data.isNotEmpty()) {
-                    data += bytes
-                } else {
-                    logger?.push(CLog("Invalid packet: data length: ${dataLen}, data size: ${data.size}, received: ${bytes.size}", false))
-                }
-                logger?.update(PLog(data.size))
+                protocol?.let {
+                    val bytes = characteristic.value
+                    if (dataLen == 0) {
+                        dataLen = byteArrayToInt(bytes.take(4))
+                        data = bytes.drop(4).toByteArray()
+                        logger?.push(PLog(dataLen))
+                    } else {
+                        data += bytes
+                        logger?.update(data.size)
+                    }
 
-                if (data.size < dataLen) {
-                    gatt.readCharacteristic(characteristic)
-                } else {
-                    dataLen = 0
-                    data = byteArrayOf()
-                    // Retrieve the message from the protocol
+                    if (data.size < dataLen) {
+                        gatt.readCharacteristic(characteristic)
+                    } else {
+                        val msg = data
+                        dataLen = 0
+                        data = byteArrayOf()
+                        it.onMessageRead(msg)
+                    }
                 }
             }
         }
 
-        // The writing operation is much simpler than the read operation because
-        // we never need to chunk.
+        /*
+            As messages the client sends will never be bigger than the MTU, we don't need to care
+            about chunking them.
+         */
         override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            characteristic?.let {
-                // handle write operation from the protocol
+            protocol?.let { proto ->
+                characteristic?.let {
+                    proto.onMessageWrite()
+                }
             }
         }
     }
@@ -197,6 +200,7 @@ class ProtocolFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_protocol, container, false)
     }
 
+    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 		val device = requireArguments().getSerializable("device") as Device
@@ -231,7 +235,24 @@ class ProtocolFragment : Fragment() {
         connectToDevice(device, onSuccess = { gatt ->
         requestMTU(gatt, MTU, onSuccess = {
         searchForUltrablueService(gatt, onServiceFound = { service ->
-            val chr = service.getCharacteristic(ultrablueChrUUID)
+        val chr = service.getCharacteristic(ultrablueChrUUID)
+        // TODO: Introduce protocol.start
+        protocol = UltrablueProtocol(
+            readMsg = { tag ->
+                logger?.push(Log("Getting $tag"))
+                gatt.readCharacteristic(chr)
+            },
+            writeMsg = { tag, msg ->
+                val prepended = intToByteArray(msg.size) + msg
+                if (prepended.size > MTU) {
+                    logger?.push(CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false))
+                } else {
+                    logger?.push(Log("Sending $tag"))
+                    chr.value = prepended
+                    gatt.writeCharacteristic(chr)
+                }
+            },
+        )
         }) }) }) }) }) })
     }
 
@@ -285,11 +306,10 @@ class ProtocolFragment : Fragment() {
 
     @SuppressLint("MissingPermission")
     private fun scanForDevice(adapter: BluetoothAdapter, address: MacAddress, onDeviceFound: (device: BluetoothDevice) -> Unit) {
-        var deviceFound = false
-        var scanning = false
+        var runnable: Runnable? = null
 
         val scanCallback = object: ScanCallback() {
-            var runnable: Runnable? = null
+            var deviceFound = false
 
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
                 super.onScanResult(callbackType, result)
@@ -297,7 +317,6 @@ class ProtocolFragment : Fragment() {
                     if (MacAddress.fromString(scanResult.device.address) == address && !deviceFound) {
                         deviceFound = true
                         logger?.push(CLog("Found attesting device", true))
-                        scanning = false
                         adapter.bluetoothLeScanner.stopScan(this)
                         stopTimer(runnable!!)
                         onDeviceFound(scanResult.device)
@@ -310,15 +329,8 @@ class ProtocolFragment : Fragment() {
             }
         }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (scanning && !deviceFound) {
-                logger?.push(CLog("Device not found", false))
-                scanning = false
-                adapter.bluetoothLeScanner.stopScan(scanCallback)
-            }
-        }, timeoutPeriod)
         logger?.push(Log("Scanning for attesting device"))
-        scanCallback.runnable = startTimer(timeoutPeriod, onTimeout = {
+        runnable = startTimer(timeoutPeriod, onTimeout = {
             adapter.bluetoothLeScanner.stopScan(scanCallback)
         })
         adapter.bluetoothLeScanner.startScan(scanCallback)
@@ -356,6 +368,7 @@ class ProtocolFragment : Fragment() {
             onServiceFound(ultrablueSvc)
         }
         logger?.push(Log("Searching for Ultrablue service"))
+        startTimer(timeoutPeriod) { }
         gatt.discoverServices()
     }
 
@@ -376,6 +389,7 @@ class ProtocolFragment : Fragment() {
         Reconstructs an Int from a little endian array of bytes.
         In particular, when reading the first packet of a BLE message.
      */
+
     private fun byteArrayToInt(bytes: List<Byte>) : Int {
         var result = 0
         for (i in bytes.indices) {
@@ -386,5 +400,15 @@ class ProtocolFragment : Fragment() {
             result = result or (n shl 8 * i)
         }
         return result
+    }
+
+    private fun intToByteArray(value: Int): ByteArray {
+        var n = value
+        val bytes = ByteArray(4)
+        for (i in (0..3).reversed()) {
+            bytes[i] = (n and 0xffff).toByte()
+            n = n ushr 8
+        }
+        return bytes
     }
 }

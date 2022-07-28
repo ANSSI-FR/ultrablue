@@ -1,13 +1,15 @@
 package fr.gouv.ssi.ultrablue
 
+// Checks that the passed string is a well formatted MAC address.
+// It must have this format: "ff:ff:ff:ff:ff:ff", where 'ff'
+// represents a two digits hex value. The case doesn't matters.
 fun isMACAddressValid(data: String): Boolean {
-    val trimmed = data.trim()
     // 6 groups of 2 hex digits + 5 separator characters
-    if (trimmed.length != 17) {
+    if (data.length != 17) {
         return false
     }
     // Check that once split, we have 6 groups
-    val bytes = trimmed.split(":")
+    val bytes = data.split(":")
     if (bytes.size != 6) {
         return false
     }
