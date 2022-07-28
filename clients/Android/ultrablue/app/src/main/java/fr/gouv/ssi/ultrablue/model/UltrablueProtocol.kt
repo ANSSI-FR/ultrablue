@@ -1,17 +1,25 @@
 package fr.gouv.ssi.ultrablue.model
 
+import fr.gouv.ssi.ultrablue.MainActivity
+import fr.gouv.ssi.ultrablue.database.Device
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 
+@Serializable
+class EKModel(@ByteString val N: ByteArray, val E: UInt, @ByteString val Cert: ByteArray)
+
 typealias ProtocolStep = Int
 
 const val REGISTRATION_READ = 0
 const val REGISTRATION = 1
-const val AUTHENTICATION_GET_NONCE = 2
-const val AUTHENTICATION_SEND_NONCE_BACK = 3
+const val AUTHENTICATION_READ = 2
+const val AUTHENTICATION = 3
+const val AK_READ = 4
+const val CREDENTIAL_ACTIVATION = 5
+const val CREDENTIAL_ACTIVATION_ASSERT = 6
 
 /*
     UltrablueProtocol is the class that drives the client - server communication.
@@ -22,7 +30,7 @@ const val AUTHENTICATION_SEND_NONCE_BACK = 3
     update the state machine, and resume the protocol.
  */
 
-class UltrablueProtocol(private val readMsg: (String) -> Unit, private var writeMsg: (String, ByteArray) -> Unit) {
+class UltrablueProtocol(private val activity: MainActivity, private var device: Device, private val readMsg: (String) -> Unit, private var writeMsg: (String, ByteArray) -> Unit) {
     private var state: ProtocolStep = REGISTRATION_READ
     private var message = byteArrayOf()
 
@@ -35,15 +43,20 @@ class UltrablueProtocol(private val readMsg: (String) -> Unit, private var write
         when (state) {
             REGISTRATION_READ -> readMsg("EkPub and EkCert")
             REGISTRATION -> {
-                Cbor.decodeFromByteArray<Int>(message)
-                writeMsg("registration confirmation", byteArrayOf(0x01, 0x00, 0x00, 0x00, -10)) // Registration success, CBOR encoded
+                val key = Cbor.decodeFromByteArray<EKModel>(message)
+                device.name = "device" + device.uid
+                device.ekn = key.N
+                device.eke = key.E.toInt()
+                device.ekcert = key.Cert
+                activity.viewModel.insert(device)
+                writeMsg("registration confirmation", byteArrayOf(-10)) // Registration success, CBOR encoded
             }
-            AUTHENTICATION_GET_NONCE -> {
-                // Read nonce
+            AUTHENTICATION_READ -> readMsg("authentication nonce")
+            AUTHENTICATION -> {
+                // When encryption will be implemented, we'll first need to decrypt the nonce here.
+                writeMsg("Nonce", message)
             }
-            AUTHENTICATION_SEND_NONCE_BACK -> {
-                // Send back the decrypted nonce (well, its currently not encrypted. That makes things easier.)
-            }
+            AK_READ -> readMsg("attestation key")
         }
     }
 

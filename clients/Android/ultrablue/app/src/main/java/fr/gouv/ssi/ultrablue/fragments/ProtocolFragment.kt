@@ -8,18 +8,17 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.MacAddress
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
-import androidx.core.view.MenuProvider
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import fr.gouv.ssi.ultrablue.*
+import fr.gouv.ssi.ultrablue.MainActivity
+import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
 import fr.gouv.ssi.ultrablue.model.*
 import java.util.*
@@ -86,15 +85,20 @@ class ProtocolFragment : Fragment() {
     }
 
     // Asks the user to grant location permission if not already granted.
-    private val locationPermissionRequest = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        when (granted) {
-            true -> {
-                logger?.push(CLog("Location permission granted", true))
-                onLocationPermissionGrantedCallback?.invoke()
+    private val permissionsRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        var granted = true
+        for (perm in perms) {
+            if (perm.value) {
+                logger?.push(CLog("${perm.key.split('.')[2]} permission granted", true))
+            } else {
+                logger?.push(CLog("${perm.key.split('.')[2]} permission denied", false))
+                granted = false
             }
-            false -> logger?.push(CLog("Location permission denied", false))
+        }
+        if (granted) {
+            onLocationPermissionGrantedCallback?.invoke()
         }
     }
 
@@ -148,8 +152,8 @@ class ProtocolFragment : Fragment() {
                         logger?.push(PLog(dataLen))
                     } else {
                         data += bytes
-                        logger?.update(data.size)
                     }
+                    logger?.update(data.size)
 
                     if (data.size < dataLen) {
                         gatt.readCharacteristic(characteristic)
@@ -215,10 +219,6 @@ class ProtocolFragment : Fragment() {
             // TODO: Ask the user if he wants to inspect the logs or go back to the menu
         })
 
-        if (!hasBluetoothPermission()) {
-            return
-        }
-
         /*
             As the following operations are not blocking, we let them run and give them
             a callback to call when completed.
@@ -228,16 +228,17 @@ class ProtocolFragment : Fragment() {
             We deliberately break indentation to make this callback-based code read like
             direct style.
          */
-        askForLocationPermission(onSuccess = {
+        askForBluetoothPermissions(onSuccess = {
         val btAdapter = getBluetoothAdapter()
         turnBluetoothOn(btAdapter, onSuccess = {
-        scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { device ->
-        connectToDevice(device, onSuccess = { gatt ->
+        scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
+        connectToDevice(btDevice, onSuccess = { gatt ->
         requestMTU(gatt, MTU, onSuccess = {
         searchForUltrablueService(gatt, onServiceFound = { service ->
         val chr = service.getCharacteristic(ultrablueChrUUID)
         // TODO: Introduce protocol.start
         protocol = UltrablueProtocol(
+            (activity as MainActivity), device,
             readMsg = { tag ->
                 logger?.push(Log("Getting $tag"))
                 gatt.readCharacteristic(chr)
@@ -245,7 +246,12 @@ class ProtocolFragment : Fragment() {
             writeMsg = { tag, msg ->
                 val prepended = intToByteArray(msg.size) + msg
                 if (prepended.size > MTU) {
-                    logger?.push(CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false))
+                    logger?.push(
+                        CLog(
+                            "$tag doesn't fit in one packet: message size = ${prepended.size}",
+                            false
+                        )
+                    )
                 } else {
                     logger?.push(Log("Sending $tag"))
                     chr.value = prepended
@@ -266,21 +272,14 @@ class ProtocolFragment : Fragment() {
         Most of them call asynchronous APIs and set up callbacks to plumb the results to.
      */
 
-    private fun hasBluetoothPermission(): Boolean {
-        val permission = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            Manifest.permission.BLUETOOTH
-        } else {
-            Manifest.permission.BLUETOOTH_CONNECT
-        }
-        return ActivityCompat.checkSelfPermission(
-            requireContext(),
-            permission
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun askForLocationPermission(onSuccess: () -> Unit) {
+    private fun askForBluetoothPermissions(onSuccess: () -> Unit) {
         onLocationPermissionGrantedCallback = onSuccess
-        locationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        var perms = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            perms += Manifest.permission.BLUETOOTH_CONNECT
+            perms += Manifest.permission.BLUETOOTH_SCAN
+        }
+        permissionsRequest.launch(perms)
     }
 
     private fun getBluetoothAdapter(): BluetoothAdapter {
@@ -368,7 +367,6 @@ class ProtocolFragment : Fragment() {
             onServiceFound(ultrablueSvc)
         }
         logger?.push(Log("Searching for Ultrablue service"))
-        startTimer(timeoutPeriod) { }
         gatt.discoverServices()
     }
 
@@ -402,10 +400,14 @@ class ProtocolFragment : Fragment() {
         return result
     }
 
+    /*
+        Break an integer into it's little endian bytes representation.
+        Useful to prepend the size of a message before sending.
+     */
     private fun intToByteArray(value: Int): ByteArray {
         var n = value
         val bytes = ByteArray(4)
-        for (i in (0..3).reversed()) {
+        for (i in 0..3) {
             bytes[i] = (n and 0xffff).toByte()
             n = n ushr 8
         }
