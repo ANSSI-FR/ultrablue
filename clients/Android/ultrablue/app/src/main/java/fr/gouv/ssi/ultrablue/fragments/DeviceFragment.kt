@@ -41,6 +41,7 @@ class DeviceFragment : Fragment() {
             }
             override fun onPrepareMenu(menu: Menu) {
                 super.onPrepareMenu(menu)
+                activity?.title = "${device?.name}"
                 menu.findItem(R.id.action_edit).isVisible = true
                 menu.findItem(R.id.action_add).isVisible = false
             }
@@ -81,6 +82,7 @@ class DeviceFragment : Fragment() {
                 device?.let {
                     if (isNameValid(nameField.text.toString())) {
                         renameDevice(it, nameField.text.toString())
+                        activity?.title = it.name
                     }
                 }
             }

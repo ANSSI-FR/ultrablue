@@ -193,6 +193,12 @@ class ProtocolFragment : Fragment() {
             }
             override fun onPrepareMenu(menu: Menu) {
                 super.onPrepareMenu(menu)
+                val device = requireArguments().getSerializable("device") as Device
+                activity?.title = if (device.name.isEmpty()) {
+                    "Enrollment in progress"
+                } else {
+                    "Attestation in progress"
+                }
                 menu.findItem(R.id.action_edit).isVisible = false
                 menu.findItem(R.id.action_add).isVisible = false
             }
@@ -208,12 +214,10 @@ class ProtocolFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 		val device = requireArguments().getSerializable("device") as Device
-        if (device.name.isEmpty()) {
-            state = State.ENROLLMENT
-            activity?.title = "Enrollment in progress"
+        state = if (device.name.isEmpty()) {
+            State.ENROLLMENT
         } else {
-            state = State.AUTHENTICATION
-            activity?.title = "Attestation in progress"
+            State.AUTHENTICATION
         }
         logger = Logger(activity as MainActivity?, view.findViewById(R.id.logger_text_view), onError = {
             // TODO: Ask the user if he wants to inspect the logs or go back to the menu
