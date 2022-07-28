@@ -73,12 +73,12 @@ class DeviceAdapter(private val itemClickListener: ItemClickListener) : Recycler
         // Change the button color on tap, and revert it on release.
         holder.attestationButton.setOnTouchListener {view, motionEvent ->
             when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_play_solid_selected)
+                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_round_play_arrow_24_selected)
                 MotionEvent.ACTION_UP -> {
-                    view.setBackgroundResource(R.drawable.ic_play_solid)
+                    view.setBackgroundResource(R.drawable.ic_round_play_arrow_24)
                     view.performClick()
                 }
-                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_play_solid)
+                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_round_play_arrow_24)
             }
             true
         }
@@ -89,12 +89,12 @@ class DeviceAdapter(private val itemClickListener: ItemClickListener) : Recycler
         // Change the button color on tap, and revert it on release.
         holder.trashButton.setOnTouchListener {view, motionEvent ->
             when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_trash_solid_selected)
+                MotionEvent.ACTION_DOWN -> view.setBackgroundResource(R.drawable.ic_baseline_delete_24_selected)
                 MotionEvent.ACTION_UP -> {
-                    view.setBackgroundResource(R.drawable.ic_trash_solid)
+                    view.setBackgroundResource(R.drawable.ic_baseline_delete_24)
                     view.performClick()
                 }
-                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_trash_solid)
+                MotionEvent.ACTION_CANCEL -> view.setBackgroundResource(R.drawable.ic_baseline_delete_24)
             }
             true
         }

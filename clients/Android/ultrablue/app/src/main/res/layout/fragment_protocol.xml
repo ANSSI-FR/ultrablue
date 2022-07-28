@@ -5,4 +5,14 @@
     android:id="@+id/fragment_protocol"
     android:layout_height="match_parent"
     tools:context=".fragments.ProtocolFragment">
+
+    <TextView
+        android:id="@+id/logger_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginVertical="10dp"
+        android:layout_marginHorizontal="5dp"
+        android:fontFamily="monospace"
+        android:textSize="15sp"
+        />
 </FrameLayout>
