@@ -204,13 +204,13 @@ func credentialActivation(ch chan []byte, tpm *attest.TPM) (*attest.AK, error) {
 
 func attestation(ch chan []byte, tpm *attest.TPM, ak *attest.AK) error {
 	logrus.Info("Getting anti replay nonce")
-	var nonce []byte
+	var nonce Bytestring
 	err := recvMsg(&nonce, ch)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Retrieving attestation plateform data")
-	ap, err := tpm.AttestPlatform(ak, nonce, nil)
+	ap, err := tpm.AttestPlatform(ak, nonce.Bytes, nil)
 	if err != nil {
 		close(ch)
 		return err

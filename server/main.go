@@ -45,31 +45,6 @@ func initLogger(loglevel int) {
 }
 
 /*
-   usage prints informations to guide the user at the
-   start of the program.
-*/
-func usage(erl bool) {
-	var yellow = "\033[33m"
-	var reset = "\033[0m"
-
-	if erl {
-		fmt.Println(yellow + `To enroll a new verifier device:
-
-   1. Install the Ultrablue application on your smartphone
-   2. From it, push the + button on the top-right corner
-   3. Scan the following QR code
-` + reset)
-	} else {
-		fmt.Println(yellow + `To perform the attestation:
-
-   1. Open the Ultrablue application on an enrolled device
-   2. Find this computer in the list of known attesters
-   3. Tap the play button
-` + reset)
-	}
-}
-
-/*
 	ARCHITECTURE
 
 	Ultrablue is a client-server application, that operates over
@@ -99,7 +74,6 @@ func usage(erl bool) {
 
 func main() {
 	flag.Parse()
-	usage(*enroll)
 	initLogger(*loglevel)
 
 	logrus.Info("Opening the default HCI device")
@@ -129,6 +103,8 @@ func main() {
 			logrus.Fatal(err)
 		}
 		fmt.Println(qrcode)
+	} else {
+		fmt.Println("Waiting for a verifier to connect...")
 	}
 
 	select {
