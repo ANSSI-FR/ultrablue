@@ -1,0 +1,15 @@
+[Unit]
+Description=ultrablue remote attestation service
+After=bluetooth.service
+Wants=cryptsetup-pre.target
+Before=cryptsetup-pre.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ultrablue-server
+TimeoutSec=60
+StandardOutput=tty
+
+[Install]
+WantedBy=bluetooth.target
