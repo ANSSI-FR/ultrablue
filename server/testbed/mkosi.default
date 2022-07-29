@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: 2022 ANSSI
+# SPDX-License-Identifier: Apache-2.0
+
+[Distribution]
+Distribution=arch
+
+[Output]
+Format=raw_btrfs
+Bootable=yes
+OutputDirectory=./mkosi.output
+Output=ultrablue.raw
+Encrypt=all
+WithUnifiedKernelImages=false
+SourceFileTransferFinal=copy-all
+
+[Validation]
+Password=root
+
+[Host]
+QemuHeadless=1
+
+[Partitions]
+RootSize=3G
+
+[Packages]
+WithNetwork=yes
+BuildPackages=
+        go
+        bluez
+        bluez-utils
+        tpm2-tools
+        tpm2-tss
+
+Packages=
+        gdb
+        vim
+        strace
+        qrencode
+        # TPM tools
+        tpm2-tools
+        tpm2-tss
+        cryptsetup
+        # bluetooth remote attestation tests
+        bluez
+        bluez-utils
+
+# Share caches with the top-level mkosi
+BuildDirectory=./mkosi/mkosi.builddir
+Cache=./mkosi/mkosi.cache
+
+BuildSources=../
