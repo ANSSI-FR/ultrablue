@@ -91,6 +91,13 @@ type EK struct {
 	E    int    // Public key exponent
 }
 
+// As encoding raw byte arrays to CBOR is not handled very well by
+// most libraries out there, we encapsulate those in a one-field
+// structure.
+type Bytestring struct {
+	Bytes []byte
+}
+
 func parseAttestEK(ek *attest.EK) (EK, error) {
 	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
 		return EK{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
@@ -138,24 +145,25 @@ func registration(ch chan []byte, tpm *attest.TPM) error {
 func authentication(ch chan []byte) error {
 	logrus.Info("Starting authentication process")
 	logrus.Info("Generating nonce")
-	nonce, err := getTPMRandom(16)
+	b, err := getTPMRandom(16)
 	if err != nil {
 		close(ch)
 		return err
 	}
+	nonce := Bytestring{b}
 	logrus.Info("Sending nonce")
 	err = sendMsg(nonce, ch)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Getting nonce back")
-	var rcvd_nonce []byte
+	var rcvd_nonce Bytestring
 	err = recvMsg(&rcvd_nonce, ch)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Verifying nonce")
-	if bytes.Equal(nonce, rcvd_nonce) == false {
+	if bytes.Equal(nonce.Bytes, rcvd_nonce.Bytes) == false {
 		close(ch)
 		return errors.New("Authentication failure: nonces differ")
 	}
@@ -187,7 +195,7 @@ func credentialActivation(ch chan []byte, tpm *attest.TPM) (*attest.AK, error) {
 		return nil, err
 	}
 	logrus.Info("Sending back decrypted credential blob")
-	err = sendMsg(decrypted, ch)
+	err = sendMsg(Bytestring{decrypted}, ch)
 	if err != nil {
 		return nil, err
 	}
