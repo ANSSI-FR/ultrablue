@@ -233,37 +233,37 @@ class ProtocolFragment : Fragment() {
             direct style.
          */
         askForBluetoothPermissions(onSuccess = {
-        val btAdapter = getBluetoothAdapter()
-        turnBluetoothOn(btAdapter, onSuccess = {
-        scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
-        connectToDevice(btDevice, onSuccess = { gatt ->
-        requestMTU(gatt, MTU, onSuccess = {
-        searchForUltrablueService(gatt, onServiceFound = { service ->
-        val chr = service.getCharacteristic(ultrablueChrUUID)
-        // TODO: Introduce protocol.start
-        protocol = UltrablueProtocol(
-            (activity as MainActivity), device,
-            readMsg = { tag ->
-                logger?.push(Log("Getting $tag"))
-                gatt.readCharacteristic(chr)
-            },
-            writeMsg = { tag, msg ->
-                val prepended = intToByteArray(msg.size) + msg
-                if (prepended.size > MTU) {
-                    logger?.push(
-                        CLog(
-                            "$tag doesn't fit in one packet: message size = ${prepended.size}",
-                            false
+            val btAdapter = getBluetoothAdapter()
+            turnBluetoothOn(btAdapter, onSuccess = {
+            scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
+            connectToDevice(btDevice, onSuccess = { gatt ->
+            requestMTU(gatt, MTU, onSuccess = {
+            searchForUltrablueService(gatt, onServiceFound = { service ->
+            val chr = service.getCharacteristic(ultrablueChrUUID)
+            // TODO: Introduce protocol.start
+            protocol = UltrablueProtocol(
+                (activity as MainActivity), device, logger,
+                readMsg = { tag ->
+                    logger?.push(Log("Getting $tag"))
+                    gatt.readCharacteristic(chr)
+                },
+                writeMsg = { tag, msg ->
+                    val prepended = intToByteArray(msg.size) + msg
+                    if (prepended.size > MTU) {
+                        logger?.push(
+                            CLog(
+                                "$tag doesn't fit in one packet: message size = ${prepended.size}",
+                                false
+                            )
                         )
-                    )
-                } else {
-                    logger?.push(Log("Sending $tag"))
-                    chr.value = prepended
-                    gatt.writeCharacteristic(chr)
-                }
-            },
-        )
-        }) }) }) }) }) })
+                    } else {
+                        logger?.push(Log("Sending $tag"))
+                        chr.value = prepended
+                        gatt.writeCharacteristic(chr)
+                    }
+                },
+            )
+            }) }) }) }) }) })
     }
 
     override fun onDestroyView() {
