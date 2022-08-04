@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2022 ANSSI
+# SPDX-License-Identifier: Apache-2.0
+
+
+set -e
+
+[ -z "${BUILDDIR}" ] && BUILDDIR=build
+
+mkdir -p "${DESTDIR}/usr/bin"
+go build -o "${DESTDIR}/usr/bin/ultrablue-server"
