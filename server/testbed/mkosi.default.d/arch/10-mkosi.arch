@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2022 ANSSI
+# SPDX-License-Identifier: Apache-2.0
+
+[Distribution]
+Distribution=arch
+
+[Packages]
+BuildPackages=
+	bluez
+	bluez-utils
+	go
+	tpm2-tools
+	tpm2-tss
+
+Packages=
+	bluez
+	bluez-utils
+	cryptsetup
+	gdb
+	qrencode
+	strace
+	tpm2-tools
+	tpm2-tss
+	vim

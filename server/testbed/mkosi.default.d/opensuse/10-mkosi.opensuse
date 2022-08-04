@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2022 ANSSI
+# SPDX-License-Identifier: Apache-2.0
+
+[Distribution]
+Distribution=opensuse
+Release=tumbleweed
+
+[Packages]
+BuildPackages=
+	bluez
+	bluez-tools
+	go
+	tpm2-tools
+	tpm2-tss
+
+Packages=
+	bluez
+	bluez-tools
+	cryptsetup
+	gdb
+	qrencode
+	strace
+	tpm2-tools
+	tpm2-tss
+	vim
