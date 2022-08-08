@@ -17,7 +17,7 @@ import (
 // Command line arguments (global variables)
 var (
 	enroll   = flag.Bool("enroll", false, "Must be true for a first time attestation")
-	loglevel = flag.Int("loglevel", 0, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
+	loglevel = flag.Int("loglevel", 1, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
 	mtu      = flag.Int("mtu", 500, "Set a custom MTU, which is basically the max size of the BLE packets")
 )
 
@@ -103,8 +103,6 @@ func main() {
 			logrus.Fatal(err)
 		}
 		fmt.Println(qrcode)
-	} else {
-		fmt.Println("Waiting for a verifier to connect...")
 	}
 
 	select {
