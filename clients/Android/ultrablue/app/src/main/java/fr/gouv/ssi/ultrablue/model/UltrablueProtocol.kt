@@ -26,10 +26,16 @@ class ByteArrayModel @OptIn(ExperimentalSerializationApi::class) constructor(
     @ByteString val Bytes: ByteArray,
 )
 
+@Serializable
+class AttestationResult constructor(
+    val Err: Boolean,
+    val Msg: String,
+)
+
 typealias ProtocolStep = Int
 
-const val REGISTRATION_READ = 0
-const val REGISTRATION = 1
+const val EK_READ = 0
+const val EK_DECODE = 1
 const val AUTHENTICATION_READ = 2
 const val AUTHENTICATION = 3
 const val AK_READ = 4
@@ -38,7 +44,10 @@ const val CREDENTIAL_ACTIVATION_READ = 6
 const val CREDENTIAL_ACTIVATION_ASSERT = 7
 const val ATTESTATION_SEND_NONCE = 8
 const val ATTESTATION_READ = 9
-const val ATTESTATION_PERFORM = 10
+const val VERIFY_QUOTE = 10
+const val REPLAY_EVENT_LOG = 11
+const val PCRS_HANDLE = 12
+const val END = 13
 
 /*
     UltrablueProtocol is the class that drives the client - server communication.
@@ -49,14 +58,17 @@ const val ATTESTATION_PERFORM = 10
     update the state machine, and resume the protocol.
  */
 
-class UltrablueProtocol(private val activity: MainActivity, private var device: Device, private val logger: Logger?, private val readMsg: (String) -> Unit, private var writeMsg: (String, ByteArray) -> Unit) {
-    private var state: ProtocolStep = REGISTRATION_READ
+class UltrablueProtocol(private val activity: MainActivity, private var enroll: Boolean = false, private var device: Device, private val logger: Logger?, private val readMsg: (String) -> Unit, private var writeMsg: (String, ByteArray) -> Unit) {
+    private var state: ProtocolStep = if (enroll) { EK_READ } else { AUTHENTICATION_READ }
     private var message = byteArrayOf()
 
     private val rand = SecureRandom()
+    private var ek = EKModel(device.ekn, device.eke.toUInt(), device.ekcert) // If enrolling a device, this field is uninitialized, but will be after EK_READ.
     private var credentialActivationSecret: ByteArray? = null
     private var encodedAttestationKey: ByteArray? = null
+    private var encodedPlatformParameters: ByteArray? = null
     private val attestationNonce = ByteArray(16)
+    private var encodedPCRs: ByteArray? = null
 
     init {
         resume()
@@ -65,20 +77,18 @@ class UltrablueProtocol(private val activity: MainActivity, private var device: 
     @OptIn(ExperimentalSerializationApi::class)
     private fun resume() {
         when (state) {
-            REGISTRATION_READ -> readMsg("EkPub and EkCert")
-            REGISTRATION -> {
-                val key = Cbor.decodeFromByteArray<EKModel>(message)
-                device.name = "device" + device.uid
-                device.ekn = key.N
-                device.eke = key.E.toInt()
-                device.ekcert = key.Cert
-                logger?.push(Log("Registering device"))
-                activity.viewModel.insert(device)
-                logger?.push(CLog("Device has been registered", true))
-                writeMsg("registration confirmation", byteArrayOf(-10)) // Registration success, CBOR encoded
+            EK_READ -> readMsg("EkPub and EkCert")
+            EK_DECODE -> {
+                ek = Cbor.decodeFromByteArray(message)
+                state += 1
+                resume()
             }
             AUTHENTICATION_READ -> readMsg("authentication nonce")
             AUTHENTICATION -> {
+                if (message.size != 24) {
+                    logger?.push(CLog("Invalid nonce length. Make sure you ran the attestation server without the --enroll flag.", false))
+                    return
+                }
                 val authNonce = Cbor.decodeFromByteArray<ByteArrayModel>(message)
                 //TODO: When encryption will be implemented, we'll need to decrypt the nonce here.
                 val encodedAuthNonce = Cbor.encodeToByteArray(authNonce)
@@ -88,12 +98,16 @@ class UltrablueProtocol(private val activity: MainActivity, private var device: 
             CREDENTIAL_ACTIVATION -> {
                 encodedAttestationKey = message
                 logger?.push(Log("Generating credential challenge"))
-                val credentialBlob = Gomobile.makeCredential(device.ekn, device.eke.toLong(), encodedAttestationKey)
-                credentialActivationSecret = credentialBlob.secret
-                val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
-                val encodedCredential = Cbor.encodeToByteArray(encryptedCredential)
-                logger?.push(CLog("Credential generated", true))
-                writeMsg("encrypted credential", encodedCredential)
+                try {
+                    val credentialBlob = Gomobile.makeCredential(ek.N, ek.E.toLong(), encodedAttestationKey)
+                    credentialActivationSecret = credentialBlob.secret
+                    val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
+                    val encodedCredential = Cbor.encodeToByteArray(encryptedCredential)
+                    logger?.push(CLog("Credential generated", true))
+                    writeMsg("encrypted credential", encodedCredential)
+                } catch (e: Exception) {
+                    logger?.push(CLog("Failed to generate credential: ${e.message}", false))
+                }
             }
             CREDENTIAL_ACTIVATION_READ -> readMsg("decrypted credential")
             CREDENTIAL_ACTIVATION_ASSERT -> {
@@ -109,22 +123,76 @@ class UltrablueProtocol(private val activity: MainActivity, private var device: 
             }
             ATTESTATION_SEND_NONCE -> {
                 rand.nextBytes(attestationNonce)
-                logger?.push(CLog("Generated anit replay nonce", true))
+                logger?.push(CLog("Generated anti replay nonce", true))
                 val encoded = Cbor.encodeToByteArray(ByteArrayModel(attestationNonce))
                 writeMsg("anti replay nonce", encoded)
             }
             ATTESTATION_READ -> readMsg("Attestation data")
-            ATTESTATION_PERFORM -> {
+            VERIFY_QUOTE -> {
+                encodedPlatformParameters = message
                 logger?.push(Log("Verifying quotes signature"))
                 try {
-                    Gomobile.checkQuotesSignature(message, encodedAttestationKey, attestationNonce)
+                    Gomobile.checkQuotesSignature(encodedPlatformParameters, encodedAttestationKey, attestationNonce)
+                    logger?.push(CLog("Quotes signature are valid", true))
+                    state += 1
+                    resume()
+                } catch (e: Exception) {
+                    logger?.push(CLog("Error while verifying quote(s) signature: ${e.message}", false))
+                }
+            }
+            REPLAY_EVENT_LOG -> {
+                logger?.push(Log("Replaying event log"))
+                try {
+                    Gomobile.replayEventLog(encodedPlatformParameters)
+                    logger?.push(CLog("Event log has been replayed", true))
+                    state += 1
+                    resume()
                 } catch (e: Exception) {
                     logger?.push(CLog("${e.message}", false))
+                }
+            }
+            PCRS_HANDLE -> {
+                try {
+                    logger?.push(Log("Getting PCRs"))
+                    encodedPCRs = Gomobile.getPCRs(encodedPlatformParameters).data
+                    logger?.push(CLog("Got PCRs", true))
+                } catch (e: Exception) {
+                    logger?.push(CLog("Error while getting PCRs: ${e.message}", false))
                     return
                 }
-                logger?.push(CLog("Quotes signature are valid", true))
+                val response: AttestationResult = if (enroll) {
+                    logger?.push(Log("Storing new attester entry"))
+                    registerDevice()
+                    AttestationResult(false, "")
+                } else {
+                    logger?.push(Log("Comparing PCRs"))
+                    if (device.encodedPCRs.contentEquals(encodedPCRs)) {
+                        logger?.push(CLog("PCRs entries match the stored ones", true))
+                        AttestationResult(false, "")
+                    } else {
+                        // TODO: Need deeper investigation to determine which PCR changed and why.
+                        logger?.push(CLog("PCRs don't match", false))
+                        AttestationResult(true, "Attestation failure")
+                    }
+                }
+                val encodedResponse = Cbor.encodeToByteArray(response)
+                writeMsg("Attestation result", encodedResponse)
+            }
+            END -> {
+                return
             }
         }
+    }
+
+    private fun registerDevice() {
+        device.name = "device" + device.uid
+        device.ekn = ek.N
+        device.eke = ek.E.toInt()
+        device.ekcert = ek.Cert
+        device.encodedPCRs = encodedPCRs!!
+        logger?.push(Log("Registering device"))
+        activity.viewModel.insert(device)
+        logger?.push(CLog("Device has been registered", true))
     }
 
     fun onMessageRead(message: ByteArray) {

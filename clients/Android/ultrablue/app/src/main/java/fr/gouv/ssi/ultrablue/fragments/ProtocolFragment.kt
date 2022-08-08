@@ -25,11 +25,6 @@ import java.util.*
 
 const val MTU = 512
 
-enum class State {
-    ENROLLMENT,
-    AUTHENTICATION
-}
-
 val ultrablueSvcUUID: UUID = UUID.fromString("ebee1789-50b3-4943-8396-16c0b7231cad")
 val ultrablueChrUUID: UUID = UUID.fromString("ebee1790-50b3-4943-8396-16c0b7231cad")
 
@@ -44,7 +39,7 @@ val ultrablueChrUUID: UUID = UUID.fromString("ebee1790-50b3-4943-8396-16c0b7231c
     The protocol itself is defined in the UltrablueProtocol.kt file.
  */
 class ProtocolFragment : Fragment() {
-    private var state = State.ENROLLMENT
+    private var enroll = false
     private var logger: Logger? = null
 
     private var protocol: UltrablueProtocol? = null
@@ -214,14 +209,17 @@ class ProtocolFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 		val device = requireArguments().getSerializable("device") as Device
-        state = if (device.name.isEmpty()) {
-            State.ENROLLMENT
-        } else {
-            State.AUTHENTICATION
+        if (device.name.isEmpty()) {
+            enroll = true
         }
-        logger = Logger(activity as MainActivity?, view.findViewById(R.id.logger_text_view), onError = {
-            // TODO: Ask the user if he wants to inspect the logs or go back to the menu
-        })
+        logger = Logger(
+            activity as MainActivity?,
+            view.findViewById(R.id.logger_text_view),
+            view.findViewById(R.id.logger_scroll_view),
+            onError = {
+                // TODO: Disconnect device
+            }
+        )
 
         /*
             As the following operations are not blocking, we let them run and give them
@@ -242,7 +240,7 @@ class ProtocolFragment : Fragment() {
             val chr = service.getCharacteristic(ultrablueChrUUID)
             // TODO: Introduce protocol.start
             protocol = UltrablueProtocol(
-                (activity as MainActivity), device, logger,
+                (activity as MainActivity), enroll, device, logger,
                 readMsg = { tag ->
                     logger?.push(Log("Getting $tag"))
                     gatt.readCharacteristic(chr)
@@ -263,11 +261,13 @@ class ProtocolFragment : Fragment() {
                     }
                 },
             )
+            logger?.push(Log("Closing connection"))
             }) }) }) }) }) })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         (activity as MainActivity).hideUpButton()
     }
 

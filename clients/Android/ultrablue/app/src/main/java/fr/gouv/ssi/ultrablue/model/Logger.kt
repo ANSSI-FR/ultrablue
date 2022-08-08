@@ -1,6 +1,8 @@
 package fr.gouv.ssi.ultrablue.model
 
 import android.text.Html
+import android.view.View
+import android.widget.ScrollView
 import android.widget.TextView
 import fr.gouv.ssi.ultrablue.MainActivity
 
@@ -56,17 +58,12 @@ open class Log(private val msg: String) {
     immediately.
     When an unsuccessful CLog is pushed, the onError callback is called.
  */
-class Logger(private var activity: MainActivity?, private var textView: TextView, private var onError: () -> Unit) {
+class Logger(private var activity: MainActivity?, private var textView: TextView, private var scrollView: ScrollView? = null, private var onError: () -> Unit) {
     private var logs = listOf<Log>()
 
     fun push(log: Log) {
         logs = logs + log
-        activity?.runOnUiThread {
-            textView.setText(
-                Html.fromHtml(this.toString(), Html.FROM_HTML_MODE_COMPACT),
-                TextView.BufferType.SPANNABLE
-            )
-        }
+        updateUI()
         if (log is CLog && !log.success && log.fatal) {
             onError()
         }
@@ -75,17 +72,20 @@ class Logger(private var activity: MainActivity?, private var textView: TextView
     fun update(progress: Int) {
         if (logs.last() is PLog) {
             (logs.last() as PLog).updateProgress(progress)
-            activity?.runOnUiThread {
-                textView.setText(
-                    Html.fromHtml(this.toString(), Html.FROM_HTML_MODE_COMPACT),
-                    TextView.BufferType.SPANNABLE
-                )
-            }
+            updateUI()
         }
     }
 
-    fun last(): Log {
-        return logs.last()
+    private fun updateUI() {
+        activity?.runOnUiThread {
+            textView.setText(
+                Html.fromHtml(this.toString(), Html.FROM_HTML_MODE_COMPACT),
+                TextView.BufferType.SPANNABLE
+            )
+            scrollView?.let {
+                it.post { it.fullScroll(View.FOCUS_DOWN) }
+            }
+        }
     }
 
     override fun toString(): String {

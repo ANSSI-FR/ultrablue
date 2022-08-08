@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 /*
     Provides a singleton to access the app_database.
  */
-@Database(entities = [Device::class], version = 2, exportSchema = false)
+@Database(entities = [Device::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun deviceDao(): DeviceDao

@@ -27,4 +27,8 @@ class DeviceRepository(private val deviceDao: DeviceDao) {
     fun setName(device: Device, newName: String) {
         deviceDao.setName(device.uid, newName)
     }
+
+    fun setPCRs(device: Device, newPCRs: ByteArray) {
+        deviceDao.setPCRs(device.uid, newPCRs)
+    }
 }
