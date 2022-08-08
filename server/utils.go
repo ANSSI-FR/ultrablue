@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/google/go-tpm/tpm2"
+	"github.com/google/go-tpm/tpmutil"
 	"github.com/skip2/go-qrcode"
 )
 
@@ -26,6 +27,20 @@ func getTPMRandom(size uint16) ([]byte, error) {
 		return nil, err
 	}
 	return rbytes, nil
+}
+
+func extendPCR(index int, secret []byte) error {
+	rwc, err := tpm2.OpenTPM()
+	if err != nil {
+		return err
+	}
+	defer rwc.Close()
+
+	err = tpm2.PCREvent(rwc, tpmutil.Handle(index), secret)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /*

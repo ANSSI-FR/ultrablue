@@ -16,6 +16,7 @@ data class Device (
     var eke: Int, // Exponent of the Endorsement Key
     var ekcert: ByteArray, // Raw certificate for the Endorsement Key
     var encodedPCRs: ByteArray, // PCRs we got at enrollment
+    var secret: ByteArray // Secret to send to the attester on attestation success, in order to extend a PCR
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
