@@ -123,7 +123,7 @@ class DeviceListFragment : Fragment(R.layout.fragment_device_list), ItemClickLis
         when(result) {
             is QRResult.QRSuccess -> {
                 if (isMACAddressValid(result.content.rawValue.trim())) {
-                    val device = Device(0, "", result.content.rawValue.trim(), byteArrayOf(), 0, byteArrayOf(), byteArrayOf())
+                    val device = Device(0, "", result.content.rawValue.trim(), byteArrayOf(), 0, byteArrayOf(), byteArrayOf(), byteArrayOf())
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
                     val bundle = bundleOf("device" to device)
                     nc.navigate(R.id.action_deviceListFragment_to_protocolFragment, bundle)

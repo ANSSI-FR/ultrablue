@@ -9,10 +9,11 @@ import kotlinx.serialization.cbor.Cbor
 import java.security.SecureRandom
 
 @Serializable
-class EKModel @OptIn(ExperimentalSerializationApi::class) constructor(
+class RegistrationDataModel @OptIn(ExperimentalSerializationApi::class) constructor(
     @ByteString val N: ByteArray,
     val E: UInt,
     @ByteString val Cert: ByteArray,
+    val PCRExtend: Boolean,
 )
 
 @Serializable
@@ -27,9 +28,9 @@ class ByteArrayModel @OptIn(ExperimentalSerializationApi::class) constructor(
 )
 
 @Serializable
-class AttestationResult constructor(
+class AttestationResponse @OptIn(ExperimentalSerializationApi::class) constructor(
     val Err: Boolean,
-    val Msg: String,
+    @ByteString val Secret: ByteArray,
 )
 
 typealias ProtocolStep = Int
@@ -47,7 +48,7 @@ const val ATTESTATION_READ = 9
 const val VERIFY_QUOTE = 10
 const val REPLAY_EVENT_LOG = 11
 const val PCRS_HANDLE = 12
-const val END = 13
+const val RESPONSE = 13
 
 /*
     UltrablueProtocol is the class that drives the client - server communication.
@@ -63,12 +64,13 @@ class UltrablueProtocol(private val activity: MainActivity, private var enroll: 
     private var message = byteArrayOf()
 
     private val rand = SecureRandom()
-    private var ek = EKModel(device.ekn, device.eke.toUInt(), device.ekcert) // If enrolling a device, this field is uninitialized, but will be after EK_READ.
+    private var ek = RegistrationDataModel(device.ekn, device.eke.toUInt(), device.ekcert, device.secret.isNotEmpty()) // If enrolling a device, this field is uninitialized, but will be after EK_READ.
     private var credentialActivationSecret: ByteArray? = null
     private var encodedAttestationKey: ByteArray? = null
     private var encodedPlatformParameters: ByteArray? = null
     private val attestationNonce = ByteArray(16)
     private var encodedPCRs: ByteArray? = null
+    private var attestationResponse: AttestationResponse? = null
 
     init {
         resume()
@@ -149,6 +151,9 @@ class UltrablueProtocol(private val activity: MainActivity, private var enroll: 
                     resume()
                 } catch (e: Exception) {
                     logger?.push(CLog("${e.message}", false))
+                    attestationResponse = AttestationResponse(true, byteArrayOf())
+                    state = RESPONSE
+                    resume()
                 }
             }
             PCRS_HANDLE -> {
@@ -160,36 +165,45 @@ class UltrablueProtocol(private val activity: MainActivity, private var enroll: 
                     logger?.push(CLog("Error while getting PCRs: ${e.message}", false))
                     return
                 }
-                val response: AttestationResult = if (enroll) {
+                attestationResponse = if (enroll) {
                     logger?.push(Log("Storing new attester entry"))
                     registerDevice()
-                    AttestationResult(false, "")
+                    AttestationResponse(false, device.secret)
                 } else {
                     logger?.push(Log("Comparing PCRs"))
                     if (device.encodedPCRs.contentEquals(encodedPCRs)) {
                         logger?.push(CLog("PCRs entries match the stored ones", true))
-                        AttestationResult(false, "")
+                        AttestationResponse(false, device.secret)
                     } else {
                         // TODO: Need deeper investigation to determine which PCR changed and why.
                         logger?.push(CLog("PCRs don't match", false))
-                        AttestationResult(true, "Attestation failure")
+                        AttestationResponse(true, byteArrayOf())
                     }
                 }
-                val encodedResponse = Cbor.encodeToByteArray(response)
-                writeMsg("Attestation result", encodedResponse)
+                state = RESPONSE
+                resume()
             }
-            END -> {
-                return
+            RESPONSE -> {
+                val encodedResponse = Cbor.encodeToByteArray(attestationResponse)
+                writeMsg("Attestation response", encodedResponse)
             }
         }
     }
 
     private fun registerDevice() {
+        val secret = if (ek.PCRExtend) {
+            ByteArray(16)
+        } else {
+            byteArrayOf()
+        }
+        rand.nextBytes(secret)
+
         device.name = "device" + device.uid
         device.ekn = ek.N
         device.eke = ek.E.toInt()
         device.ekcert = ek.Cert
         device.encodedPCRs = encodedPCRs!!
+        device.secret = secret
         logger?.push(Log("Registering device"))
         activity.viewModel.insert(device)
         logger?.push(CLog("Device has been registered", true))

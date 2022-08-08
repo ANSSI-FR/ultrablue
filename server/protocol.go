@@ -15,6 +15,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const PCR_EXTENSION_INDEX = 9
+
 /*
 	sendMsg takes the data to send, which is a generic,
 	and sends it to the message channel of the connection
@@ -82,13 +84,17 @@ func recvMsg[T any](obj *T, ch chan []byte) error {
 	again.
 */
 
-// EK contains a RSA public key and an optional certificate.
+// RegistrationData contains the TPM's endorsement RSA public key
+// with an optional certificate.
 // It is used to deconstruct complex crypto.Certificate go type
 // in order to encode and send it.
-type EK struct {
-	Cert []byte // x509 key certificate (one byte set to 0 if none)
-	N    []byte // Raw public key bytes
-	E    int    // Public key exponent
+// It also contains a boolean @PCRExtend that indicates the new verifier
+// it must generate a new secret to send back on attestation success.
+type RegistrationData struct {
+	Cert      []byte // x509 key certificate (one byte set to 0 if none)
+	N         []byte // Raw public key bytes
+	E         int    // Public key exponent
+	PCRExtend bool   // Wether or not PCR_EXTENSION_INDEX must be extended on attestation success
 }
 
 // As encoding raw byte arrays to CBOR is not handled very well by
@@ -98,9 +104,9 @@ type Bytestring struct {
 	Bytes []byte
 }
 
-func parseAttestEK(ek *attest.EK) (EK, error) {
+func parseAttestEK(ek *attest.EK) (RegistrationData, error) {
 	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
-		return EK{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
+		return RegistrationData{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
 	}
 	var c []byte = make([]byte, 0)
 	if ek.Certificate != nil {
@@ -108,7 +114,7 @@ func parseAttestEK(ek *attest.EK) (EK, error) {
 	}
 	var n = ek.Public.(*rsa.PublicKey).N.Bytes()
 	var e = ek.Public.(*rsa.PublicKey).E
-	return EK{c, n, e}, nil
+	return RegistrationData{c, n, e, *pcrextend}, nil
 }
 
 func ekenroll(ch chan []byte, tpm *attest.TPM) error {
@@ -216,22 +222,26 @@ func attestation(ch chan []byte, tpm *attest.TPM, ak *attest.AK) error {
 
 func response(ch chan []byte) error {
 	logrus.Info("Getting attestation response")
-	var regerr struct  {
-		Err bool
-		Msg string
+	var response struct  {
+		Err        bool
+		Secret     []byte
 	}
-	err := recvMsg(&regerr, ch)
+	err := recvMsg(&response, ch)
 	if err != nil {
 		return err
 	}
-	if regerr.Err == true {
+	if response.Err == true {
 		close(ch)
-		return errors.New(regerr.Msg)
+		return errors.New("Attestation failure")
 	}
 	if *enroll {
 		logrus.Info("Enrollment success")
 	} else {
 		logrus.Info("Attestation success")
+	}
+	if len(response.Secret) > 0 {
+		logrus.Info("Extending PCR", PCR_EXTENSION_INDEX)
+		extendPCR(PCR_EXTENSION_INDEX, response.Secret)
 	}
 	return nil
 }

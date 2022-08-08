@@ -16,9 +16,10 @@ import (
 
 // Command line arguments (global variables)
 var (
-	enroll   = flag.Bool("enroll", false, "Must be true for a first time attestation")
-	loglevel = flag.Int("loglevel", 1, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
-	mtu      = flag.Int("mtu", 500, "Set a custom MTU, which is basically the max size of the BLE packets")
+	enroll       = flag.Bool("enroll", false, "Must be true for a first time attestation")
+	loglevel     = flag.Int("loglevel", 1, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
+	mtu          = flag.Int("mtu", 500, "Set a custom MTU, which is basically the max size of the BLE packets")
+	pcrextend    = flag.Bool("pcr-extend", false, "Extend the 9th PCR with the verifier secret on attestation success")
 )
 
 /*
@@ -64,7 +65,6 @@ func initLogger(loglevel int) {
 		It's up to the client to read/write enough times to complete the
 		operation, the server can't drive the communicatin and send every
 		chunks in a for loop.
-		TODO: the server should disconnect the client if it does not follow the expected steps of the protocol
 
 		- The r/w handlers of the characteristics runs in a goroutine, thus
 		errors/success are transmitted to the main routine through channels.
