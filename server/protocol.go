@@ -102,13 +102,16 @@ func parseAttestEK(ek *attest.EK) (EK, error) {
 	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
 		return EK{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
 	}
-	var c = ek.Certificate.Raw
+	var c []byte = make([]byte, 0)
+	if ek.Certificate != nil {
+		c = ek.Certificate.Raw
+	}
 	var n = ek.Public.(*rsa.PublicKey).N.Bytes()
 	var e = ek.Public.(*rsa.PublicKey).E
 	return EK{c, n, e}, nil
 }
 
-func registration(ch chan []byte, tpm *attest.TPM) error {
+func ekenroll(ch chan []byte, tpm *attest.TPM) error {
 	logrus.Info("Retrieving EK pub and EK cert")
 	eks, err := tpm.EKs()
 	if err != nil {
@@ -128,17 +131,6 @@ func registration(ch chan []byte, tpm *attest.TPM) error {
 	if err != nil {
 		return err
 	}
-	logrus.Info("Getting registration confirmation")
-	var regerr error
-	err = recvMsg(&regerr, ch)
-	if err != nil {
-		return err
-	}
-	if regerr != nil {
-		close(ch)
-		return regerr
-	}
-	logrus.Info("Registration success")
 	return nil
 }
 
@@ -219,16 +211,28 @@ func attestation(ch chan []byte, tpm *attest.TPM, ak *attest.AK) error {
 	if err != nil {
 		return err
 	}
-	var atterr error
-	err = recvMsg(&atterr, ch)
+	return nil
+}
+
+func response(ch chan []byte) error {
+	logrus.Info("Getting attestation response")
+	var regerr struct  {
+		Err bool
+		Msg string
+	}
+	err := recvMsg(&regerr, ch)
 	if err != nil {
 		return err
 	}
-	if atterr != nil {
+	if regerr.Err == true {
 		close(ch)
-		return atterr
+		return errors.New(regerr.Msg)
 	}
-	logrus.Info("Attestation success")
+	if *enroll {
+		logrus.Info("Enrollment success")
+	} else {
+		logrus.Info("Attestation success")
+	}
 	return nil
 }
 
@@ -254,13 +258,15 @@ func ultrablueProtocol(ch chan []byte) {
 		logrus.Fatal(err)
 	}
 	defer tpm.Close()
+
 	if *enroll {
-		err = registration(ch, tpm)
+		err = ekenroll(ch, tpm)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 	}
+
 	err = authentication(ch)
 	if err != nil {
 		logrus.Error(err)
@@ -275,6 +281,11 @@ func ultrablueProtocol(ch chan []byte) {
 	if err != nil {
 		logrus.Error(err)
 		return
+	}
+	err = response(ch)
+	if err != nil {
+		logrus.Error(err)
+		os.Exit(1)
 	}
 	os.Exit(0)
 }
