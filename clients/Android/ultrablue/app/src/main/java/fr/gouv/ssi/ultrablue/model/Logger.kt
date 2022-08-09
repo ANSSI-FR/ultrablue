@@ -76,6 +76,11 @@ class Logger(private var activity: MainActivity?, private var textView: TextView
         }
     }
 
+    fun reset() {
+        this.logs = listOf()
+        updateUI()
+    }
+
     private fun updateUI() {
         activity?.runOnUiThread {
             textView.setText(
