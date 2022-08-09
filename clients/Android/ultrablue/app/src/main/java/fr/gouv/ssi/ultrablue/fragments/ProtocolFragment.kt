@@ -222,7 +222,7 @@ class ProtocolFragment : Fragment() {
             view.findViewById(R.id.logger_text_view),
             view.findViewById(R.id.logger_scroll_view),
             onError = {
-                // TODO: Disconnect device
+                gatt?.disconnect()
             }
         )
 

@@ -1,6 +1,7 @@
 package fr.gouv.ssi.ultrablue.model
 
 import fr.gouv.ssi.ultrablue.MainActivity
+import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
 import gomobile.Gomobile
 import kotlinx.serialization.*
@@ -88,13 +89,13 @@ class UltrablueProtocol(
     @OptIn(ExperimentalSerializationApi::class)
     private fun resume() {
         when (state) {
-            EK_READ -> readMsg("EkPub and EkCert")
+            EK_READ -> readMsg(activity.getString(R.string.ek_pub_cert))
             EK_DECODE -> {
                 ek = Cbor.decodeFromByteArray(message)
                 state += 1
                 resume()
             }
-            AUTHENTICATION_READ -> readMsg("authentication nonce")
+            AUTHENTICATION_READ -> readMsg(activity.getString(R.string.auth_nonce))
             AUTHENTICATION -> {
                 if (message.size != 24) {
                     logger?.push(CLog("Invalid nonce length. Make sure you ran the attestation server without the --enroll flag.", false))
@@ -103,9 +104,9 @@ class UltrablueProtocol(
                 val authNonce = Cbor.decodeFromByteArray<ByteArrayModel>(message)
                 //TODO: When encryption will be implemented, we'll need to decrypt the nonce here.
                 val encodedAuthNonce = Cbor.encodeToByteArray(authNonce)
-                writeMsg("Nonce", encodedAuthNonce)
+                writeMsg(activity.getString(R.string.decrypted_auth_nonce), encodedAuthNonce)
             }
-            AK_READ -> readMsg("attestation key")
+            AK_READ -> readMsg(activity.getString(R.string.ak))
             CREDENTIAL_ACTIVATION -> {
                 encodedAttestationKey = message
                 logger?.push(Log("Generating credential challenge"))
@@ -115,12 +116,12 @@ class UltrablueProtocol(
                     val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
                     val encodedCredential = Cbor.encodeToByteArray(encryptedCredential)
                     logger?.push(CLog("Credential generated", true))
-                    writeMsg("encrypted credential", encodedCredential)
+                    writeMsg(activity.getString(R.string.encrypted_cred), encodedCredential)
                 } catch (e: Exception) {
                     logger?.push(CLog("Failed to generate credential: ${e.message}", false))
                 }
             }
-            CREDENTIAL_ACTIVATION_READ -> readMsg("decrypted credential")
+            CREDENTIAL_ACTIVATION_READ -> readMsg(activity.getString(R.string.decrypted_cred))
             CREDENTIAL_ACTIVATION_ASSERT -> {
                 val decryptedCredential = Cbor.decodeFromByteArray<ByteArrayModel>(message)
                 logger?.push(Log("Comparing received credential"))
@@ -138,7 +139,7 @@ class UltrablueProtocol(
                 val encoded = Cbor.encodeToByteArray(ByteArrayModel(attestationNonce))
                 writeMsg("anti replay nonce", encoded)
             }
-            ATTESTATION_READ -> readMsg("Attestation data")
+            ATTESTATION_READ -> readMsg(activity.getString(R.string.attestation_data))
             VERIFY_QUOTE -> {
                 encodedPlatformParameters = message
                 logger?.push(Log("Verifying quotes signature"))
@@ -194,7 +195,7 @@ class UltrablueProtocol(
             }
             RESPONSE -> {
                 val encodedResponse = Cbor.encodeToByteArray(attestationResponse)
-                writeMsg("Attestation response", encodedResponse)
+                writeMsg(activity.getString(R.string.attestation_response), encodedResponse)
                 onCompletion(attestationResponse?.Err == false)
             }
         }
