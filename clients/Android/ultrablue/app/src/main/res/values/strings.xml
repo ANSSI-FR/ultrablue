@@ -21,7 +21,17 @@
     <string name="delete_device_dialog_title">Delete</string>
     <string name="delete_device_dialog_body">"Are you sure you want to delete %s\nThis action is irreversible."</string>
 
-    <string name="delete_label">delete</string>
+    <string name="delete_label">Delete</string>
     <string name="cancel_label">Cancel</string>
 
+<!-- Materials we send/receive during the protocol -->
+    <string name="ek_pub_cert">EkPub and EKCert</string>
+    <string name="auth_nonce">authentication nonce</string>
+    <string name="decrypted_auth_nonce">decrypted authentication nonce</string>
+    <string name="ak">attestation key</string>
+    <string name="encrypted_cred">encrypted credential</string>
+    <string name="decrypted_cred">decrypted credential</string>
+    <string name="anti_replay_nonce">anti replay nonce</string>
+    <string name="attestation_data">attestation data</string>
+    <string name="attestation_response">attestation response</string>
 </resources>
