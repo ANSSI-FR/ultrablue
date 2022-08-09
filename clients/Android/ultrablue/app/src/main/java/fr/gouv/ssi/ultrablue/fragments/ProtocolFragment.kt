@@ -61,6 +61,11 @@ class ProtocolFragment : Fragment() {
     private var onDeviceConnectionCallback: ((BluetoothGatt) -> Unit)? = null
     private var onMTUChangedCallback: (() -> Unit)? = null
     private var onServicesFoundCallback: (() -> Unit)? = null
+    private var gatt: BluetoothGatt? = null
+
+    private var onDeviceDisconnectionCallback: (() -> Unit) = {
+        logger?.push(CLog("Disconnected from device", false))
+    }
 
     /*
         The following variables register activities that will be started later in the program.
@@ -110,7 +115,7 @@ class ProtocolFragment : Fragment() {
                 logger?.push(CLog("Connected to device", true))
                 onDeviceConnectionCallback?.invoke(gatt!!)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                logger?.push(CLog("Disconnected from device", false))
+                onDeviceDisconnectionCallback.invoke()
             }
         }
 
@@ -235,10 +240,10 @@ class ProtocolFragment : Fragment() {
             turnBluetoothOn(btAdapter, onSuccess = {
             scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
             connectToDevice(btDevice, onSuccess = { gatt ->
+            this.gatt = gatt
             requestMTU(gatt, MTU, onSuccess = {
             searchForUltrablueService(gatt, onServiceFound = { service ->
             val chr = service.getCharacteristic(ultrablueChrUUID)
-            // TODO: Introduce protocol.start
             protocol = UltrablueProtocol(
                 (activity as MainActivity), enroll, device, logger,
                 readMsg = { tag ->
@@ -249,10 +254,7 @@ class ProtocolFragment : Fragment() {
                     val prepended = intToByteArray(msg.size) + msg
                     if (prepended.size > MTU) {
                         logger?.push(
-                            CLog(
-                                "$tag doesn't fit in one packet: message size = ${prepended.size}",
-                                false
-                            )
+                            CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false)
                         )
                     } else {
                         logger?.push(Log("Sending $tag"))
@@ -260,14 +262,31 @@ class ProtocolFragment : Fragment() {
                         gatt.writeCharacteristic(chr)
                     }
                 },
+                onCompletion = { success ->
+                    if (success) {
+                        logger?.push(CLog("Attestation success", true))
+                    } else {
+                        logger?.push(CLog("Attestation failure", false))
+                    }
+                    logger?.push(Log("Closing connection"))
+					// The protocol is over, thus it's no longer an error to be disconnected as we asked for it.
+                    onDeviceDisconnectionCallback = {
+                        logger?.push(CLog("Device disconnected", true))
+                    }
+                    gatt.disconnect()
+                    if (success && (enroll || device.secret.isNotEmpty())) {
+                        (activity as MainActivity).onSupportNavigateUp()
+                    }
+                }
             )
-            logger?.push(Log("Closing connection"))
+            protocol?.start()
             }) }) }) }) }) })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        gatt?.disconnect()
+        logger?.reset()
         (activity as MainActivity).hideUpButton()
     }
 

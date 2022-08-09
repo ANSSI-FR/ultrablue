@@ -59,7 +59,15 @@ const val RESPONSE = 13
     update the state machine, and resume the protocol.
  */
 
-class UltrablueProtocol(private val activity: MainActivity, private var enroll: Boolean = false, private var device: Device, private val logger: Logger?, private val readMsg: (String) -> Unit, private var writeMsg: (String, ByteArray) -> Unit) {
+class UltrablueProtocol(
+    private val activity: MainActivity,
+    private var enroll: Boolean = false,
+    private var device: Device,
+    private val logger: Logger?,
+    private val readMsg: (String) -> Unit,
+    private var writeMsg: (String, ByteArray) -> Unit,
+    private var onCompletion: (Boolean) -> Unit
+) {
     private var state: ProtocolStep = if (enroll) { EK_READ } else { AUTHENTICATION_READ }
     private var message = byteArrayOf()
 
@@ -72,7 +80,8 @@ class UltrablueProtocol(private val activity: MainActivity, private var enroll: 
     private var encodedPCRs: ByteArray? = null
     private var attestationResponse: AttestationResponse? = null
 
-    init {
+
+    fun start() {
         resume()
     }
 
@@ -186,6 +195,7 @@ class UltrablueProtocol(private val activity: MainActivity, private var enroll: 
             RESPONSE -> {
                 val encodedResponse = Cbor.encodeToByteArray(attestationResponse)
                 writeMsg("Attestation response", encodedResponse)
+                onCompletion(attestationResponse?.Err == false)
             }
         }
     }
