@@ -17,6 +17,7 @@ struct DeviceCardView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showProtocolView = false
     @State private var showDeviceView = false
+    @State private var bleManager = BLEManager()
         
     @StateObject var device: Device
     
@@ -38,7 +39,9 @@ struct DeviceCardView: View {
             }
             Spacer()
             VStack(alignment: .trailing) {
-                Button(action: runAttestation) {
+                Button(action: {
+                    runAttestation()
+                }) {
                     Image(systemName: "play.fill")
                 }
                 .font(.system(size: 25))
@@ -64,9 +67,9 @@ struct DeviceCardView: View {
         .onTapGesture {
             showDeviceInfo()
         }
-        NavigationLink(destination: ProtocolView(device: device), isActive: $showProtocolView) {
-            EmptyView()
-        }
+        .sheet(isPresented: $showProtocolView, content: {
+            ProtocolView(address: device.addr!, bleManager: $bleManager)
+        })
         NavigationLink(destination: DeviceView(device: device), isActive: $showDeviceView) {
             EmptyView()
         }

@@ -24,5 +24,13 @@ class ultrablueTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+    
+    func testUIntToData() throws {
+        let u: UInt = 42
+        let ref = Data([0x2a, 0, 0, 0])
+        
+        let d = u.toLittleEndianData()
+        XCTAssert(d == ref)
+    }
 
 }

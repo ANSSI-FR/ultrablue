@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import SwiftUI
+import Combine
 
 extension Log {
     enum Kind {
@@ -13,13 +15,13 @@ extension Log {
     }
 }
 
-class Log {
+class Log: Identifiable, ObservableObject {
     private let uuid = UUID()
     private let kind: Kind
     private let value: String
     
-    var success: Bool?
-    var state: (progress: UInt, total: UInt)?
+    @Published var success: Bool?
+    @Published var state: (progress: UInt, total: UInt)?
 
     var string: String {
         get {
@@ -58,8 +60,19 @@ class Log {
         }
     }
     
+    func update(delta: UInt) {
+        if kind == .progress {
+            if state!.progress + delta >= state!.total {
+                success = true
+                state!.progress = state!.total
+            } else {
+                state!.progress += delta
+            }
+        }
+    }
+    
     private func drawProgressBar(_ state: (progress: UInt, total: UInt)) -> String {
-        let barLength = 20
+        let barLength = 23
         let percent = Float(state.progress) / Float(state.total)
         let filled = Int(percent * (Float(barLength) - 2))
         let empty = barLength - (2 + filled)
@@ -70,14 +83,50 @@ class Log {
     
 }
 
-class Logger {
-    var logs: [Log]
+class Logger: ObservableObject {
+    @Published private var logs: [Log]
+    private var onFailure: () -> Void
     
-    init() {
+    var lines: [Log] {
+        return self.logs
+    }
+    
+    init(onFailure: @escaping () -> Void = {}) {
+        self.onFailure = onFailure
         self.logs = [Log]()
     }
 
     func push(log: Log) {
         self.logs.append(log)
+    }
+    
+    func updateLast(progress: UInt) {
+        self.logs.last?.update(progress: progress)
+    }
+    
+    func updateLast(delta: UInt) {
+        self.logs.last?.update(delta: delta)
+    }
+    
+    func completeLast(success: Bool) {
+        self.logs.last?.complete(success: success)
+        if success == false {
+            onFailure()
+        }
+    }
+    
+    func clear() {
+        self.logs.removeAll()
+    }
+    
+    func debug() {
+        print("=== DEBUG ===")
+        for log in logs {
+            print("log: \(log.string), success: \(log.success ?? false)")
+        }
+    }
+    
+    func setOnFailureCallback(_ callback: @escaping () -> Void) {
+        self.onFailure = callback
     }
 }

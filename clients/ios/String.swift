@@ -10,8 +10,10 @@ import Foundation
 extension String {
     func replaceLast(with ch: Character) -> String {
         var newString = self
-        newString.removeLast()
-        newString.append(ch)
+        if !newString.isEmpty {
+            newString.removeLast()
+            newString.append(ch)
+        }
         return newString
     }
 }

@@ -8,34 +8,34 @@
 import SwiftUI
 
 struct LogView: View {
-    var log: Log
+    @StateObject var log: Log
+    var fontSize = 14.0
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             Text("[")
                 .padding(.leading, 10)
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: fontSize, design: .monospaced))
             switch (log.success) {
             case true:
                 Text("OK")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: fontSize, design: .monospaced))
                     .foregroundColor(Color(UIColor.systemGreen))
             case false:
                 Text("KO")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: fontSize, design: .monospaced))
                     .foregroundColor(Color(UIColor.systemRed))
             default:
                 Text("  ")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: fontSize, design: .monospaced))
             }
             Text("]")
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: fontSize, design: .monospaced))
             Text(log.string)
                 .padding(.leading, 10)
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: fontSize, design: .monospaced))
             Spacer()
         }
-        Spacer()
         .frame(maxWidth: .infinity)
     }
 }

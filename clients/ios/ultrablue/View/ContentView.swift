@@ -16,18 +16,7 @@ struct ContentView: View {
     private var devices: FetchedResults<Device>
 
     var body: some View {
-        TabView {
-            DeviceListView()
-            .tabItem {
-                Text("Devices")
-                Image(systemName: "rectangle.stack")
-            }
-            SettingsView()
-            .tabItem {
-                Text("Settings")
-                Image(systemName: "gearshape")
-            }
-        }
+        DeviceListView()
     }
 }
 

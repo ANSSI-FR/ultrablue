@@ -17,7 +17,7 @@ struct ContentCard: View {
                 Text(title)
                     .padding([.top, .leading], 10)
                 Text(content)
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(.gray)
                     .font(.system(size: 18, design: .monospaced))
                     .padding([.leading, .bottom], 10)
                     .padding(.top, 1)

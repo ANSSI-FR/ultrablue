@@ -34,7 +34,7 @@ struct DeviceView: View {
                 Button(action: {
                     isEditing = true
                 }, label: {
-                    Image(systemName: "pencil")
+                    Text("Edit")
                 })
                 .sheet(isPresented: $isEditing, content: {
                     DeviceEditView(newName: device.name!, device: device, policy: Policy(device.pcrpolicy).toBoolArray())
