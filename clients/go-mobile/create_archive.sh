@@ -19,8 +19,8 @@ go get golang.org/x/mobile/bind
 gomobile bind -target=android -v .
 
 if [ $# -eq 1 ]; then
-	echo "Copying gaac.aac to $1"
+	echo "Copying gomobile.aac to $1"
 	cp gomobile.aar "$1"
 else
-	echo "Don't forget to copy gac.aac in your android project"
+	echo "Don't forget to copy gomobile.aac in your android project"
 fi

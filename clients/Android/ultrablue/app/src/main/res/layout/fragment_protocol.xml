@@ -6,13 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".fragments.ProtocolFragment">
 
-    <TextView
-        android:id="@+id/logger_text_view"
+    <ScrollView
+        android:id="@+id/logger_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginVertical="10dp"
-        android:layout_marginHorizontal="5dp"
-        android:fontFamily="monospace"
-        android:textSize="15sp"
-        />
+        android:layout_marginHorizontal="5dp">
+        <TextView
+            android:id="@+id/logger_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textSize="15sp"
+            />
+    </ScrollView>
+
 </FrameLayout>

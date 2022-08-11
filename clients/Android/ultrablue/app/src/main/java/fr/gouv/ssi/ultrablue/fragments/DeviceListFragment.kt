@@ -6,7 +6,6 @@ import android.view.*
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -124,7 +123,7 @@ class DeviceListFragment : Fragment(R.layout.fragment_device_list), ItemClickLis
         when(result) {
             is QRResult.QRSuccess -> {
                 if (isMACAddressValid(result.content.rawValue.trim())) {
-                    val device = Device(0, "", result.content.rawValue.trim(), byteArrayOf(), 0, byteArrayOf())
+                    val device = Device(0, "", result.content.rawValue.trim(), byteArrayOf(), 0, byteArrayOf(), byteArrayOf())
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
                     val bundle = bundleOf("device" to device)
                     nc.navigate(R.id.action_deviceListFragment_to_protocolFragment, bundle)
