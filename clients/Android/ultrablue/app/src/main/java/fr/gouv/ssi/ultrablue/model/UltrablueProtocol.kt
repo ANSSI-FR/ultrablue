@@ -36,8 +36,8 @@ class AttestationResponse @OptIn(ExperimentalSerializationApi::class) constructo
 
 typealias ProtocolStep = Int
 
-const val EK_READ = 0
-const val EK_DECODE = 1
+const val REGISTRATION_DATA_READ = 0
+const val REGISTRATION_DATA_DECODE = 1
 const val AUTHENTICATION_READ = 2
 const val AUTHENTICATION = 3
 const val AK_READ = 4
@@ -69,11 +69,11 @@ class UltrablueProtocol(
     private var writeMsg: (String, ByteArray) -> Unit,
     private var onCompletion: (Boolean) -> Unit
 ) {
-    private var state: ProtocolStep = if (enroll) { EK_READ } else { AUTHENTICATION_READ }
+    private var state: ProtocolStep = if (enroll) { REGISTRATION_DATA_READ } else { AUTHENTICATION_READ }
     private var message = byteArrayOf()
 
     private val rand = SecureRandom()
-    private var ek = RegistrationDataModel(device.ekn, device.eke.toUInt(), device.ekcert, device.secret.isNotEmpty()) // If enrolling a device, this field is uninitialized, but will be after EK_READ.
+    private var registrationData = RegistrationDataModel(device.ekn, device.eke.toUInt(), device.ekcert, device.secret.isNotEmpty()) // If enrolling a device, this field is uninitialized, but will be after EK_READ.
     private var credentialActivationSecret: ByteArray? = null
     private var encodedAttestationKey: ByteArray? = null
     private var encodedPlatformParameters: ByteArray? = null
@@ -89,16 +89,16 @@ class UltrablueProtocol(
     @OptIn(ExperimentalSerializationApi::class)
     private fun resume() {
         when (state) {
-            EK_READ -> readMsg(activity.getString(R.string.ek_pub_cert))
-            EK_DECODE -> {
-                ek = Cbor.decodeFromByteArray(message)
+            REGISTRATION_DATA_READ -> readMsg(activity.getString(R.string.ek_pub_cert))
+            REGISTRATION_DATA_DECODE -> {
+                registrationData = Cbor.decodeFromByteArray(message)
                 state += 1
                 resume()
             }
             AUTHENTICATION_READ -> readMsg(activity.getString(R.string.auth_nonce))
             AUTHENTICATION -> {
                 if (message.size != 24) {
-                    logger?.push(CLog("Invalid nonce length. Make sure you ran the attestation server without the --enroll flag.", false))
+                    logger?.push(CLog("The Ultrablue server is running on enroll mode whereas an attestation was expected", false))
                     return
                 }
                 val authNonce = Cbor.decodeFromByteArray<ByteArrayModel>(message)
@@ -111,7 +111,7 @@ class UltrablueProtocol(
                 encodedAttestationKey = message
                 logger?.push(Log("Generating credential challenge"))
                 try {
-                    val credentialBlob = Gomobile.makeCredential(ek.N, ek.E.toLong(), encodedAttestationKey)
+                    val credentialBlob = Gomobile.makeCredential(registrationData.N, registrationData.E.toLong(), encodedAttestationKey)
                     credentialActivationSecret = credentialBlob.secret
                     val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
                     val encodedCredential = Cbor.encodeToByteArray(encryptedCredential)
@@ -202,7 +202,7 @@ class UltrablueProtocol(
     }
 
     private fun registerDevice() {
-        val secret = if (ek.PCRExtend) {
+        val secret = if (registrationData.PCRExtend) {
             ByteArray(16)
         } else {
             byteArrayOf()
@@ -210,9 +210,9 @@ class UltrablueProtocol(
         rand.nextBytes(secret)
 
         device.name = "device" + device.uid
-        device.ekn = ek.N
-        device.eke = ek.E.toInt()
-        device.ekcert = ek.Cert
+        device.ekn = registrationData.N
+        device.eke = registrationData.E.toInt()
+        device.ekcert = registrationData.Cert
         device.encodedPCRs = encodedPCRs!!
         device.secret = secret
         logger?.push(Log("Registering device"))
