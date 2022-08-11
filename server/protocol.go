@@ -230,7 +230,7 @@ func response(ch chan []byte) error {
 	if err != nil {
 		return err
 	}
-	if response.Err == true {
+	if response.Err {
 		close(ch)
 		return errors.New("Attestation failure")
 	}
