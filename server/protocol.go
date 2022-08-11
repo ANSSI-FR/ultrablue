@@ -117,7 +117,7 @@ func parseAttestEK(ek *attest.EK) (RegistrationData, error) {
 	return RegistrationData{c, n, e, *pcrextend}, nil
 }
 
-func ekenroll(ch chan []byte, tpm *attest.TPM) error {
+func sendRegistrationData(ch chan []byte, tpm *attest.TPM) error {
 	logrus.Info("Retrieving EK pub and EK cert")
 	eks, err := tpm.EKs()
 	if err != nil {
@@ -270,7 +270,7 @@ func ultrablueProtocol(ch chan []byte) {
 	defer tpm.Close()
 
 	if *enroll {
-		err = ekenroll(ch, tpm)
+		err = sendRegistrationData(ch, tpm)
 		if err != nil {
 			logrus.Error(err)
 			return
