@@ -94,7 +94,7 @@ type RegistrationData struct {
 	Cert      []byte // x509 key certificate (one byte set to 0 if none)
 	N         []byte // Raw public key bytes
 	E         int    // Public key exponent
-	PCRExtend bool   // Wether or not PCR_EXTENSION_INDEX must be extended on attestation success
+	PCRExtend bool   // Whether or not PCR_EXTENSION_INDEX must be extended on attestation success
 }
 
 // As encoding raw byte arrays to CBOR is not handled very well by
