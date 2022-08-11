@@ -81,6 +81,10 @@ class Logger(private var activity: MainActivity?, private var textView: TextView
         updateUI()
     }
 
+    /*
+        This is where we update the user interface so that the
+        user see the logger updates.
+     */
     private fun updateUI() {
         activity?.runOnUiThread {
             textView.setText(

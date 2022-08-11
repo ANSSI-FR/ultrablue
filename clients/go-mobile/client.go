@@ -23,6 +23,12 @@ import (
 	"github.com/google/go-attestation/attest"
 )
 
+/*
+	CredentialBlob is a structure used during the
+	credential activation process. It packs all
+	return values of the ActivationParameters.generate
+	method from the attest package.
+*/
 type CredentialBlob struct {
 	Secret     []byte
 	Cred       []byte
@@ -85,12 +91,12 @@ func MakeCredential(ekn []byte, eke int, encodedap []byte) (*CredentialBlob, err
 	It also asserts that the final PCRs values from the attestation
 	data matches the quotes ones.
 */
-func CheckQuotesSignature(encodedak, encodedpp, nonce []byte) error {
+func CheckQuotesSignature(encodedap, encodedpp, nonce []byte) error {
 	var ap attest.AttestationParameters
 	var pp attest.PlatformParameters
 
 	// Decoding CBOR parameters
-	if err := cbor.Unmarshal(encodedak, &ap); err != nil {
+	if err := cbor.Unmarshal(encodedap, &ap); err != nil {
 		return err
 	}
 	if err := cbor.Unmarshal(encodedpp, &pp); err != nil {

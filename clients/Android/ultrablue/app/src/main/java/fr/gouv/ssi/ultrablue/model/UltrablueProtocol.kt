@@ -86,13 +86,18 @@ class UltrablueProtocol(
         resume()
     }
 
+    /*
+        Some steps ends with writeMsg or readMsg. It so, the state is automatically updated, and the
+        protocol resumed. If not, we need to set the state, and call resume() manually.
+    */
+
     @OptIn(ExperimentalSerializationApi::class)
     private fun resume() {
         when (state) {
             REGISTRATION_DATA_READ -> readMsg(activity.getString(R.string.ek_pub_cert))
             REGISTRATION_DATA_DECODE -> {
                 registrationData = Cbor.decodeFromByteArray(message)
-                state += 1
+                state = AUTHENTICATION_READ
                 resume()
             }
             AUTHENTICATION_READ -> readMsg(activity.getString(R.string.auth_nonce))
@@ -112,6 +117,7 @@ class UltrablueProtocol(
                 logger?.push(Log("Generating credential challenge"))
                 try {
                     val credentialBlob = Gomobile.makeCredential(registrationData.N, registrationData.E.toLong(), encodedAttestationKey)
+                    // We store the secret now to validate it later.
                     credentialActivationSecret = credentialBlob.secret
                     val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
                     val encodedCredential = Cbor.encodeToByteArray(encryptedCredential)
@@ -127,7 +133,7 @@ class UltrablueProtocol(
                 logger?.push(Log("Comparing received credential"))
                 if (decryptedCredential.Bytes.contentEquals(credentialActivationSecret)) {
                     logger?.push(CLog("Credential matches the generated one", true))
-                    state += 1
+                    state = ATTESTATION_SEND_NONCE
                     resume()
                 } else {
                     logger?.push(CLog("Credential doesn't match the generated one", false))
@@ -146,7 +152,7 @@ class UltrablueProtocol(
                 try {
                     Gomobile.checkQuotesSignature(encodedPlatformParameters, encodedAttestationKey, attestationNonce)
                     logger?.push(CLog("Quotes signature are valid", true))
-                    state += 1
+                    state = REPLAY_EVENT_LOG
                     resume()
                 } catch (e: Exception) {
                     logger?.push(CLog("Error while verifying quote(s) signature: ${e.message}", false))
@@ -157,7 +163,7 @@ class UltrablueProtocol(
                 try {
                     Gomobile.replayEventLog(encodedPlatformParameters)
                     logger?.push(CLog("Event log has been replayed", true))
-                    state += 1
+                    state = PCRS_HANDLE
                     resume()
                 } catch (e: Exception) {
                     logger?.push(CLog("${e.message}", false))
