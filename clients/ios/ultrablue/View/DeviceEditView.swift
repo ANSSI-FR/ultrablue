@@ -55,6 +55,12 @@ struct DeviceEditView: View {
                         .padding(10)
                         Button(action: {
                             viewContext.delete(device)
+                            do {
+                                try viewContext.save()
+                            } catch {
+                                // TODO: Show an alert
+                                print("Failed to delete device")
+                            }
                             dismiss()
                         }) {
                            Text("Delete")
