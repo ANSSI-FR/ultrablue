@@ -122,8 +122,12 @@ extension BLEManager: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if attester != nil {
-            logger?.push(log: Log("Device just disconnected"))
-            logger?.completeLast(success: false)
+            // Delay the disconnection notification, because on protocol end, the disconnection isn't an error, and
+            // we want to let the client time to shutdown manually.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.logger?.push(log: Log("Device just disconnected"))
+                self.logger?.completeLast(success: false)
+            }
         }
     }
     
