@@ -48,7 +48,8 @@ class BLEManager: NSObject {
         if manager.isScanning {
             manager.stopScan()
         }
-        if attester != nil {
+        if let at = attester {
+            self.manager.cancelPeripheralConnection(at)
             attester = nil
         }
     }
@@ -75,6 +76,14 @@ class BLEManager: NSObject {
     func setOnMsgWriteCallback(callback: @escaping () -> Void) {
         self.onMsgWriteCallback = callback
     }
+    
+    func getAttesterUUID() -> UUID? {
+        if let a = attester {
+            return a.identifier
+        } else {
+            return nil
+        }
+    }
 
 }
 
@@ -93,7 +102,9 @@ extension BLEManager: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         // TODO: Scan for server with the name "ultrablue-PIN", where pin is a pin in the qrcode, or scan for a known device (with uuid)
-        if peripheral.name == "Ultrablue server" || peripheral.name == "computer_t" || peripheral.name == "Gopher" {
+        print("Discovered someone" + (peripheral.name ?? "name"))
+        // TODO: Change it to only ultrablue-server when iphone cache is reset
+        if peripheral.name == "ultrablue-server" || peripheral.name == "Gopher" {
             central.stopScan()
             logger?.completeLast(success: true)
             logger?.push(log: Log("Device found, connecting"))

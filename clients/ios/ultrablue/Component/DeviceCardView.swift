@@ -17,21 +17,28 @@ struct DeviceCardView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showProtocolView = false
     @State private var showDeviceView = false
-    @State private var bleManager = BLEManager()
+    @State var bleManager: BLEManager
         
     @StateObject var device: Device
     
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
-                Text(device.name ?? "")
-                    .font(.system(size: 24))
-                    .foregroundColor(Color(UIColor.label))
-                    .bold()
-                    .padding(.leading, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, 2)
-                Text(device.addr ?? "")
+                HStack(alignment: .top) {
+                    if device.secret != nil && device.secret!.count > 0 {
+                        Image(systemName: "key.fill")
+                            .padding(.top, 5)
+                            .foregroundColor(.gray)
+                    }
+                    Text(device.name ?? "")
+                        .font(.system(size: 24))
+                        .foregroundColor(Color(UIColor.label))
+                        .bold()
+                }
+                .padding(.leading, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 2)
+                Text("Last attestation:\n" + (device.last_attestation_time?.formatted() ?? "--/--/--"))
                     .font(.system(size: 16, design: .monospaced))
                     .foregroundColor(Color(UIColor.label))
                     .padding(.bottom, 10)
@@ -68,7 +75,7 @@ struct DeviceCardView: View {
             showDeviceInfo()
         }
         .sheet(isPresented: $showProtocolView, content: {
-            ProtocolView(address: device.addr!, bleManager: $bleManager)
+            ProtocolView(device: device, bleManager: bleManager)
         })
         NavigationLink(destination: DeviceView(device: device), isActive: $showDeviceView) {
             EmptyView()
@@ -91,11 +98,5 @@ struct DeviceCardView: View {
             // TODO: Show an alert
             print("Failed to delete device")
         }
-    }
-}
-
-struct DeviceCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        DeviceCardView(device: Device())
     }
 }

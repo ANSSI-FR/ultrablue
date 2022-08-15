@@ -14,13 +14,15 @@ struct DeviceListView: View {
     @FetchRequest(entity: Device.entity(), sortDescriptors: [])
     var devices: FetchedResults<Device>
     @State private var isShowingScanner = false
+    @State private var showProtocolView = false
+    @State private var bleManager = BLEManager()
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(devices) { device in
-                        DeviceCardView(device: device)
+                        DeviceCardView(bleManager: bleManager, device: device)
                             .padding(.bottom, 3)
                     }
                 }
@@ -44,6 +46,9 @@ struct DeviceListView: View {
                     .sheet(isPresented: $isShowingScanner) {
                         CodeScannerView(codeTypes: [.qr], showViewfinder: true, completion: self.handleScan)
                     }
+                    .sheet(isPresented: $showProtocolView, content: {
+                        ProtocolView(device: nil, bleManager: bleManager)
+                    })
                 }
             }
             .navigationTitle("Devices")
@@ -55,17 +60,7 @@ struct DeviceListView: View {
         switch result {
         case .success(let result):
             if isValidRegistrationData(data: result.string) {
-                let device = Device(context: viewContext)
-                device.id = UUID()
-                device.addr = result.string
-                device.name = Name.generate()
-                device.pcrpolicy = Policy(.strict).value
-                do {
-                    try viewContext.save()
-                } catch {
-                    // TODO: Show an alert
-                    print("An error occured")
-                }
+                showProtocolView = true
             } else {
                 // TODO: Show an alert
                 print("Invalid registration QR code")

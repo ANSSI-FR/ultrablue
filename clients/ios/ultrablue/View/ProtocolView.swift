@@ -11,11 +11,14 @@ import CoreBluetooth
 import ConfettiSwiftUI
 
 struct ProtocolView: View {
+    @Environment(\.dismiss) var dismiss: DismissAction
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var isAlertPresented = false
+    @State private var isActionSheetPresented = false
     @State private var confettiCounter = 0
     @StateObject var logger = Logger()
-    var address: String
-    @Binding var bleManager: BLEManager
+    var device: Device?
+    @State var bleManager: BLEManager
 
     var body: some View {
         NavigationView {
@@ -32,7 +35,7 @@ struct ProtocolView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: {
-                        print("Tried to cancel attestation")
+                        isActionSheetPresented = true
                     }, label: {
                         Text("Cancel")
                     })
@@ -62,16 +65,26 @@ struct ProtocolView: View {
                 })
             )
         }
+        .confirmationDialog("Cancel attestation", isPresented: $isActionSheetPresented) {
+            // TODO: replace attestation with enrollment when appropriate
+            Button("Cancel attestation", role: .destructive) {
+                bleManager.shutdown()
+                logger.clear()
+                dismiss()
+            }
+        }
+        // TODO: Present the confirmation dialog when the feature is added by Apple.
+        .interactiveDismissDisabled()
         .confettiCannon(counter: $confettiCounter, num: 150, rainHeight: 600, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 400)
     }
     
     func runAttestation() {
         bleManager.searchForAttestingDevice(onAttesterFound: {
-            let _ = UltrablueProtocol(bleManager: bleManager, logger: logger, onSuccess: {
+            let _ = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onSuccess: {
                 bleManager.shutdown()
                 confettiCounter += 1
             })
         })
     }
-    
+
 }

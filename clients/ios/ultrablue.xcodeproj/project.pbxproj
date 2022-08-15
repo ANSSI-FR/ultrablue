@@ -24,6 +24,8 @@
 		2679B9FF288444BF009BBB4A /* Policy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9FE288444BF009BBB4A /* Policy.swift */; };
 		2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0028845A14009BBB4A /* PCREntryCard.swift */; };
 		2679BA0328845E38009BBB4A /* PCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0228845E37009BBB4A /* PCR.swift */; };
+		267E9CB828A446F700320228 /* Gomobile.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 267E9CB628A4465200320228 /* Gomobile.xcframework */; settings = {ATTRIBUTES = (Required, ); }; };
+		267E9CB928A446F700320228 /* Gomobile.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 267E9CB628A4465200320228 /* Gomobile.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		268B68E52889BC6600235C6A /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268B68E42889BC6600235C6A /* BLEManager.swift */; };
 		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
 		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
@@ -56,6 +58,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		267E9CBA28A446F700320228 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				267E9CB928A446F700320228 /* Gomobile.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		260B8D0E28A41B820001DB80 /* Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversion.swift; sourceTree = "<group>"; };
 		260B8D1328A42FFE0001DB80 /* CBOR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBOR.swift; sourceTree = "<group>"; };
@@ -71,6 +87,7 @@
 		2679B9FE288444BF009BBB4A /* Policy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Policy.swift; sourceTree = "<group>"; };
 		2679BA0028845A14009BBB4A /* PCREntryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCREntryCard.swift; sourceTree = "<group>"; };
 		2679BA0228845E37009BBB4A /* PCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCR.swift; sourceTree = "<group>"; };
+		267E9CB628A4465200320228 /* Gomobile.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Gomobile.xcframework; path = "../../../go-mobile/Gomobile.xcframework"; sourceTree = "<group>"; };
 		268B68E42889BC6600235C6A /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
 		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
@@ -96,6 +113,7 @@
 			files = (
 				260B8D1228A42FD90001DB80 /* SwiftCBOR in Frameworks */,
 				260B8D0A28A409910001DB80 /* ConfettiSwiftUI in Frameworks */,
+				267E9CB828A446F700320228 /* Gomobile.xcframework in Frameworks */,
 				260B8D0728A4096F0001DB80 /* Introspect in Frameworks */,
 				260B8D0D28A409A00001DB80 /* CodeScanner in Frameworks */,
 			);
@@ -157,6 +175,14 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		267E9CB528A4461400320228 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				267E9CB628A4465200320228 /* Gomobile.xcframework */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
 		269650972879E02900A6C399 = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +207,7 @@
 		269650A22879E02900A6C399 /* ultrablue */ = {
 			isa = PBXGroup;
 			children = (
+				267E9CB528A4461400320228 /* Frameworks */,
 				265FCD3C288318D9001A25CD /* Model */,
 				263212A628820D2A005E6A2D /* Component */,
 				263212A528820CD7005E6A2D /* View */,
@@ -236,6 +263,7 @@
 				2696509C2879E02900A6C399 /* Sources */,
 				2696509D2879E02900A6C399 /* Frameworks */,
 				2696509E2879E02900A6C399 /* Resources */,
+				267E9CBA28A446F700320228 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

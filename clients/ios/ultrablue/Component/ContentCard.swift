@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentCard: View {
     var title: String
     var content: String
+    var copiable: Bool
     
     var body: some View {
         HStack(alignment: .top) {
@@ -18,11 +20,19 @@ struct ContentCard: View {
                     .padding([.top, .leading], 10)
                 Text(content)
                     .foregroundColor(.gray)
-                    .font(.system(size: 18, design: .monospaced))
+                    .font(.system(size: copiable ? 12 : 18, design: .monospaced))
                     .padding([.leading, .bottom], 10)
                     .padding(.top, 1)
             }
             Spacer()
+            if copiable {
+                Button(action: {
+                    UIPasteboard.general.string = content
+                }) {
+                    Image(systemName: "square.on.square")
+                }
+                .padding(10)
+            }
         }
         .background(Color(UIColor.secondarySystemGroupedBackground))
         .cornerRadius(10)
@@ -31,6 +41,6 @@ struct ContentCard: View {
 
 struct ContentCard_Previews: PreviewProvider {
     static var previews: some View {
-        ContentCard(title: "title", content: "content")
+        ContentCard(title: "title", content: "content", copiable: true)
     }
 }

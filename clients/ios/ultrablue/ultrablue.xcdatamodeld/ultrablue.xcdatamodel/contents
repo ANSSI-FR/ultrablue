@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21G72" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Device" representedClassName="Device" syncable="YES" codeGenerationType="class">
         <attribute name="addr" optional="YES" attributeType="String"/>
+        <attribute name="cert" optional="YES" attributeType="Binary"/>
+        <attribute name="creation_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="e" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="last_attestation_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="n" optional="YES" attributeType="Binary"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="pcrpolicy" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="secret" optional="YES" attributeType="Binary"/>
     </entity>
     <elements>
-        <element name="Device" positionX="-45" positionY="9" width="128" height="89"/>
+        <element name="Device" positionX="-45" positionY="9" width="128" height="179"/>
     </elements>
 </model>
