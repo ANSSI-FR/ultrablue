@@ -9,6 +9,7 @@ import (
 	"errors"
 	"os"
 	"reflect"
+	"time"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/google/go-attestation/attest"
@@ -105,7 +106,7 @@ func parseAttestEK(ek *attest.EK) (RegistrationData, error) {
 	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
 		return RegistrationData{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
 	}
-	var c []byte = make([]byte, 1)
+	var c []byte = make([]byte, 0)
 	if ek.Certificate != nil {
 		c = ek.Certificate.Raw
 	}
@@ -295,5 +296,6 @@ func ultrablueProtocol(ch chan []byte) {
 		logrus.Error(err)
 		os.Exit(1)
 	}
+	time.Sleep(time.Second)
 	os.Exit(0)
 }
