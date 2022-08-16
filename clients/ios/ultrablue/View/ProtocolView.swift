@@ -44,14 +44,13 @@ struct ProtocolView: View {
         }
         .onAppear() {
             logger.setOnFailureCallback({
-                bleManager.shutdown()
+                bleManager.shutdown(err: true)
                 self.isAlertPresented.toggle()
             })
             bleManager.setLogger(logger: logger)
             runAttestation()
         }
         .onDisappear() {
-            bleManager.shutdown()
             logger.clear()
         }
         .alert(isPresented: $isAlertPresented) { () -> Alert in
@@ -61,6 +60,10 @@ struct ProtocolView: View {
                 primaryButton: .default(Text("Ok")),
                 secondaryButton: .default(Text("Retry"), action: {
                     logger.clear()
+                    logger.setOnFailureCallback {
+                        bleManager.shutdown(err: true)
+                        self.isAlertPresented.toggle()
+                    }
                     runAttestation()
                 })
             )
@@ -68,7 +71,7 @@ struct ProtocolView: View {
         .confirmationDialog("Cancel attestation", isPresented: $isActionSheetPresented) {
             // TODO: replace attestation with enrollment when appropriate
             Button("Cancel attestation", role: .destructive) {
-                bleManager.shutdown()
+                bleManager.shutdown(err: true)
                 logger.clear()
                 dismiss()
             }

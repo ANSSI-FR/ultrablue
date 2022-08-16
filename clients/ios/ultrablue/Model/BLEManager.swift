@@ -22,6 +22,8 @@ class BLEManager: NSObject {
     private var onMsgReadCallback: ((Data) -> Void)? = nil
     private var onMsgWriteCallback: (() -> Void)? = nil
     
+    private var shutdownLock: Bool = false
+    private var shutdownErr: Bool = false
     private var message: Data = Data()
     private var messageLength: UInt = 0
     private var messageTag: String = ""
@@ -37,6 +39,7 @@ class BLEManager: NSObject {
     
     func searchForAttestingDevice(onAttesterFound: @escaping () -> Void) {
         if manager.state == .poweredOn {
+            reset()
             self.onAttesterFound = onAttesterFound
             logger?.push(log: Log("Scanning for attesting device"))
             let options: [String: Any] = [CBCentralManagerScanOptionAllowDuplicatesKey: NSNumber(value: false)]
@@ -44,14 +47,32 @@ class BLEManager: NSObject {
         }
     }
     
-    func shutdown() {
+    func shutdown(err: Bool = false) {
+        if shutdownLock {
+            return
+        }
+        shutdownLock = true
+        logger?.push(log: Log("Shutting down connection"))
         if manager.isScanning {
             manager.stopScan()
         }
         if let at = attester {
+            attestationChr = nil // To make sure the disconnection will not block
+            shutdownErr = err
             self.manager.cancelPeripheralConnection(at)
-            attester = nil
+        } else {
+            logger?.completeLast(success: !err)
         }
+    }
+    
+    func reset() {
+        attester = nil
+        attestationChr = nil
+        message = Data()
+        messageLength = 0
+        messageTag = ""
+        shutdownErr = false
+        shutdownLock = false
     }
     
     func sendMsg(msg: Data) {
@@ -102,9 +123,8 @@ extension BLEManager: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         // TODO: Scan for server with the name "ultrablue-PIN", where pin is a pin in the qrcode, or scan for a known device (with uuid)
-        print("Discovered someone" + (peripheral.name ?? "name"))
-        // TODO: Change it to only ultrablue-server when iphone cache is reset
-        if peripheral.name == "ultrablue-server" || peripheral.name == "Gopher" {
+        let advertisedName = advertisementData["kCBAdvDataLocalName"] as? String?
+        if advertisedName == "ultrablue-server" {
             central.stopScan()
             logger?.completeLast(success: true)
             logger?.push(log: Log("Device found, connecting"))
@@ -121,13 +141,11 @@ extension BLEManager: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if attester != nil {
-            // Delay the disconnection notification, because on protocol end, the disconnection isn't an error, and
-            // we want to let the client time to shutdown manually.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.logger?.push(log: Log("Device just disconnected"))
-                self.logger?.completeLast(success: false)
-            }
+        if !shutdownLock {
+            shutdownLock = true
+            logger?.push(log: Log("Device just disconnected", success: false))
+        } else {
+            logger?.completeLast(success: !shutdownErr)
         }
     }
     

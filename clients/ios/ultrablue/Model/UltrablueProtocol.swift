@@ -58,6 +58,7 @@ class UltrablueProtocol {
     private var credentialActivationSecret: Data? = nil
     private var antiReplayNonce: Data? = nil
     private var encodedPCRs: Data? = nil
+    private var secret: Data = Data()
     private var attestationResponse: AttestationResponse? = nil
     
     init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onSuccess: @escaping () -> Void) {
@@ -172,7 +173,7 @@ class UltrablueProtocol {
                 return
             }
             logger.completeLast(success: true)
-            resumeProtocol(at: .pcr_policy_apply)
+            resumeProtocol(at: .pcrs_read)
         case .pcrs_read:
             logger.push(log: Log("Extract PCRs from attestation data"))
             let wrappedPCRs = Gomobile.GomobileGetPCRs(encodedpp, nil)
@@ -182,17 +183,25 @@ class UltrablueProtocol {
             }
             encodedPCRs = wp.data
             logger.completeLast(success: true)
-            resumeProtocol(at: .pcr_policy_apply)
-        case .pcr_policy_apply:
             if enroll {
-                saveNewDevice()
-                attestationResponse = AttestationResponse(err: false, Secret: device!.secret!)
+                if enrollData?.PCRExtend == true {
+                    logger.push(log: Log("Generating new attester secret"))
+                    guard let s = generateSecret() else {
+                        logger.completeLast(success: false)
+                        return
+                    }
+                    logger.completeLast(success: true)
+                    secret = s
+                }
+                attestationResponse = AttestationResponse(err: false, Secret: secret)
                 resumeProtocol(at: .attestation_response)
             } else {
+                resumeProtocol(at: .pcr_policy_apply)
+            }
+        case .pcr_policy_apply:
                 logger.push(log: Log("Applying PCR policy"))
                 // TODO: Checking each stored PCR against received ones
                 logger.completeLast(success: false)
-            }
         case .attestation_response:
             guard let ar = attestationResponse else {
                 print("attestation response must be set at this stage")
@@ -208,22 +217,12 @@ class UltrablueProtocol {
                 return
             }
         case .end:
+            saveNewDevice()
             onSuccess()
         }
     }
     
     private func saveNewDevice() {
-        var secret = Data()
-        if enrollData?.PCRExtend == true {
-            logger.push(log: Log("Generating secret for new attester"))
-            var bytes = [Int8](repeating: 0, count: 16)
-            guard SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes) == errSecSuccess else {
-                logger.completeLast(success: false)
-                return
-            }
-            secret = Data(bytes: &bytes, count: 16)
-            logger.completeLast(success: true)
-        }
         logger.push(log: Log("Saving new attester entry"))
         device = Device(context: context)
         guard let d = device else {
@@ -247,6 +246,14 @@ class UltrablueProtocol {
             return
         }
         logger.completeLast(success: true)
+    }
+    
+    private func generateSecret() -> Data? {
+        var bytes = [Int8](repeating: 0, count: 16)
+        guard SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes) == errSecSuccess else {
+            return nil
+        }
+        return Data(bytes: &bytes, count: 16)
     }
     
     private func readMsg(tag: String) {

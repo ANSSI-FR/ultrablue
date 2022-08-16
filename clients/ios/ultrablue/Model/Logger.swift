@@ -34,9 +34,10 @@ class Log: Identifiable, ObservableObject {
         }
     }
 
-    init(_ msg: String) {
+    init(_ msg: String, success: Bool? = nil) {
         self.kind = .standard
         self.value = msg
+        self.success = success
     }
     
     init(_ msg: String, tasksize: UInt) {
@@ -97,6 +98,9 @@ class Logger: ObservableObject {
     }
 
     func push(log: Log) {
+        if !logs.isEmpty && !isLastComplete() {
+            completeLast(success: false)
+        }
         self.logs.append(log)
     }
     
@@ -112,7 +116,12 @@ class Logger: ObservableObject {
         self.logs.last?.complete(success: success)
         if success == false {
             onFailure()
+            self.setOnFailureCallback ({})
         }
+    }
+    
+    func isLastComplete() -> Bool {
+        return self.logs.last?.success != nil
     }
     
     func clear() {
