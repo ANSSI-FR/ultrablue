@@ -102,6 +102,10 @@ class Logger: ObservableObject {
             completeLast(success: false)
         }
         self.logs.append(log)
+        if log.success == false {
+            onFailure()
+            self.setOnFailureCallback ({})
+        }
     }
     
     func updateLast(progress: UInt) {

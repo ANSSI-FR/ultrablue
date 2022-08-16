@@ -16,6 +16,7 @@ struct ProtocolView: View {
     @State private var isAlertPresented = false
     @State private var isActionSheetPresented = false
     @State private var confettiCounter = 0
+    @State private var protocolSuccess: Bool? = nil
     @StateObject var logger = Logger()
     var device: Device?
     @State var bleManager: BLEManager
@@ -35,23 +36,31 @@ struct ProtocolView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: {
-                        isActionSheetPresented = true
+                        if protocolSuccess != nil {
+                            logger.clear()
+                            dismiss()
+                        } else {
+                            isActionSheetPresented = true
+                        }
                     }, label: {
-                        Text("Cancel")
+                        Text(protocolSuccess != nil ? "Done" : "Cancel")
                     })
+                }
+                ToolbarItem(placement: .automatic) {
+                    Button(action: {
+                        reset()
+                        runAttestation()
+                    }, label: {
+                        Text("Retry")
+                    })
+                    .disabled(protocolSuccess != false)
                 }
             }
         }
         .onAppear() {
-            logger.setOnFailureCallback({
-                bleManager.shutdown(err: true)
-                self.isAlertPresented.toggle()
-            })
             bleManager.setLogger(logger: logger)
+            reset()
             runAttestation()
-        }
-        .onDisappear() {
-            logger.clear()
         }
         .alert(isPresented: $isAlertPresented) { () -> Alert in
             Alert(
@@ -59,11 +68,7 @@ struct ProtocolView: View {
                 message: Text("The attestation failed due to a communication error. This doesn't means the boot state changed."),
                 primaryButton: .default(Text("Ok")),
                 secondaryButton: .default(Text("Retry"), action: {
-                    logger.clear()
-                    logger.setOnFailureCallback {
-                        bleManager.shutdown(err: true)
-                        self.isAlertPresented.toggle()
-                    }
+                    reset()
                     runAttestation()
                 })
             )
@@ -71,23 +76,36 @@ struct ProtocolView: View {
         .confirmationDialog("Cancel attestation", isPresented: $isActionSheetPresented) {
             // TODO: replace attestation with enrollment when appropriate
             Button("Cancel attestation", role: .destructive) {
+                logger.setOnFailureCallback { }
                 bleManager.shutdown(err: true)
                 logger.clear()
                 dismiss()
             }
         }
         // TODO: Present the confirmation dialog when the feature is added by Apple.
-        .interactiveDismissDisabled()
+        .interactiveDismissDisabled(protocolSuccess == nil)
         .confettiCannon(counter: $confettiCounter, num: 150, rainHeight: 600, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 400)
     }
     
     func runAttestation() {
+        protocolSuccess = nil
         bleManager.searchForAttestingDevice(onAttesterFound: {
             let _ = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onSuccess: {
                 bleManager.shutdown()
+                protocolSuccess = true
                 confettiCounter += 1
             })
         })
+    }
+    
+    func reset() {
+        logger.clear()
+        protocolSuccess = nil
+        logger.setOnFailureCallback {
+            bleManager.shutdown(err: true)
+            isAlertPresented.toggle()
+            protocolSuccess = false
+        }
     }
 
 }
