@@ -132,7 +132,7 @@ func main() {
 
 	logrus.Info("Start advertising")
 	ctx := ble.WithSigHandler(context.WithCancel(context.Background()))
-	go ble.AdvertiseNameAndServices(ctx, "Ultrablue server", ultrablueSvc.UUID)
+	go ble.AdvertiseNameAndServices(ctx, "ultrablue-server", ultrablueSvc.UUID)
 
 	if *enroll {
 		logrus.Info("Generating enrollment QR code")
