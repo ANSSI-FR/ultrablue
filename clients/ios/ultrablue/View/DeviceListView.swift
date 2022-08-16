@@ -11,7 +11,7 @@ import CoreData
 
 struct DeviceListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(entity: Device.entity(), sortDescriptors: [])
+    @FetchRequest(sortDescriptors: [SortDescriptor(\.last_attestation_time, order: .reverse)])
     var devices: FetchedResults<Device>
     @State private var isShowingScanner = false
     @State private var showProtocolView = false
