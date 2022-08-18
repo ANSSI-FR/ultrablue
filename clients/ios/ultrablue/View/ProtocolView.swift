@@ -20,17 +20,28 @@ struct ProtocolView: View {
     @StateObject var logger = Logger()
     var device: Device?
     @State var bleManager: BLEManager
-
+    
+    @Namespace var bottomID
+        
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack {
-                    ForEach(logger.lines) { log in
-                        LogView(log: log)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack {
+                        ForEach(logger.lines) { log in
+                            LogView(log: log)
+                        }
+                        .onChange(of: self.logger.lines.count, perform: { _ in
+                            proxy.scrollTo(bottomID)
+                        })
+                        Spacer()
+                        Button("bottomID") { }
+                        .id(bottomID)
+                        .disabled(true)
+                        .opacity(0)
                     }
-                    Spacer()
+                    .padding(.top, 10)
                 }
-                .padding(.top, 10)
             }
             .navigationBarTitle("Attestation", displayMode: .inline)
             .toolbar {
@@ -90,10 +101,24 @@ struct ProtocolView: View {
     func runAttestation() {
         protocolSuccess = nil
         bleManager.searchForAttestingDevice(onAttesterFound: {
-            let _ = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onSuccess: {
+            let _ = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: { success in
                 bleManager.shutdown()
-                protocolSuccess = true
-                confettiCounter += 1
+                protocolSuccess = success
+                if success {
+                    if device == nil {
+                        dismiss()
+                    } else {
+                        device!.last_attestation_time = Date.now
+                        do {
+                            try viewContext.save()
+                        } catch {
+                            print("Error while updating device: \(error)")
+                        }
+                        confettiCounter += 1
+                    }
+                } else {
+                    print("Printing event log diffs")
+                }
             })
         })
     }

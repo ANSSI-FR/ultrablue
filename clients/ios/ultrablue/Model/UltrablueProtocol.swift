@@ -46,7 +46,7 @@ class UltrablueProtocol {
     private var logger: Logger
     private var currentState: ProtoState
     private var bleManager: BLEManager
-    private var onSuccess: () -> Void
+    private var onCompletion: (Bool) -> Void
     
     private var context: NSManagedObjectContext
     private var device: Device?
@@ -61,16 +61,16 @@ class UltrablueProtocol {
     private var secret: Data = Data()
     private var attestationResponse: AttestationResponse? = nil
     
-    init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onSuccess: @escaping () -> Void) {
+    init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void) {
         self.context = context
         self.device = device
         self.enroll = device == nil
         self.currentState = enroll ? .enroll : .auth_read
         self.bleManager = bleManager
         self.logger = logger
-        self.onSuccess = onSuccess
+        self.onCompletion = onCompletion
         if enroll == false {
-            enrollData = EnrollDataModel(Cert: device!.cert!, N: device!.n!, E: UInt(device!.e), PCRExtend: device!.secret != nil)
+            enrollData = EnrollDataModel(Cert: device!.cert ?? Data(), N: device!.n!, E: UInt(device!.e), PCRExtend: device!.secret != nil)
         }
         bleManager.setOnMsgReadCallback(callback: self.onMsgRead)
         bleManager.setOnMsgWriteCallback(callback: self.onMsgWrite)
@@ -199,9 +199,45 @@ class UltrablueProtocol {
                 resumeProtocol(at: .pcr_policy_apply)
             }
         case .pcr_policy_apply:
-                logger.push(log: Log("Applying PCR policy"))
-                // TODO: Checking each stored PCR against received ones
+            logger.push(log: Log("Decoding PCRs"))
+            let pcrs: [PCR]
+            let refs: [PCR]
+            do {
+                let decoder = CodableCBORDecoder()
+                pcrs = try decoder.decode([PCR].self, from: encodedPCRs!)
+                refs = try decoder.decode([PCR].self, from: device!.encoded_pcrs!)
+            }
+            catch {
                 logger.completeLast(success: false)
+                return
+            }
+            logger.completeLast(success: true)
+            logger.push(log: Log("Checking reveived PCRs"))
+            if pcrs.count != refs.count {
+                logger.completeLast(success: false)
+                return
+            }
+            logger.completeLast(success: true)
+            var failure = false
+            // We want to get all pcrs result before raising the error, so we save the onError callback, and set it to void for now
+            logger.setOnFailureCallback { }
+            for i in 0..<refs.count {
+                if Policy(device!.pcrpolicy).isPCRSet(index: refs[i].Index) {
+                    logger.push(log: Log("PCR\(refs[i].Index) - \(PCRBank[refs[i].DigestAlg] ?? "Unknown")"))
+                    if pcrs[i].Digest == refs[i].Digest {
+                        logger.completeLast(success: true)
+                    } else {
+                        logger.completeLast(success: false)
+                        failure = true
+                    }
+                }
+            }
+            if failure {
+                attestationResponse = AttestationResponse(err: true, Secret: Data())
+            } else {
+                attestationResponse = AttestationResponse(err: false, Secret: device!.secret ?? Data())
+            }
+            resumeProtocol(at: .attestation_response)
         case .attestation_response:
             guard let ar = attestationResponse else {
                 print("attestation response must be set at this stage")
@@ -217,8 +253,10 @@ class UltrablueProtocol {
                 return
             }
         case .end:
-            saveNewDevice()
-            onSuccess()
+            if enroll {
+                saveNewDevice()
+            }
+            onCompletion(enroll || attestationResponse!.err == false)
         }
     }
     
@@ -235,6 +273,7 @@ class UltrablueProtocol {
         d.name = Name.generate()
         d.pcrpolicy = Policy(.strict).value
         d.e = Int64(enrollData!.E)
+        d.encoded_pcrs = encodedPCRs
         d.n = enrollData!.N
         d.cert = enrollData!.Cert
         d.secret = secret

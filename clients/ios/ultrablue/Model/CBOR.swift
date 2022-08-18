@@ -28,3 +28,9 @@ struct AttestationResponse: Codable {
     let err: Bool
     let Secret: Data
 }
+
+struct PCR: Codable {
+    let Index: Int
+    let Digest: Data
+    let DigestAlg: UInt
+}
