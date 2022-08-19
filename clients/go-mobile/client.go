@@ -15,12 +15,16 @@
 package gomobile
 
 import (
+	"strings"
 	"crypto/rsa"
-	"math/big"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"math/big"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/google/go-attestation/attest"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 /*
@@ -42,6 +46,14 @@ type CredentialBlob struct {
 */
 type EncodedPCRs struct {
 	Data []byte
+}
+
+type EventLog struct {
+	Raw []byte
+}
+
+type Diff struct {
+	Raw []byte
 }
 
 /*
@@ -153,4 +165,114 @@ func GetPCRs(encodedpp []byte) (*EncodedPCRs, error) {
 		return nil, err
 	}
 	return &EncodedPCRs {ep}, nil
+}
+
+func isPrintable(data []byte) bool {
+	for _, b := range data {
+		if (b < 32 || b > 127) && b != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func GetParsedEventLog(encodedpp []byte) (*EventLog, error) {
+	var pp attest.PlatformParameters
+	var els = ""
+
+	if err := cbor.Unmarshal(encodedpp, &pp); err != nil {
+		return nil, err
+	}
+	el, err := attest.ParseEventLog(pp.EventLog)
+	if err != nil {
+		return nil, err
+	}
+	es := el.Events(attest.HashSHA256)
+	for i, e := range es {
+		els += fmt.Sprintln("- EventNum:", i)
+		els += fmt.Sprintln("\tPCRIndex:", e.Index)
+		els += fmt.Sprintln("\tEventType:", e.Type)
+		els += fmt.Sprintln("\tDigest:", hex.EncodeToString(e.Digest))
+		if isPrintable(e.Data) {
+			els += fmt.Sprintln("\tData:", string(e.Data))
+		}
+	}
+	return &EventLog { Raw: []byte(els) }, nil
+}
+
+func getLastLines(s string, count int) string {
+	s = strings.Trim(s, "\n")
+	lines := strings.Split(s, "\n")
+	if count < len(lines) {
+		lines = lines[len(lines) - count:]
+	}
+	return strings.Join(lines, "\n")
+}
+
+func getFirstLines(s string, count int) string {
+	s = strings.Trim(s, "\n")
+	lines := strings.Split(s, "\n")
+	if count < len(lines) {
+		lines = lines[:count]
+	}
+	return strings.Join(lines, "\n")
+}
+
+func prettyDiff(d diffmatchpatch.Diff) string {
+	var prefix = map[diffmatchpatch.Operation]string {
+		diffmatchpatch.DiffDelete: "<",
+		diffmatchpatch.DiffEqual: " ",
+		diffmatchpatch.DiffInsert: ">",
+	}
+	var diff = ""
+
+	strs := strings.Split(strings.Trim(d.Text, "\n"), "\n")
+	for _, s := range strs {
+		diff += fmt.Sprintln(string(prefix[d.Type]), s)
+	}
+	return diff
+}
+
+func prettyDiffs(diffs []diffmatchpatch.Diff, contextLines int) string {
+	var currentline int
+	var diff = ""	
+
+	var i int
+	for i < len(diffs) {
+		d := diffs[i]
+		if d.Type != diffmatchpatch.DiffEqual {
+			var si, ei, sl, el int // start index, end index, start line, end line
+			si = i
+			sl = currentline + 1
+			for diffs[i].Type != diffmatchpatch.DiffEqual {
+				currentline += strings.Count(diffs[i].Text, "\n")
+				i += 1
+			}
+			ei = i
+			el = currentline + 1
+			diff += fmt.Sprintf("@@ l. %d:%d @@\n", sl, el)
+			if si > 0 {
+				diff += fmt.Sprintln(getLastLines(diffs[si - 1].Text, contextLines))
+			}
+			for j := si; j < ei; j++ {
+				diff += prettyDiff(diffs[j])
+			}
+			if ei < len(diffs) {
+				diff += fmt.Sprintln(getFirstLines(diffs[ei].Text, contextLines))
+			}
+			continue
+		}
+		currentline += strings.Count(d.Text, "\n")
+		i += 1
+	}
+	return diff
+}
+
+func GetDiff(s1, s2 string) *Diff {
+	dmp := diffmatchpatch.New()
+	wSrc, wDst, warray := dmp.DiffLinesToRunes(s1, s2)
+	diffs := dmp.DiffMainRunes(wSrc, wDst, false)
+	diffs = dmp.DiffCharsToLines(diffs, warray)
+	s := prettyDiffs(diffs, 3)
+	return &Diff { Raw: []byte(s) }
 }

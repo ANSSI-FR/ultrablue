@@ -16,7 +16,10 @@ struct ProtocolView: View {
     @State private var isAlertPresented = false
     @State private var isActionSheetPresented = false
     @State private var confettiCounter = 0
+    @State private var ubProtocol: UltrablueProtocol? = nil
     @State private var protocolSuccess: Bool? = nil
+    @State private var PCRPolicyError: Bool = false
+    @State private var bootStateDiff: BootStateDiff? = nil
     @StateObject var logger = Logger()
     var device: Device?
     @State var bleManager: BLEManager
@@ -36,12 +39,94 @@ struct ProtocolView: View {
                         })
                         Spacer()
                         Button("bottomID") { }
-                        .id(bottomID)
-                        .disabled(true)
-                        .opacity(0)
+                            .id(bottomID)
+                            .disabled(true)
+                            .opacity(0)
                     }
                     .padding(.top, 10)
                 }
+                .sheet(isPresented: $PCRPolicyError, content: {
+                    if let diff = bootStateDiff {
+                        ScrollView {
+                            VStack {
+                                Text("Boot state has changed")
+                                    .bold()
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.red)
+                                    .padding(20)
+                                ContentHolderCard(title: "Modified PCR(s)", details: "Those values has been cryptographically verified and can be trusted.") {
+                                    VStack(alignment: .leading) {
+                                        ForEach(diff.PCRs) { pcr in
+                                            Text("PCR\(pcr.pcr.Index) - \(PCRBank[pcr.pcr.DigestAlg] ?? "Unknown") bank:")
+                                                .font(.system(size: 16))
+                                                .bold()
+                                            Text("\(PCRs[pcr.pcr.Index].desc)")
+                                                .font(.system(size: 12))
+                                                .padding(.leading, 10)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 10)
+                                ContentHolderCard(title: "Event log diff", details: "Event logs can't be trusted as PCRs does, they are used for debug purpose only.") {
+                                    ZStack(alignment: .topTrailing) {
+                                        VStack(alignment: .leading) {
+                                            ForEach(diff.eventLogDiff.splitLines()) { line in
+                                                if (line.raw.starts(with: "@")) {
+                                                    Text(line.raw)
+                                                        .font(.system(size: 14))
+                                                        .bold()
+                                                } else {
+                                                    Text(line.raw)
+                                                        .font(.system(size: 14))
+                                                        .foregroundColor(line.raw.starts(with: ">") ? .green : line.raw.starts(with: "<") ? .red : Color(UIColor.label))
+                                                }
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        Button(action: {
+                                            UIPasteboard.general.string = diff.eventLogDiff
+                                        }) {
+                                            Image(systemName: "square.on.square")
+                                        }
+                                        .padding(5)
+                                    }
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.bottom, 5)
+                                Spacer()
+                                Button("Trust and save new boot state") {
+                                    PCRPolicyError = false
+                                    resumeAttestation(trust: true, save: true)
+                                }
+                                    .frame(maxWidth: .infinity, minHeight: 45)
+                                    .foregroundColor(.white)
+                                    .background(.blue)
+                                    .cornerRadius(7)
+                                    .padding(.horizontal, 15)
+                                Button("Trust boot state this time only") {
+                                    PCRPolicyError = false
+                                    resumeAttestation(trust: true, save: false)
+                                }
+                                    .frame(maxWidth: .infinity, minHeight: 45)
+                                    .foregroundColor(.white)
+                                    .background(.blue)
+                                    .cornerRadius(7)
+                                    .padding(.horizontal, 15)
+                                Button("Mark as failed") {
+                                    PCRPolicyError = false
+                                    resumeAttestation(trust: false, save: false)
+                                }
+                                    .frame(maxWidth: .infinity, minHeight: 45)
+                                    .foregroundColor(.white)
+                                    .background(.red)
+                                    .cornerRadius(7)
+                                    .padding(.horizontal, 15)
+                            }
+                        }
+                        .background(Color(UIColor.systemGroupedBackground))
+                        .interactiveDismissDisabled(true)
+                    }
+                })
             }
             .navigationBarTitle("Attestation", displayMode: .inline)
             .toolbar {
@@ -101,7 +186,7 @@ struct ProtocolView: View {
     func runAttestation() {
         protocolSuccess = nil
         bleManager.searchForAttestingDevice(onAttesterFound: {
-            let _ = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: { success in
+            ubProtocol = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: { success in
                 bleManager.shutdown()
                 protocolSuccess = success
                 if success {
@@ -109,18 +194,26 @@ struct ProtocolView: View {
                         dismiss()
                     } else {
                         device!.last_attestation_time = Date.now
-                        do {
-                            try viewContext.save()
-                        } catch {
-                            print("Error while updating device: \(error)")
-                        }
                         confettiCounter += 1
                     }
-                } else {
-                    print("Printing event log diffs")
                 }
+                do {
+                    try viewContext.save()
+                } catch {
+                    print("Error while updating device: \(error)")
+                }
+            },
+            onPCRChanged: { diff in
+                PCRPolicyError = true
+                bootStateDiff = diff
             })
         })
+    }
+    
+    func resumeAttestation(trust: Bool, save: Bool) {
+        if let p = ubProtocol {
+            p.resumeProtocol(with: Data([trust ? 1 : 0, save ? 1 : 0]), at: .user_decision)
+        }
     }
     
     func reset() {

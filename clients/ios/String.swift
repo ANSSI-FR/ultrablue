@@ -16,4 +16,18 @@ extension String {
         }
         return newString
     }
+    
+    func splitLines() -> [IdentifiableSubstring] {
+        var identifiableLines = [IdentifiableSubstring]()
+        let lines = self.split(separator: "\n")
+        for line in lines {
+            identifiableLines.append(IdentifiableSubstring(id: UUID(), raw: line))
+        }
+        return identifiableLines
+    }
+}
+
+struct IdentifiableSubstring: Identifiable {
+    let id: UUID
+    let raw: Substring
 }

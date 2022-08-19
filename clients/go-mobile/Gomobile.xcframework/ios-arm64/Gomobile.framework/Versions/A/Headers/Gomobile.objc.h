@@ -12,7 +12,9 @@
 
 
 @class GomobileCredentialBlob;
+@class GomobileDiff;
 @class GomobileEncodedPCRs;
+@class GomobileEventLog;
 
 @interface GomobileCredentialBlob : NSObject <goSeqRefInterface> {
 }
@@ -23,6 +25,15 @@
 @property (nonatomic) NSData* _Nullable secret;
 @property (nonatomic) NSData* _Nullable cred;
 @property (nonatomic) NSData* _Nullable credSecret;
+@end
+
+@interface GomobileDiff : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+@property (nonatomic) NSData* _Nullable raw;
 @end
 
 /**
@@ -39,6 +50,15 @@
 @property (nonatomic) NSData* _Nullable data;
 @end
 
+@interface GomobileEventLog : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+@property (nonatomic) NSData* _Nullable raw;
+@end
+
 /**
  * 	CheckQuotesSignature verifies that all quotes coming from
 	the attestation data in @encodedpp are signed by the
@@ -50,11 +70,15 @@
  */
 FOUNDATION_EXPORT BOOL GomobileCheckQuotesSignature(NSData* _Nullable encodedak, NSData* _Nullable encodedpp, NSData* _Nullable nonce, NSError* _Nullable* _Nullable error);
 
+FOUNDATION_EXPORT GomobileDiff* _Nullable GomobileGetDiff(NSString* _Nullable s1, NSString* _Nullable s2);
+
 /**
  * 	GetPCRs extracts, encodes and returns PCRs from the
 	attestation data @encodedpp.
  */
 FOUNDATION_EXPORT GomobileEncodedPCRs* _Nullable GomobileGetPCRs(NSData* _Nullable encodedpp, NSError* _Nullable* _Nullable error);
+
+FOUNDATION_EXPORT GomobileEventLog* _Nullable GomobileGetParsedEventLog(NSData* _Nullable encodedpp, NSError* _Nullable* _Nullable error);
 
 /**
  * 	MakeCredential generates a challenge used to assert that

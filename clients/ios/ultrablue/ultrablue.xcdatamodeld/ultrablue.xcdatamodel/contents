@@ -6,6 +6,7 @@
         <attribute name="creation_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="e" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="encoded_pcrs" optional="YES" attributeType="Binary"/>
+        <attribute name="eventlog" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="last_attestation_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="n" optional="YES" attributeType="Binary"/>
@@ -14,6 +15,6 @@
         <attribute name="secret" optional="YES" attributeType="Binary"/>
     </entity>
     <elements>
-        <element name="Device" positionX="-45" positionY="9" width="128" height="194"/>
+        <element name="Device" positionX="-45" positionY="9" width="128" height="209"/>
     </elements>
 </model>

@@ -34,3 +34,8 @@ struct PCR: Codable {
     let Digest: Data
     let DigestAlg: UInt
 }
+
+struct IdentifiablePCR: Identifiable {
+    var id: UUID
+    var pcr: PCR
+}

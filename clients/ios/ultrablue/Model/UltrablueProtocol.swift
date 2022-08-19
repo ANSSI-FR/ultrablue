@@ -10,6 +10,41 @@ import SwiftCBOR
 import Gomobile
 import CoreData
 
+let hardcodeddiff = """
+@@ l. 194:205 @@
+  Event:
+    BlobBase: 0xf9c00000
+    BlobLength: 0x400000
+- - EventNum: 17
+-   PCRIndex: 0
+-   EventType: EV_EFI_PLATFORM_FIRMWARE_BLOB
+-   DigestCount: 1
+-   Digests:
+-   - AlgorithmId: sha256
+-     Digest: "9f9fb81e54492ab392dc64c20704d3ed5b24e17917f5c2d272197e7400f5392c"
+-   EventSize: 16
+-   Event:
+-     BlobBase: 0xff250000
+-     BlobLength: 0x320000
+- EventNum: 18
+  PCRIndex: 0
+  EventType: EV_EFI_PLATFORM_FIRMWARE_BLOB
+@@ l. 721:723 @@
+  DigestCount: 1
+  Digests:
+  - AlgorithmId: sha256
+-     Digest: "5cb1940732fcc7bbf6b6c61a1d74cf6158f370535a68f0b9764e6e8ebdcc687c"
++     Digest: "3180280dfe10480facb98098ab0899a0b80a7ba0b78a098bab07a0b8a67678ab"
+  EventSize: 31
+  Event:
+    String: |-
+"""
+
+struct BootStateDiff {
+    let PCRs: [IdentifiablePCR]
+    let eventLogDiff: String
+}
+
 extension CaseIterable where Self: Equatable {
     private var allCases: AllCases { Self.allCases }
     var next: Self {
@@ -34,6 +69,7 @@ enum ProtoState: CaseIterable {
          event_log_replay,
          pcrs_read,
          pcr_policy_apply,
+         user_decision,
          attestation_response,
          end
     
@@ -47,7 +83,8 @@ class UltrablueProtocol {
     private var currentState: ProtoState
     private var bleManager: BLEManager
     private var onCompletion: (Bool) -> Void
-    
+    private var onPCRChanged: (BootStateDiff) -> Void
+
     private var context: NSManagedObjectContext
     private var device: Device?
     private var enroll: Bool
@@ -58,10 +95,11 @@ class UltrablueProtocol {
     private var credentialActivationSecret: Data? = nil
     private var antiReplayNonce: Data? = nil
     private var encodedPCRs: Data? = nil
+    private var eventlog: String? = nil
     private var secret: Data = Data()
     private var attestationResponse: AttestationResponse? = nil
     
-    init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void) {
+    init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void, onPCRChanged: @escaping (BootStateDiff) -> Void) {
         self.context = context
         self.device = device
         self.enroll = device == nil
@@ -69,6 +107,7 @@ class UltrablueProtocol {
         self.bleManager = bleManager
         self.logger = logger
         self.onCompletion = onCompletion
+        self.onPCRChanged = onPCRChanged
         if enroll == false {
             enrollData = EnrollDataModel(Cert: device!.cert ?? Data(), N: device!.n!, E: UInt(device!.e), PCRExtend: device!.secret != nil)
         }
@@ -81,7 +120,7 @@ class UltrablueProtocol {
         resumeProtocol()
     }
     
-    private func resumeProtocol(with msg: Data? = nil, at state: ProtoState? = nil) {
+    func resumeProtocol(with msg: Data? = nil, at state: ProtoState? = nil) {
         if let s = state {
             currentState = s
         }
@@ -167,6 +206,13 @@ class UltrablueProtocol {
             logger.completeLast(success: true)
             resumeProtocol(at: .event_log_replay)
         case .event_log_replay:
+            logger.push(log: Log("Extract event log from attestation data"))
+            guard let el = Gomobile.GomobileGetParsedEventLog(encodedpp, nil) else {
+                logger.completeLast(success: false)
+                return
+            }
+            eventlog =  String(decoding: el.raw!, as: UTF8.self)
+            logger.completeLast(success: true)
             logger.push(log: Log("Replaying event log"))
             guard Gomobile.GomobileReplayEventLog(encodedpp, nil) else {
                 logger.completeLast(success: false)
@@ -176,8 +222,7 @@ class UltrablueProtocol {
             resumeProtocol(at: .pcrs_read)
         case .pcrs_read:
             logger.push(log: Log("Extract PCRs from attestation data"))
-            let wrappedPCRs = Gomobile.GomobileGetPCRs(encodedpp, nil)
-            guard let wp = wrappedPCRs else {
+            guard let wp = Gomobile.GomobileGetPCRs(encodedpp, nil) else {
                 logger.completeLast(success: false)
                 return
             }
@@ -212,30 +257,61 @@ class UltrablueProtocol {
                 return
             }
             logger.completeLast(success: true)
-            logger.push(log: Log("Checking reveived PCRs"))
+            logger.push(log: Log("Validating PCRs"))
             if pcrs.count != refs.count {
                 logger.completeLast(success: false)
                 return
             }
             logger.completeLast(success: true)
             var failure = false
+            var diffs = [IdentifiablePCR]()
             // We want to get all pcrs result before raising the error, so we save the onError callback, and set it to void for now
             logger.setOnFailureCallback { }
             for i in 0..<refs.count {
                 if Policy(device!.pcrpolicy).isPCRSet(index: refs[i].Index) {
-                    logger.push(log: Log("PCR\(refs[i].Index) - \(PCRBank[refs[i].DigestAlg] ?? "Unknown")"))
-                    if pcrs[i].Digest == refs[i].Digest {
-                        logger.completeLast(success: true)
-                    } else {
-                        logger.completeLast(success: false)
+                    if pcrs[i].Digest != refs[i].Digest {
+                        logger.push(log: Log("PCR\(refs[i].Index) - \(PCRBank[refs[i].DigestAlg] ?? "Unknown")", success: false))
                         failure = true
+                        diffs.append(IdentifiablePCR(id: UUID(), pcr: pcrs[i]))
                     }
                 }
             }
             if failure {
-                attestationResponse = AttestationResponse(err: true, Secret: Data())
+                let diffStr = Gomobile.GomobileGetDiff(device!.eventlog!, eventlog!)
+                let diff = BootStateDiff(PCRs: diffs, eventLogDiff: String(decoding: diffStr!.raw!, as: UTF8.self))
+                onPCRChanged(diff)
+                return
             } else {
                 attestationResponse = AttestationResponse(err: false, Secret: device!.secret ?? Data())
+            }
+            resumeProtocol(at: .attestation_response)
+        case .user_decision:
+            logger.push(log: Log("Read user decision"))
+            guard let m = msg else {
+                logger.completeLast(success: false)
+                return
+            }
+            logger.completeLast(success: true)
+            if m[1] == 1 {
+                logger.push(log: Log("Updating attester information"))
+                guard let d = device else {
+                    logger.completeLast(success: false)
+                    return
+                }
+                d.encoded_pcrs = encodedPCRs
+                d.eventlog = eventlog
+                do {
+                    try context.save()
+                } catch {
+                    logger.completeLast(success: false)
+                    return
+                }
+                logger.completeLast(success: true)
+            }
+            if m[0] == 1 {
+                attestationResponse = AttestationResponse(err: false, Secret: device!.secret ?? Data())
+            } else {
+                attestationResponse = AttestationResponse(err: true, Secret: Data())
             }
             resumeProtocol(at: .attestation_response)
         case .attestation_response:
@@ -277,6 +353,7 @@ class UltrablueProtocol {
         d.n = enrollData!.N
         d.cert = enrollData!.Cert
         d.secret = secret
+        d.eventlog = eventlog
         d.addr = "\(bleManager.getAttesterUUID()!)"
         do {
             try context.save()

@@ -13,6 +13,8 @@
 		260B8D0F28A41B820001DB80 /* Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B8D0E28A41B820001DB80 /* Conversion.swift */; };
 		260B8D1228A42FD90001DB80 /* SwiftCBOR in Frameworks */ = {isa = PBXBuildFile; productRef = 260B8D1128A42FD90001DB80 /* SwiftCBOR */; };
 		260B8D1428A42FFE0001DB80 /* CBOR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B8D1328A42FFE0001DB80 /* CBOR.swift */; };
+		2613854C28B3E50A0035F0A7 /* Gomobile.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */; };
+		262BE04328AFA993003E2EBA /* ContentHolderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262BE04228AFA993003E2EBA /* ContentHolderCard.swift */; };
 		263212A028807355005E6A2D /* DeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2632129F28807355005E6A2D /* DeviceCardView.swift */; };
 		263212A228820CBD005E6A2D /* DeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A128820CBD005E6A2D /* DeviceView.swift */; };
 		263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A328820CCD005E6A2D /* DeviceListView.swift */; };
@@ -24,8 +26,6 @@
 		2679B9FF288444BF009BBB4A /* Policy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9FE288444BF009BBB4A /* Policy.swift */; };
 		2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0028845A14009BBB4A /* PCREntryCard.swift */; };
 		2679BA0328845E38009BBB4A /* PCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0228845E37009BBB4A /* PCR.swift */; };
-		267E9CB828A446F700320228 /* Gomobile.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 267E9CB628A4465200320228 /* Gomobile.xcframework */; settings = {ATTRIBUTES = (Required, ); }; };
-		267E9CB928A446F700320228 /* Gomobile.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 267E9CB628A4465200320228 /* Gomobile.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		268B68E52889BC6600235C6A /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268B68E42889BC6600235C6A /* BLEManager.swift */; };
 		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
 		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
@@ -65,7 +65,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				267E9CB928A446F700320228 /* Gomobile.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -75,6 +74,8 @@
 /* Begin PBXFileReference section */
 		260B8D0E28A41B820001DB80 /* Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversion.swift; sourceTree = "<group>"; };
 		260B8D1328A42FFE0001DB80 /* CBOR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBOR.swift; sourceTree = "<group>"; };
+		2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Gomobile.xcframework; path = "../../../go-mobile/Gomobile.xcframework"; sourceTree = "<group>"; };
+		262BE04228AFA993003E2EBA /* ContentHolderCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentHolderCard.swift; sourceTree = "<group>"; };
 		2632129F28807355005E6A2D /* DeviceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCardView.swift; sourceTree = "<group>"; };
 		263212A128820CBD005E6A2D /* DeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceView.swift; sourceTree = "<group>"; };
 		263212A328820CCD005E6A2D /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
@@ -87,7 +88,6 @@
 		2679B9FE288444BF009BBB4A /* Policy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Policy.swift; sourceTree = "<group>"; };
 		2679BA0028845A14009BBB4A /* PCREntryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCREntryCard.swift; sourceTree = "<group>"; };
 		2679BA0228845E37009BBB4A /* PCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCR.swift; sourceTree = "<group>"; };
-		267E9CB628A4465200320228 /* Gomobile.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Gomobile.xcframework; path = "../../../go-mobile/Gomobile.xcframework"; sourceTree = "<group>"; };
 		268B68E42889BC6600235C6A /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
 		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
@@ -113,7 +113,7 @@
 			files = (
 				260B8D1228A42FD90001DB80 /* SwiftCBOR in Frameworks */,
 				260B8D0A28A409910001DB80 /* ConfettiSwiftUI in Frameworks */,
-				267E9CB828A446F700320228 /* Gomobile.xcframework in Frameworks */,
+				2613854C28B3E50A0035F0A7 /* Gomobile.xcframework in Frameworks */,
 				260B8D0728A4096F0001DB80 /* Introspect in Frameworks */,
 				260B8D0D28A409A00001DB80 /* CodeScanner in Frameworks */,
 			);
@@ -155,6 +155,7 @@
 				265FCD4228832BA0001A25CD /* ContentCard.swift */,
 				2679BA0028845A14009BBB4A /* PCREntryCard.swift */,
 				26E01D2B2885D6F3003A5EA6 /* LogView.swift */,
+				262BE04228AFA993003E2EBA /* ContentHolderCard.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -178,7 +179,7 @@
 		267E9CB528A4461400320228 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				267E9CB628A4465200320228 /* Gomobile.xcframework */,
+				2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -420,6 +421,7 @@
 				260B8D1428A42FFE0001DB80 /* CBOR.swift in Sources */,
 				2679B9FF288444BF009BBB4A /* Policy.swift in Sources */,
 				269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */,
+				262BE04328AFA993003E2EBA /* ContentHolderCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
