@@ -6,6 +6,9 @@ git clone git@github.com:ANSSI-FR/ultrablue # If you didn't clone it yet
 cd ultrablue/server
 go build
 ./ultrablue-server
+
+You may have to run the server as root to access bluetooth and TPM devices.
+
 ```
 You can use the following flags with the Ultrablue server:
 ```

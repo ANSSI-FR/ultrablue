@@ -1,14 +1,4 @@
-#!/bin/bash
-
-if [ ! -v ANDROID_HOME ]; then
-	echo "Setting ANDROID_HOME to $HOME/Android/Sdk"
-	export ANDROID_HOME="$HOME/Android/Sdk"
-fi
-
-if [ ! -v ANDROID_NDK_HOME ]; then
-	echo "Setting ANDROID_NDK_HOME to $HOME/Android/Sdk/ndk-bundle"
-	export ANDROID_NDK_HOME="$ANDROID_HOME/ndk-bundle"
-fi
+#!/bin/bash -e
 
 go install golang.org/x/mobile/cmd/gobind@latest
 go install golang.org/x/mobile/cmd/gomobile@latest
@@ -16,11 +6,11 @@ go install golang.org/x/mobile/cmd/gomobile@latest
 go mod download golang.org/x/mobile
 go get golang.org/x/mobile/bind
 
-gomobile bind -target=android -v .
+# Force Android API to >= 19 to work around bug with newer SDK:
+# https://github.com/golang/go/issues/52470#issuecomment-1203874724
+gomobile bind -target=android -androidapi 19 -v .
 
-if [ $# -eq 1 ]; then
-	echo "Copying gomobile.aac to $1"
-	cp gomobile.aar "$1"
-else
-	echo "Don't forget to copy gomobile.aac in your android project"
-fi
+TARGET="../Android/ultrablue/app/libs"
+mkdir -p $TARGET
+echo "Copying gomobile.aar to $TARGET"
+cp gomobile.aar "$TARGET"
