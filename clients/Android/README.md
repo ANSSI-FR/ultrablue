@@ -33,6 +33,9 @@ $ sudo server/ultrablue_server --enroll
 ```
 
 This should display a QR Code.
+See [server/README.md](../../server/) for more instructions about building and
+running the server.
+
 
 Start the client app on your phone (from Android Studio), and follow the
 instructions displayed by the server to scan the QR Code.
