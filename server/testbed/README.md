@@ -41,7 +41,7 @@ testbed generation is made by the `mkosi` tool, that needs to be installed on
 your machine. 
 
 The distribution defaults to the host one; you can build a different one with
-eg. `DISTRIBUTION=debian make`. Beware that `mkosi` needs root privileges in
+eg. `make DISTRIBUTION=debian`. Beware that `mkosi` needs root privileges in
 order to work and will write the `mkosi` and `mkosi.output` cache directories
 as root owned.
 

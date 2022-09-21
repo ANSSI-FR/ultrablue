@@ -8,18 +8,16 @@ Release=tumbleweed
 [Packages]
 BuildPackages=
 	bluez
-	bluez-tools
 	go
-	tpm2-tools
-	tpm2-tss
+	tpm2.0-tools
+	tpm2-0-tss
 
 Packages=
 	bluez
-	bluez-tools
 	cryptsetup
 	gdb
 	qrencode
 	strace
-	tpm2-tools
-	tpm2-tss
+	tpm2.0-tools
+	tpm2-0-tss
 	vim

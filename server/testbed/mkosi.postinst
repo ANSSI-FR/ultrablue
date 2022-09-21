@@ -6,6 +6,6 @@
 systemctl enable bluetooth.service
 
 # Work around https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1016051
-if [ -f /etc/debian_version ]; then
-    ln -s /etc/dbus-1/system.d/bluetooth.conf /usr/share/dbus-1/system.d/bluetooth.conf
-fi
+# Fedora has a similar issue
+# On systems that have the file in /usr already, ln will just fail which is fine.
+ln -s /etc/dbus-1/system.d/bluetooth.conf /usr/share/dbus-1/system.d/bluetooth.conf

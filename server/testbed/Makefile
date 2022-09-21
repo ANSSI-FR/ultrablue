@@ -4,7 +4,7 @@
 hostbus := $(shell lsusb | grep Bluetooth | sed -r 's/.*Bus ([0-9]+){1}.*/\1/')
 hostaddr := $(shell lsusb | grep Bluetooth | sed -r 's/.*Device ([0-9]+){1}.*/\1/')
 
-# Allow building with `DISTRIBUTION=debian make`
+# Allow building with `make DISTRIBUTION=debian`
 # `man mkosi` for a list of distributions
 DISTRIBUTION=
 

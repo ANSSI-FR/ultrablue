@@ -9,6 +9,7 @@ Release=36
 BuildPackages=
 	bluez
 	bluez-tools
+	git
 	golang
 	tpm2-tools
 	tpm2-tss
