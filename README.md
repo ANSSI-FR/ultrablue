@@ -23,9 +23,9 @@ Once installed, the classical Ultrablue control flow consists of several steps:
 Using Ultrablue requires a Linux computer that you want to attest the boot state of,
 featuring a TPM and a Bluetooth interface (typically a laptop), as well as mobile phone.
 
-* On the computer, you need to build and install the **[Linux server](server).
+* On the computer, you need to build and install the [Linux server](server).
 * On the mobile phone, you need to install either the [IOS client](clients/ios)
-  or the [Android client](clients/Android)**.
+  or the [Android client](clients/Android).
 
 
 ## 1. Enrollment
