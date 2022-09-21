@@ -4,3 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 systemctl enable bluetooth.service
+
+# Work around https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1016051
+if [ -f /etc/debian_version ]; then
+    ln -s /etc/dbus-1/system.d/bluetooth.conf /usr/share/dbus-1/system.d/bluetooth.conf
+fi

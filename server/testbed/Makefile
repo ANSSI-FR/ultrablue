@@ -4,22 +4,36 @@
 hostbus := $(shell lsusb | grep Bluetooth | sed -r 's/.*Bus ([0-9]+){1}.*/\1/')
 hostaddr := $(shell lsusb | grep Bluetooth | sed -r 's/.*Device ([0-9]+){1}.*/\1/')
 
-all: install scratch-build run
-quick: install cache-build run
-debug: install debug-build run
+# Allow building with `DISTRIBUTION=debian make`
+# `man mkosi` for a list of distributions
+DISTRIBUTION=
 
-scratch-build:
-	sudo mkosi -ff
+MKOSI_FLAGS=
+ifeq ($(DISTRIBUTION),)
+else
+	MKOSI_FLAGS += --distribution=$(DISTRIBUTION)
+endif
 
-cache-build:
-	sudo mkosi --incremental -f
+# A few useful aliases - by default, build and run.
+quick: build run
+full: scratch-build run
+debug: debug-build run
+build: cache-build
 
-debug-build:
-	sudo mkosi --kernel-command-line="systemd.log_level=debug systemd.log_target=console" --force
+scratch-build: install
+	sudo mkosi $(MKOSI_FLAGS) -ff
+
+cache-build: install
+	sudo mkosi $(MKOSI_FLAGS) --incremental -f
+
+debug-build: install
+	sudo mkosi $(MKOSI_FLAGS)  --kernel-command-line="systemd.log_level=debug systemd.log_target=console" --force
 
 install:
 	mkdir -p mkosi.extra/usr/lib/dracut/modules.d
 	cp -r ../dracut/90ultrablue mkosi.extra/usr/lib/dracut/modules.d/
+	mkdir -p mkosi.extra/etc/dracut.conf.d
+	cp ../dracut/90crypttab.conf mkosi.extra/etc/dracut.conf.d
 	mkdir -p mkosi.extra/usr/lib/systemd/system/
 	cp ../unit/ultrablue-server.service mkosi.extra/usr/lib/systemd/system/
 	mkdir -p mkosi.extra/etc
@@ -33,7 +47,7 @@ run:
 	          --ctrl type=unixio,path=/tmp/emulated_tpm/ultrablue/swtpm-sock \
 	          --log level=20 --tpm2 --daemon
 	
-	sudo mkosi qemu \
+	sudo mkosi $(MKOSI_FLAGS) qemu \
 	    -chardev socket,id=chrtpm,path=/tmp/emulated_tpm/ultrablue/swtpm-sock \
 	    -tpmdev emulator,id=tpm0,chardev=chrtpm \
 	    -device tpm-tis,tpmdev=tpm0 \

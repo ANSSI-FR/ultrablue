@@ -1,15 +1,17 @@
 [Unit]
 Description=ultrablue remote attestation service
 After=bluetooth.service
-Wants=cryptsetup-pre.target
+Wants=bluetooth.service cryptsetup-pre.target
 Before=cryptsetup-pre.target
 DefaultDependencies=no
 
 [Service]
 Type=oneshot
+# Horrible hack to wait for bluetooth to be ready
+ExecStartPre=/usr/bin/sleep 5
 ExecStart=/usr/bin/ultrablue-server
 TimeoutSec=60
 StandardOutput=tty
 
 [Install]
-WantedBy=bluetooth.target
+WantedBy=cryptsetup.target

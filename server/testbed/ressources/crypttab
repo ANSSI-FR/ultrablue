@@ -1,1 +1,1 @@
-root /dev/sda2 - tpm2-device=auto,tpm2-pcrs=9
+root /dev/vda2 - tpm2-device=auto,tpm2-pcrs=9

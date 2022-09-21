@@ -21,5 +21,6 @@ Packages=
 	libtss2-dev
 	qrencode
 	strace
+	systemd-resolved
 	tpm2-tools
 	vim
