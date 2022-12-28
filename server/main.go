@@ -22,6 +22,12 @@ var (
 	pcrextend    = flag.Bool("pcr-extend", false, "Extend the 9th PCR with the verifier secret on attestation success")
 )
 
+// Encryption key used at enroll time. It needs to be globally available
+// to be accessible from the protocol functions
+var enrollkey []byte
+
+const ULTRABLUE_KEYS_PATH = "/etc/ultrablue/"
+
 /*
 	initLogger sets the level of logging
 	according to the loglevel parameter.
@@ -84,6 +90,13 @@ func main() {
 	ble.SetDefaultDevice(device)
 	defer device.Stop()
 
+	if *enroll {
+		logrus.Info("Generating symmetric key")
+		if enrollkey, err = getTPMRandom(32); err != nil {
+			logrus.Fatal(err)
+		}
+	}
+
 	logrus.Info("Registering ultrablue service and characteristic")
 	ultrablueSvc := ble.NewService(ultrablueSvcUUID)
 	ultrablueSvc.AddCharacteristic(UltrablueChr(*mtu))
@@ -98,11 +111,12 @@ func main() {
 	if *enroll {
 		logrus.Info("Generating enrollment QR code")
 		addr := device.Address().String()
-		qrcode, err := generateQRCode(addr)
+		json := fmt.Sprintf(`{"addr":"%s","key":"%x"}`, addr, enrollkey)
+		qrcode, err := generateQRCode(json)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		fmt.Println(qrcode)
+		fmt.Print(qrcode)
 	}
 
 	select {
