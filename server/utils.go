@@ -4,8 +4,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpmutil"
 	"github.com/skip2/go-qrcode"
@@ -57,9 +55,9 @@ func extendPCR(index int, secret []byte) error {
 	ascii art string.
 */
 func generateQRCode(data string) (string, error) {
-	qr, err := qrcode.New(fmt.Sprintf("%s\n", data), qrcode.Low)
+	qr, err := qrcode.New(data, qrcode.Low)
 	if err != nil {
 		return "", err
 	}
-	return qr.ToString(false), nil
+	return qr.ToSmallString(false), nil
 }
