@@ -2,14 +2,15 @@ package fr.gouv.ssi.ultrablue.database
 
 import androidx.room.*
 import java.io.Serializable
+import java.util.*
 
 /*
     This table stores the registered devices.
  */
 @Entity(tableName = "device_table")
 data class Device (
-    @PrimaryKey(autoGenerate = true)
-    val uid: Int,
+    @PrimaryKey(autoGenerate = false)
+    val uid: UUID, // UUID used to enroll the phone device to the server
     var name: String, // user-defined device name
     var addr: String, // MAC address
     var ekn: ByteArray, // Public part of the Endorsement Key
@@ -30,6 +31,6 @@ data class Device (
     }
 
     override fun hashCode(): Int {
-        return uid
+        return uid.hashCode()
     }
 }

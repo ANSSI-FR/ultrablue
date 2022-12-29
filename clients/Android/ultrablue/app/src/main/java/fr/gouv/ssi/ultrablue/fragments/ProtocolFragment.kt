@@ -22,6 +22,7 @@ import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
 import fr.gouv.ssi.ultrablue.model.*
 import java.util.*
+import javax.crypto.spec.SecretKeySpec
 
 const val MTU = 512
 
@@ -42,6 +43,7 @@ class ProtocolFragment : Fragment() {
     private var enroll = false
     private var logger: Logger? = null
 
+    private var cryptoManager: CryptoManager? = null
     private var protocol: UltrablueProtocol? = null
 
     // Timer related variables
@@ -158,7 +160,10 @@ class ProtocolFragment : Fragment() {
                     if (data.size < dataLen) {
                         gatt.readCharacteristic(characteristic)
                     } else {
-                        val msg = data
+                        var msg = data
+                        cryptoManager?.let { cm ->
+                            msg = cm.decrypt(msg)
+                        }
                         dataLen = 0
                         data = byteArrayOf()
                         it.onMessageRead(msg)
@@ -214,6 +219,7 @@ class ProtocolFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 		val device = requireArguments().getSerializable("device") as Device
+        val key = requireArguments().getSerializable("key") as SecretKeySpec
         if (device.name.isEmpty()) {
             enroll = true
         }
@@ -235,52 +241,76 @@ class ProtocolFragment : Fragment() {
             We deliberately break indentation to make this callback-based code read like
             direct style.
          */
-        askForBluetoothPermissions(onSuccess = {
+        askForBluetoothPermissions {
             val btAdapter = getBluetoothAdapter()
             turnBluetoothOn(btAdapter, onSuccess = {
-            scanForDevice(btAdapter, MacAddress.fromString(device.addr), onDeviceFound = { btDevice ->
-            connectToDevice(btDevice, onSuccess = { gatt ->
-            this.gatt = gatt
-            requestMTU(gatt, MTU, onSuccess = {
-            searchForUltrablueService(gatt, onServiceFound = { service ->
-            val chr = service.getCharacteristic(ultrablueChrUUID)
-            protocol = UltrablueProtocol(
-                (activity as MainActivity), enroll, device, logger,
-                readMsg = { tag ->
-                    logger?.push(Log("Getting $tag"))
-                    gatt.readCharacteristic(chr)
-                },
-                writeMsg = { tag, msg ->
-                    val prepended = intToByteArray(msg.size) + msg
-                    if (prepended.size > MTU) {
-                        logger?.push(
-                            CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false)
-                        )
-                    } else {
-                        logger?.push(Log("Sending $tag"))
-                        chr.value = prepended
-                        gatt.writeCharacteristic(chr)
-                    }
-                },
-                onCompletion = { success ->
-                    if (success) {
-                        logger?.push(CLog("Attestation success", true))
-                    } else {
-                        logger?.push(CLog("Attestation failure", false))
-                    }
-                    logger?.push(Log("Closing connection"))
-					// The protocol is over, thus it's no longer an error to be disconnected as we asked for it.
-                    onDeviceDisconnectionCallback = {
-                        logger?.push(CLog("Device disconnected", true))
-                    }
-                    gatt.disconnect()
-                    if (success && (enroll || device.secret.isNotEmpty())) {
-                        (activity as MainActivity).onSupportNavigateUp()
-                    }
-                }
-            )
-            protocol?.start()
-            }) }) }) }) }) })
+                scanForDevice(
+                    btAdapter,
+                    MacAddress.fromString(device.addr),
+                    onDeviceFound = { btDevice ->
+                        connectToDevice(btDevice, onSuccess = { gatt ->
+                            this.gatt = gatt
+                            requestMTU(gatt, MTU, onSuccess = {
+                                searchForUltrablueService(gatt, onServiceFound = { service ->
+                                    val chr = service.getCharacteristic(ultrablueChrUUID)
+                                    protocol = UltrablueProtocol(
+                                        (activity as MainActivity), enroll, device, logger,
+                                        readMsg = { tag ->
+                                            logger?.push(Log("Getting $tag"))
+                                            gatt.readCharacteristic(chr)
+                                        },
+                                        writeMsg = { tag, msg ->
+                                            var data = msg
+                                            cryptoManager?.let { cm ->
+                                                data = cm.encrypt(data)
+                                            }
+                                            val prepended = intToByteArray(data.size) + data
+                                            if (prepended.size > MTU) {
+                                                logger?.push(
+                                                    CLog(
+                                                        "$tag doesn't fit in one packet: message size = ${prepended.size}",
+                                                        false
+                                                    )
+                                                )
+                                            } else {
+                                                logger?.push(Log("Sending $tag"))
+                                                chr.value = prepended
+                                                gatt.writeCharacteristic(chr)
+                                            }
+                                        },
+                                        onCompletion = { success ->
+                                            if (success) {
+                                                logger?.push(CLog("Attestation success", true))
+                                            } else {
+                                                logger?.push(CLog("Attestation failure", false))
+                                            }
+                                            logger?.push(Log("Closing connection"))
+                                            // The protocol is over, thus it's no longer an error to be disconnected as we asked for it.
+                                            onDeviceDisconnectionCallback = {
+                                                logger?.push(CLog("Device disconnected", true))
+                                            }
+                                            gatt.disconnect()
+                                            if (success && (enroll || device.secret.isNotEmpty())) {
+                                                (activity as MainActivity).onSupportNavigateUp()
+                                            }
+                                        },
+                                        enableEncryption = {
+                                            cryptoManager = if (enroll) {
+                                                CryptoManager(key).also { cm ->
+                                                    cm.persistKey("ultrablue-" + device.uid.toString())
+                                                }
+                                            } else {
+                                                CryptoManager("ultrablue-" + device.uid.toString())
+                                            }
+                                        }
+                                    )
+                                    protocol?.start()
+                                })
+                            })
+                        })
+                    })
+            })
+        }
     }
 
     override fun onDestroyView() {

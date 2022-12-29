@@ -1,6 +1,7 @@
 package fr.gouv.ssi.ultrablue.database
 
 import androidx.lifecycle.LiveData
+import java.util.*
 
 /*
     This class provides an abstraction layer to manage the device_table.
@@ -12,7 +13,7 @@ class DeviceRepository(private val deviceDao: DeviceDao) {
         deviceDao.addDevice(device)
     }
 
-    fun get(id: Int) : Device {
+    fun get(id: UUID) : Device {
         return deviceDao.get(id)
     }
 
