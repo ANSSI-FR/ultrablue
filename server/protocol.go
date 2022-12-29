@@ -10,65 +10,13 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/fxamacker/cbor/v2"
 	"github.com/google/go-attestation/attest"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
 const PCR_EXTENSION_INDEX = 9
 
-/*
-	sendMsg takes the data to send, which is a generic,
-	and sends it to the message channel of the connection
-	state, encoded to CBOR.
-	This will make the message available to read
-	on the characteristic, and the function will
-	block until the client reads it completely.
-
-	If an error arises, and the channel is still open,
-	sendMsg closes it.
-*/
-func sendMsg[T any](data T, ch chan []byte) error {
-	logrus.Debug("Encoding to CBOR")
-	encoded, err := cbor.Marshal(data)
-	if err != nil {
-		close(ch)
-		return err
-	}
-	logrus.Debug("Sending message")
-	ch <- encoded
-	_, ok := <-ch
-	if !ok {
-		return errors.New("The channel has been closed")
-	}
-	return nil
-}
-
-/*
-	recvMsg blocks until a message has been fully
-	written by the client on the characteristic.
-	It then tries to decode the CBOR message, and
-	stores it in the obj parameter. Since obj is declared
-	beforehand, and has a strong type, the cbor package
-	will be able to decode it.
-
-	If an error arises, and the channel is still open,
-	recvMsg closes it.
-*/
-func recvMsg[T any](obj *T, ch chan []byte) error {
-	logrus.Debug("Receiving message")
-	rsp, ok := <-ch
-	if !ok {
-		return errors.New("The channel has been closed")
-	}
-	logrus.Debug("Decoding from CBOR")
-	err := cbor.Unmarshal(rsp, obj)
-	if err != nil {
-		close(ch)
-		return err
-	}
-	return nil
-}
 
 // ------------- PROTOCOL FUNCTIONS ---------------- //
 
@@ -84,16 +32,16 @@ func recvMsg[T any](obj *T, ch chan []byte) error {
 	again.
 */
 
-// RegistrationData contains the TPM's endorsement RSA public key
+// EnrollData contains the TPM's endorsement RSA public key
 // with an optional certificate.
 // It is used to deconstruct complex crypto.Certificate go type
 // in order to encode and send it.
 // It also contains a boolean @PCRExtend that indicates the new verifier
 // it must generate a new secret to send back on attestation success.
-type RegistrationData struct {
-	Cert      []byte // x509 key certificate (one byte set to 0 if none)
-	N         []byte // Raw public key bytes
-	E         int    // Public key exponent
+type EnrollData struct {
+	EKCert    []byte // x509 key certificate (one byte set to 0 if none)
+	EKPub     []byte // Raw public key bytes
+	EKExp     int    // Public key exponent
 	PCRExtend bool   // Whether or not PCR_EXTENSION_INDEX must be extended on attestation success
 }
 
@@ -104,9 +52,9 @@ type Bytestring struct {
 	Bytes []byte
 }
 
-func parseAttestEK(ek *attest.EK) (RegistrationData, error) {
+func parseAttestEK(ek *attest.EK) (EnrollData, error) {
 	if reflect.TypeOf(ek.Public).String() != "*rsa.PublicKey" {
-		return RegistrationData{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
+		return EnrollData{}, errors.New("Invalid key type:" + reflect.TypeOf(ek.Public).String())
 	}
 	var c []byte = make([]byte, 0)
 	if ek.Certificate != nil {
@@ -114,124 +62,153 @@ func parseAttestEK(ek *attest.EK) (RegistrationData, error) {
 	}
 	var n = ek.Public.(*rsa.PublicKey).N.Bytes()
 	var e = ek.Public.(*rsa.PublicKey).E
-	return RegistrationData{c, n, e, *pcrextend}, nil
+	return EnrollData{c, n, e, *pcrextend}, nil
 }
 
-func sendRegistrationData(ch chan []byte, tpm *attest.TPM) error {
+func establishEncryptedSession(ch chan []byte) (*Session, error) {
+	var data Bytestring
+	var key []byte
+	var session = NewSession(ch)
+	var err error
+
+	logrus.Info("Getting client UUID")
+	if err = recvMsg(&data, session); err != nil {
+		return nil, err
+	}
+	if session.uuid, err = uuid.FromBytes(data.Bytes); err != nil {
+		close(ch)
+		return nil, err
+	}
+
+	if *enroll {
+		key = enrollkey
+		enrollkey = nil
+	}
+	// NOTE: The key will be null during an attestation, because
+	// key persistence isn't yet implemented. Only the enrollment
+	// works as expected for now.
+	if err := session.StartEncryption(key); err != nil {
+		close(ch)
+		return nil, err
+	}
+	return session, nil
+}
+
+func enrollment(session *Session, tpm *attest.TPM) error {
 	logrus.Info("Retrieving EK pub and EK cert")
 	eks, err := tpm.EKs()
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return err
 	}
-	logrus.Info("Sending EK pub and EK cert")
+	logrus.Info("Sending enrollment data")
 
 	// Any key should do the job in principle, use the first one
 	// as we expect it to include a certificate.
 	ek, err := parseAttestEK(&eks[0])
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return nil
 	}
-	err = sendMsg(ek, ch)
+	err = sendMsg(ek, session)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func authentication(ch chan []byte) error {
+func authentication(session *Session) error {
 	logrus.Info("Starting authentication process")
 	logrus.Info("Generating nonce")
-	b, err := getTPMRandom(16)
+	rbytes, err := TPM2_GetRandom(16)
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return err
 	}
-	nonce := Bytestring{b}
+	nonce := Bytestring{rbytes}
 	logrus.Info("Sending nonce")
-	err = sendMsg(nonce, ch)
+	err = sendMsg(nonce, session)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Getting nonce back")
 	var rcvd_nonce Bytestring
-	err = recvMsg(&rcvd_nonce, ch)
+	err = recvMsg(&rcvd_nonce, session)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Verifying nonce")
 	if bytes.Equal(nonce.Bytes, rcvd_nonce.Bytes) == false {
-		close(ch)
+		close(session.ch)
 		return errors.New("Authentication failure: nonces differ")
 	}
 	logrus.Info("The client is now authenticated")
 	return nil
 }
 
-func credentialActivation(ch chan []byte, tpm *attest.TPM) (*attest.AK, error) {
+func credentialActivation(session *Session, tpm *attest.TPM) (*attest.AK, error) {
 	logrus.Info("Generating AK")
 	ak, err := tpm.NewAK(nil)
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return nil, err
 	}
-	err = sendMsg(ak.AttestationParameters(), ch)
+	err = sendMsg(ak.AttestationParameters(), session)
 	if err != nil {
 		return nil, err
 	}
 	logrus.Info("Getting credential blob")
 	var ec attest.EncryptedCredential
-	err = recvMsg(&ec, ch)
+	err = recvMsg(&ec, session)
 	if err != nil {
 		return nil, err
 	}
 	logrus.Info("Decrypting credential blob")
 	decrypted, err := ak.ActivateCredential(tpm, ec)
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return nil, err
 	}
 	logrus.Info("Sending back decrypted credential blob")
-	err = sendMsg(Bytestring{decrypted}, ch)
+	err = sendMsg(Bytestring{decrypted}, session)
 	if err != nil {
 		return nil, err
 	}
 	return ak, nil
 }
 
-func attestation(ch chan []byte, tpm *attest.TPM, ak *attest.AK) error {
+func attestation(session *Session, tpm *attest.TPM, ak *attest.AK) error {
 	logrus.Info("Getting anti replay nonce")
 	var nonce Bytestring
-	err := recvMsg(&nonce, ch)
+	err := recvMsg(&nonce, session)
 	if err != nil {
 		return err
 	}
 	logrus.Info("Retrieving attestation plateform data")
 	ap, err := tpm.AttestPlatform(ak, nonce.Bytes, nil)
 	if err != nil {
-		close(ch)
+		close(session.ch)
 		return err
 	}
-	err = sendMsg(ap, ch)
+	err = sendMsg(ap, session)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func response(ch chan []byte) error {
+func response(session *Session) error {
 	logrus.Info("Getting attestation response")
 	var response struct  {
 		Err        bool
 		Secret     []byte
 	}
-	err := recvMsg(&response, ch)
+	err := recvMsg(&response, session)
 	if err != nil {
 		return err
 	}
 	if response.Err {
-		close(ch)
+		close(session.ch)
 		return errors.New("Attestation failure")
 	}
 	if *enroll {
@@ -241,7 +218,9 @@ func response(ch chan []byte) error {
 	}
 	if len(response.Secret) > 0 {
 		logrus.Info("Extending PCR", PCR_EXTENSION_INDEX)
-		extendPCR(PCR_EXTENSION_INDEX, response.Secret)
+		if err = TPM2_PCRExtend(PCR_EXTENSION_INDEX, response.Secret); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -263,36 +242,40 @@ func response(ch chan []byte) error {
 	it needs to close the connection on the next client interaction.
 */
 func ultrablueProtocol(ch chan []byte) {
+	var session *Session
+
 	tpm, err := attest.OpenTPM(nil)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	defer tpm.Close()
 
+	if session, err = establishEncryptedSession(ch); err != nil {
+		logrus.Error(err); return
+	}
+	err = authentication(session)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
 	if *enroll {
-		err = sendRegistrationData(ch, tpm)
+		err = enrollment(session, tpm)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 	}
-
-	err = authentication(ch)
+	ak, err := credentialActivation(session, tpm)
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
-	ak, err := credentialActivation(ch, tpm)
+	err = attestation(session, tpm, ak)
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
-	err = attestation(ch, tpm, ak)
-	if err != nil {
-		logrus.Error(err)
-		return
-	}
-	err = response(ch)
+	err = response(session)
 	if err != nil {
 		logrus.Error(err)
 		os.Exit(1)

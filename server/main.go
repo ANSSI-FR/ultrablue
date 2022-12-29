@@ -92,7 +92,7 @@ func main() {
 
 	if *enroll {
 		logrus.Info("Generating symmetric key")
-		if enrollkey, err = getTPMRandom(32); err != nil {
+		if enrollkey, err = TPM2_GetRandom(32); err != nil {
 			logrus.Fatal(err)
 		}
 	}
