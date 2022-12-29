@@ -12,7 +12,9 @@ import (
 
 func TestSendMsg_NormalCase(t *testing.T) {
 	var data = []int{4, 8, 15, 16, 23, 42}
-	var ch = make(chan []byte)
+	var session = &Session {
+		ch: make(chan []byte),
+	}
 
 	// Emulate a successful client read on the characteristic
 	go func(ch chan []byte, t *testing.T) {
@@ -21,10 +23,10 @@ func TestSendMsg_NormalCase(t *testing.T) {
 			t.Fatal("The channel has been closed")
 		}
 		ch <- nil
-	}(ch, t)
+	}(session.ch, t)
 
 	// Check that no error occured
-	err := sendMsg(data, ch)
+	err := sendMsg(data, session)
 	if err != nil {
 		t.Errorf("Failed to send data %v", data)
 	}
@@ -32,7 +34,9 @@ func TestSendMsg_NormalCase(t *testing.T) {
 
 func TestSendMsg_WithError(t *testing.T) {
 	var data = []int{4, 8, 15, 16, 23, 42}
-	var ch = make(chan []byte)
+	var session = &Session {
+		ch: make(chan []byte),
+	}
 
 	// Emulate a client read on the characteristic that
 	// fails , in a goroutine.
@@ -42,10 +46,10 @@ func TestSendMsg_WithError(t *testing.T) {
 			t.Fatal("The channel has been closed")
 		}
 		close(ch) // This means an error occured
-	}(ch, t)
+	}(session.ch, t)
 
 	// Make sure an error occured
-	err := sendMsg(data, ch)
+	err := sendMsg(data, session)
 	if err == nil {
 		t.Error("sendMsg succeeded whereas the channel closed unexpectedly")
 	}
@@ -77,7 +81,9 @@ func TestSendMsg_WithError(t *testing.T) {
 func TestRecvMsg_NormalCase(t *testing.T) {
 	var data []int
 	var expected = []int{4, 8, 15, 16, 23, 42}
-	var ch = make(chan []byte)
+	var session = &Session {
+		ch: make(chan []byte),
+	}
 
 	// Emulate a successful client write on the characteristic
 	go func(ch chan []byte, t *testing.T) {
@@ -87,10 +93,10 @@ func TestRecvMsg_NormalCase(t *testing.T) {
 			t.Fatalf("Failed to encode %#v as CBOR", data)
 		}
 		ch <- encoded
-	}(ch, t)
+	}(session.ch, t)
 
 	// Check that no error occured
-	err := recvMsg(&data, ch)
+	err := recvMsg(&data, session)
 	if err != nil {
 		t.Error("Failed to receive data")
 	}
@@ -103,16 +109,18 @@ func TestRecvMsg_NormalCase(t *testing.T) {
 
 func TestRecvMsg_ChannelError(t *testing.T) {
 	var data []int
-	var ch = make(chan []byte)
+	var session = &Session {
+		ch: make(chan []byte),
+	}
 
 	// Emulate a channel error while a client is writing on
 	// the characteristic.
 	go func(ch chan []byte, t *testing.T) {
 		close(ch)
-	}(ch, t)
+	}(session.ch, t)
 
 	// Make sure the error is caught
-	err := recvMsg(&data, ch)
+	err := recvMsg(&data, session)
 	if err == nil {
 		t.Error("recvMsg succeeded whereas the channel closed unecpectedly.")
 	}
@@ -120,16 +128,18 @@ func TestRecvMsg_ChannelError(t *testing.T) {
 
 func TestRecvMsg_InvalidCBOR(t *testing.T) {
 	var data []int
-	var ch = make(chan []byte)
+	var session = &Session {
+		ch: make(chan []byte),
+	}
 
 	// Emulate a successful client write on the characteristic
 	go func(ch chan []byte, t *testing.T) {
 		var encoded = []byte{0x38, 0x18, 0x12} // Invalid CBOR
 		ch <- encoded
-	}(ch, t)
+	}(session.ch, t)
 
 	// Make sure an error occured
-	err := recvMsg(&data, ch)
+	err := recvMsg(&data, session)
 	if err == nil {
 		t.Error("recvMsg succeeded whereas invalid CBOR data was sent")
 	}
