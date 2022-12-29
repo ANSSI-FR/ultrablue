@@ -55,6 +55,7 @@ dependencies {
     implementation "androidx.room:room-ktx:$roomVersion"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.0-RC"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
 
     implementation files("libs/gomobile.aar")
 }

@@ -8,12 +8,13 @@ import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import java.security.SecureRandom
+import java.util.UUID
 
 @Serializable
 class RegistrationDataModel @OptIn(ExperimentalSerializationApi::class) constructor(
-    @ByteString val N: ByteArray,
-    val E: UInt,
-    @ByteString val Cert: ByteArray,
+    @ByteString val EKPub: ByteArray,
+    val EKExp: UInt,
+    @ByteString val EKCert: ByteArray,
     val PCRExtend: Boolean,
 )
 
@@ -25,7 +26,7 @@ class EncryptedCredentialModel @OptIn(ExperimentalSerializationApi::class) const
 
 @Serializable
 class ByteArrayModel @OptIn(ExperimentalSerializationApi::class) constructor(
-    @ByteString val Bytes: ByteArray,
+    @ByteString var Bytes: ByteArray,
 )
 
 @Serializable
@@ -36,20 +37,22 @@ class AttestationResponse @OptIn(ExperimentalSerializationApi::class) constructo
 
 typealias ProtocolStep = Int
 
-const val REGISTRATION_DATA_READ = 0
-const val REGISTRATION_DATA_DECODE = 1
-const val AUTHENTICATION_READ = 2
-const val AUTHENTICATION = 3
-const val AK_READ = 4
-const val CREDENTIAL_ACTIVATION = 5
-const val CREDENTIAL_ACTIVATION_READ = 6
-const val CREDENTIAL_ACTIVATION_ASSERT = 7
-const val ATTESTATION_SEND_NONCE = 8
-const val ATTESTATION_READ = 9
-const val VERIFY_QUOTE = 10
-const val REPLAY_EVENT_LOG = 11
-const val PCRS_HANDLE = 12
-const val RESPONSE = 13
+const val UUID_SEND = 1
+const val ENABLE_ENCRYPTION = 2
+const val AUTHENTICATION_READ = 3
+const val AUTHENTICATION = 4
+const val REGISTRATION_DATA_READ = 5
+const val REGISTRATION_DATA_DECODE = 6
+const val AK_READ = 7
+const val CREDENTIAL_ACTIVATION = 8
+const val CREDENTIAL_ACTIVATION_READ = 9
+const val CREDENTIAL_ACTIVATION_ASSERT = 10
+const val ATTESTATION_SEND_NONCE = 11
+const val ATTESTATION_READ = 12
+const val VERIFY_QUOTE = 13
+const val REPLAY_EVENT_LOG = 14
+const val PCRS_HANDLE = 15
+const val RESPONSE = 16
 
 /*
     UltrablueProtocol is the class that drives the client - server communication.
@@ -67,9 +70,10 @@ class UltrablueProtocol(
     private val logger: Logger?,
     private val readMsg: (String) -> Unit,
     private var writeMsg: (String, ByteArray) -> Unit,
-    private var onCompletion: (Boolean) -> Unit
+    private var onCompletion: (Boolean) -> Unit,
+    private var enableEncryption: () -> Unit
 ) {
-    private var state: ProtocolStep = if (enroll) { REGISTRATION_DATA_READ } else { AUTHENTICATION_READ }
+    private var state: ProtocolStep = UUID_SEND
     private var message = byteArrayOf()
 
     private val rand = SecureRandom()
@@ -94,29 +98,38 @@ class UltrablueProtocol(
     @OptIn(ExperimentalSerializationApi::class)
     private fun resume() {
         when (state) {
-            REGISTRATION_DATA_READ -> readMsg(activity.getString(R.string.ek_pub_cert))
-            REGISTRATION_DATA_DECODE -> {
-                registrationData = Cbor.decodeFromByteArray(message)
-                state = AUTHENTICATION_READ
+            UUID_SEND -> {
+                val uuid = device.uid
+                val encoded = Cbor.encodeToByteArray(ByteArrayModel(uuid.toByteArray()))
+                writeMsg("UUID", encoded)
+            }
+            ENABLE_ENCRYPTION -> {
+                enableEncryption()
+                state++
                 resume()
             }
             AUTHENTICATION_READ -> readMsg(activity.getString(R.string.auth_nonce))
             AUTHENTICATION -> {
-                if (message.size != 24) {
-                    logger?.push(CLog("The Ultrablue server is running on enroll mode whereas an attestation was expected", false))
-                    return
+                writeMsg(activity.getString(R.string.decrypted_auth_nonce), message)
+            }
+            REGISTRATION_DATA_READ -> {
+                if (!enroll) {
+                    state = AK_READ
+                    resume()
                 }
-                val authNonce = Cbor.decodeFromByteArray<ByteArrayModel>(message)
-                //TODO: When encryption will be implemented, we'll need to decrypt the nonce here.
-                val encodedAuthNonce = Cbor.encodeToByteArray(authNonce)
-                writeMsg(activity.getString(R.string.decrypted_auth_nonce), encodedAuthNonce)
+                readMsg(activity.getString(R.string.ek_pub_cert))
+            }
+            REGISTRATION_DATA_DECODE -> {
+                registrationData = Cbor.decodeFromByteArray(message)
+                state = AK_READ
+                resume()
             }
             AK_READ -> readMsg(activity.getString(R.string.ak))
             CREDENTIAL_ACTIVATION -> {
                 encodedAttestationKey = message
                 logger?.push(Log("Generating credential challenge"))
                 try {
-                    val credentialBlob = Gomobile.makeCredential(registrationData.N, registrationData.E.toLong(), encodedAttestationKey)
+                    val credentialBlob = Gomobile.makeCredential(registrationData.EKPub, registrationData.EKExp.toLong(), encodedAttestationKey)
                     // We store the secret now to validate it later.
                     credentialActivationSecret = credentialBlob.secret
                     val encryptedCredential = EncryptedCredentialModel(credentialBlob.cred, credentialBlob.credSecret)
@@ -216,9 +229,9 @@ class UltrablueProtocol(
         rand.nextBytes(secret)
 
         device.name = "device" + device.uid
-        device.ekn = registrationData.N
-        device.eke = registrationData.E.toInt()
-        device.ekcert = registrationData.Cert
+        device.ekn = registrationData.EKPub
+        device.eke = registrationData.EKExp.toInt()
+        device.ekcert = registrationData.EKCert
         device.encodedPCRs = encodedPCRs!!
         device.secret = secret
         logger?.push(Log("Registering device"))
