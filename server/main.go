@@ -14,7 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Command line arguments (global variables)
+// Command line arguments - Global variables
 var (
 	enroll       = flag.Bool("enroll", false, "Must be true for a first time attestation")
 	loglevel     = flag.Int("loglevel", 1, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
@@ -52,28 +52,53 @@ func initLogger(loglevel int) {
 }
 
 /*
-	ARCHITECTURE
+	ARCHITECTURE OVERVIEW
 
-	Ultrablue is a client-server application, that operates over
-	Bluetooth Low Energy. This tool acts as the server.
-	Each step of the protocol is implemented in a characteristic,
-	and the client must read/write on those characteristic
-	successively to perform the remote attestation.
-	The protocol diagram can be found in the README.md file.
+	Ultrablue is a client-server application that operates over
+	Bluetooth Low Energy (BLE). This tool acts as the server.
 
-	Characteristics implementation details:
+	BLE is a client-driven transport layer, in the sense that
+	the server exposes characteristics and it is up to the client to read or
+	write them whenever it wants.
 
-		- Each characteristic is declared in its own file, ending with Chr.go.
+	Ultrablue implements an inversion of control through serveral components,
+	abstracting the BLE layer and allowing the server to drive the exchange.
+	Each of those components, briefly described here, is implemented in a
+	dedicated file named after the functionality.
 
-		- As the chunking of the packets is not handled by the ble package,
-		each characteristic maintains its state in the context associated
-		with the connection.
-		It's up to the client to read/write enough times to complete the
-		operation, the server can't drive the communicatin and send every
-		chunks in a for loop.
+	- The characteristic: Bluetooth Low Energy sends/receives data through
+	  characteristics. When a characteristic is advertised by a device, clients
+	  are able to see it and can read/write on it if allowed by the advertising
+	  device. When a client performs a read/write operation, the characteristic
+	  will process it through handlers.
+	  Ultrablue only exposes one characteristic, enabled both for reading and
+	  writing.
 
-		- The r/w handlers of the characteristics runs in a goroutine, thus
-		errors/success are transmitted to the main routine through channels.
+	- The state: The state is a data structure that holds information about the
+	  currently running read/write operation on the characteristic for a
+	  connection.
+	  It has a go channel, that abstracts the characteristic handlers and makes
+	  possible to read/write full messages to the channel without dealing with BLE
+	  internals (chunking, size prefix...).
+	  The state is created on the first client interaction with the characteristic,
+	  and lives as long as the client connection does.
+	  When the state is created, it also runs a protocol instance that operates
+	  on the above-mentioned channel and runs in a dedicated goroutine.
+
+	- The session: It wraps the state channel and keeps information on how to
+	  read/write data into it, e.g. if messages must be encrypted/decrypted.
+	  A StartEncryption method is available so that the caller can make the session
+	  encrypted whenever they want.
+	  The session also exposes two functions to communicate with clients: SendMsg
+	  and recvMsg. These functions make use of the abstractions provided by lower
+	  layers to operate on the characteristic (through the go channel of the
+	  state); upper layers should never need to call the lower layers directly.
+
+	- The protocol: It implements the actual remote attestation routine. It is
+	  split in several steps, each implemented in its own function. Thanks to
+	  previous abstractions, the server doesn't care of the transport layer and
+	  only relies on the session and its exported methods/functions to communicate
+	  with clients.
 
 	Note: The server only accepts one simulteanous client.
 */
