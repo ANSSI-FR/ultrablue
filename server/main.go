@@ -61,7 +61,7 @@ func initLogger(loglevel int) {
 	the server exposes characteristics and it is up to the client to read or
 	write them whenever it wants.
 
-	Ultrablue implements an inversion of control through serveral components,
+	Ultrablue implements an inversion of control through several components,
 	abstracting the BLE layer and allowing the server to drive the exchange.
 	Each of those components, briefly described here, is implemented in a
 	dedicated file named after the functionality.
