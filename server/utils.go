@@ -4,8 +4,65 @@
 package main
 
 import (
+	"os"
+
 	"github.com/skip2/go-qrcode"
 )
+
+/*
+	Seals the given key with the TPM Storage Root Key
+	and stores it under two files named after the given
+	uuid. If those files already exists, an error is
+	returned.
+*/
+func storeKey(uuid string, key []byte) error {
+	var priv, pub []byte
+	var err error
+	var fpriv, fpub *os.File
+
+	if priv, pub, err = TPM2_Seal(key); err != nil {
+		return err
+	}
+	if err = os.MkdirAll(ULTRABLUE_KEYS_PATH, os.ModeDir); err != nil {
+		return err
+	}
+	if fpriv, err = os.OpenFile(ULTRABLUE_KEYS_PATH + uuid, os.O_WRONLY | os.O_CREATE | os.O_EXCL, 0600); err != nil {
+		return err
+	}
+	defer fpriv.Close()
+	if fpub, err = os.OpenFile(ULTRABLUE_KEYS_PATH + uuid + ".pub", os.O_WRONLY | os.O_CREATE | os.O_EXCL, 0600); err != nil {
+		return err
+	}
+	defer fpub.Close()
+	if _, err = fpriv.Write(priv); err != nil {
+		return err
+	}
+	if _, err = fpub.Write(pub); err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+	Gets the sealed key from the ultrablue keys directory
+	and tries to unseal it with the TPM Storage Root Key.
+	Returns the unsealed key on success
+*/
+func loadKey(uuid string) ([]byte, error) {
+	var priv, pub, key []byte
+	var err error
+
+	if priv, err = os.ReadFile("/etc/ultrablue/" + uuid); err != nil {
+		return nil, err
+	}
+	if pub, err = os.ReadFile("/etc/ultrablue/" + uuid + ".pub"); err != nil {
+		return nil, err
+	}
+	if key, err = TPM2_Unseal(priv, pub); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
 
 /*
 	generateQRCode generates a QR code containing the

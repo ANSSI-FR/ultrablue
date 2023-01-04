@@ -83,10 +83,16 @@ func establishEncryptedSession(ch chan []byte) (*Session, error) {
 	if *enroll {
 		key = enrollkey
 		enrollkey = nil
+		logrus.Info("Saving UUID & encryption key")
+		err = storeKey(session.uuid.String(), key)
+	} else {
+		logrus.Info("Fetching encryption key")
+		key, err = loadKey(session.uuid.String())
 	}
-	// NOTE: The key will be null during an attestation, because
-	// key persistence isn't yet implemented. Only the enrollment
-	// works as expected for now.
+	if err != nil {
+		close(ch)
+		return nil, err
+	}
 	if err := session.StartEncryption(key); err != nil {
 		close(ch)
 		return nil, err
