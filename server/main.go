@@ -16,10 +16,11 @@ import (
 
 // Command line arguments - Global variables
 var (
-	enroll       = flag.Bool("enroll", false, "Must be true for a first time attestation")
+	enroll       = flag.Bool("enroll", false, "Must be set for a first time attestation (known as the enrollment)")
 	loglevel     = flag.Int("loglevel", 1, "Indicates the level of logging, 0 is the minimum, 3 is the maximum")
 	mtu          = flag.Int("mtu", 500, "Set a custom MTU, which is basically the max size of the BLE packets")
 	pcrextend    = flag.Bool("pcr-extend", false, "Extend the 9th PCR with the verifier secret on attestation success")
+	withpin      = flag.Bool("with-pin", false, "Use a PIN to seal the encryption key to the TPM (default is sealing to the SRK without password)")
 )
 
 // Encryption key used at enroll time. It needs to be globally available

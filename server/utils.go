@@ -4,9 +4,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"syscall"
 
 	"github.com/skip2/go-qrcode"
+	"golang.org/x/term"
 )
 
 /*
@@ -17,10 +20,17 @@ import (
 */
 func storeKey(uuid string, key []byte) error {
 	var priv, pub []byte
+	var pin []byte
 	var err error
 	var fpriv, fpub *os.File
 
-	if priv, pub, err = TPM2_Seal(key); err != nil {
+	if *withpin {
+		fmt.Println("Choose a PIN to seal the encryption key on disk:")
+		if pin, err = term.ReadPassword(syscall.Stdin); err != nil {
+			return err
+		}
+	}
+	if priv, pub, err = TPM2_Seal(key, string(pin)); err != nil {
 		return err
 	}
 	if err = os.MkdirAll(ULTRABLUE_KEYS_PATH, os.ModeDir); err != nil {
@@ -50,15 +60,22 @@ func storeKey(uuid string, key []byte) error {
 */
 func loadKey(uuid string) ([]byte, error) {
 	var priv, pub, key []byte
+	var pin []byte
 	var err error
 
+	if *withpin {
+		fmt.Println("Please enter the PIN used to seal the encryption key:")
+		if pin, err = term.ReadPassword(syscall.Stdin); err != nil {
+			return nil, err
+		}
+	}
 	if priv, err = os.ReadFile("/etc/ultrablue/" + uuid); err != nil {
 		return nil, err
 	}
 	if pub, err = os.ReadFile("/etc/ultrablue/" + uuid + ".pub"); err != nil {
 		return nil, err
 	}
-	if key, err = TPM2_Unseal(priv, pub); err != nil {
+	if key, err = TPM2_Unseal(priv, pub, string(pin)); err != nil {
 		return nil, err
 	}
 	return key, nil
