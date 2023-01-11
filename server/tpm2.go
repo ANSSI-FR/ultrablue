@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-tpm/tpm2"
 	"github.com/google/go-tpm/tpmutil"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -177,6 +178,9 @@ func TPM2_GetRandom(size uint16) ([]byte, error) {
 	rbytes, err := tpm2.GetRandom(rwc, size)
 	if err != nil {
 		return nil, err
+	}
+	if rbytes == nil || len(rbytes) != int(size) || onlyContainsZeros(rbytes) {
+		return nil, errors.New("Failed to generate random bytes")
 	}
 	return rbytes, nil
 }
