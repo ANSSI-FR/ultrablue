@@ -74,10 +74,15 @@ func TPM2_LoadSRK(rwc io.ReadWriteCloser) (tpmutil.Handle, error) {
 }
 
 /*
-	Seals the given data to the TPM Storage Root Key (SRK) and
-	returns the resulting private and public blobs
+	Seals the given data to the TPM Storage Root Key (SRK) and to the
+	provided PIN if the --with-pin command line argument is provided.
+	Returns the resulting private and public blobs
+
+	If the --with-pin command line argument is provided, a password policy
+	will be used to seal the key.
+	To get it back, the same policy will be needed at unseal time.
 */
-func TPM2_Seal(data []byte) ([]byte, []byte, error) {
+func TPM2_Seal(data []byte, pin string) ([]byte, []byte, error) {
 	var rwc io.ReadWriteCloser
 	var priv, pub, policy []byte
 	var srkHandle, sessHandle tpmutil.Handle
@@ -94,10 +99,21 @@ func TPM2_Seal(data []byte) ([]byte, []byte, error) {
 	if sessHandle, _, err = tpm2.StartAuthSession(rwc, tpm2.HandleNull, tpm2.HandleNull, make([]byte, 16), nil, tpm2.SessionPolicy, tpm2.AlgNull, tpm2.AlgSHA256); err != nil {
 		return nil, nil, err
 	}
+
+	// Note that we check for the command line argument rather than for an
+	// empty PIN, because we don't want to transparently disable the password
+	// policy for the session if the user inputs an empty string while providing
+	// the --with-pin option.
+	if *withpin {
+		if err = tpm2.PolicyPassword(rwc, sessHandle); err != nil {
+			return nil, nil, err
+		}
+	}
+
 	if policy, err = tpm2.PolicyGetDigest(rwc, sessHandle); err != nil {
 		return nil, nil, err
 	}
-	if priv, pub, err = tpm2.Seal(rwc, srkHandle, "", "", policy, data); err != nil {
+	if priv, pub, err = tpm2.Seal(rwc, srkHandle, "", pin, policy, data); err != nil {
 		return nil, nil, err
 	}
 	return priv, pub, err
@@ -105,9 +121,19 @@ func TPM2_Seal(data []byte) ([]byte, []byte, error) {
 
 /*
 	Unseals the given object with the TPM Storage Root Key (SRK)
-	and returns the original data
+	and returns the original data, assuming the policy is correct:
+
+	If the --with-pin command line argument is provided, a password policy is
+	used for the session. This means that an incorrect PIN will increment
+	the TPM DA counter, and may lock the TPM. This is wanted and prevents
+	brute-force attacks.
+	If the --with-pin was used at enroll time (thus sealing the key with a password
+	policy), and it is not at attestation time: The password policy will not be
+	used and TPM2_Unseal will return a policy error, without trying any password.
+	In consequence, the TPM DA counter will NOT be incremented, which is also
+	wanted because it is likely to be a usage error.
 */
-func TPM2_Unseal(priv, pub []byte) ([]byte, error) {
+func TPM2_Unseal(priv, pub []byte, pin string) ([]byte, error) {
 	var rwc io.ReadWriteCloser
 	var data []byte
 	var srkHandle, keyHandle, sessHandle tpmutil.Handle
@@ -127,7 +153,12 @@ func TPM2_Unseal(priv, pub []byte) ([]byte, error) {
 	if keyHandle, _, err = tpm2.Load(rwc, srkHandle, "", pub, priv); err != nil {
 		return nil, err
 	}
-	if data, err = tpm2.UnsealWithSession(rwc, sessHandle, keyHandle, ""); err != nil {
+	if *withpin {
+		if err = tpm2.PolicyPassword(rwc, sessHandle); err != nil {
+			return nil, err
+		}
+	}
+	if data, err = tpm2.UnsealWithSession(rwc, sessHandle, keyHandle, pin); err != nil {
 		return nil, err
 	}
 	return data, nil
