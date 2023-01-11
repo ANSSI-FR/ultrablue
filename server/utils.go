@@ -93,3 +93,15 @@ func generateQRCode(data string) (string, error) {
 	}
 	return qr.ToSmallString(false), nil
 }
+
+/*
+	Returns true if the data only contains zeros, false otherwise
+*/
+func onlyContainsZeros(data []byte) bool {
+	for _, b := range data {
+		if b != 0 {
+			return false
+		}
+	}
+	return true
+}
