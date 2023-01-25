@@ -283,6 +283,7 @@ class ProtocolFragment : Fragment() {
             }) }) }) }) }) })
     }
 
+    @SuppressLint("MissingPermission")
     override fun onDestroyView() {
         super.onDestroyView()
         gatt?.disconnect()
