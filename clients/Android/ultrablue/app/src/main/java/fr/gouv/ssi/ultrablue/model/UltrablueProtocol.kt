@@ -175,6 +175,15 @@ class UltrablueProtocol(
                 }
             }
             REPLAY_EVENT_LOG -> {
+                // From this point, an error is considered to be harmful: This isn't anymore a
+                // connection error, a protocol error or whatever; It is likely that something
+                // changes in the bootchain. We must make the attestation fail by sending an
+                // attestation response showing the error.
+                // This can be done by removing the previously set logger handler, which disconnected
+                // the client in case of error, but also preventing it to get to the attestation
+                // response message.
+                logger?.setOnErrorHandler{}
+                
                 logger?.push(Log("Replaying event log"))
                 try {
                     Gomobile.replayEventLog(encodedPlatformParameters)
