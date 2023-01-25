@@ -35,3 +35,8 @@ jobs:
       run: cd clients/Android/ultrablue/ && chmod +x gradlew
     - name: Build with Gradle
       run: cd clients/Android/ultrablue/ && ./gradlew build
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ultrablue-debug.apk
+        path: clients/Android/ultrablue/app/build/outputs/apk/debug/app-debug.apk

@@ -26,3 +26,8 @@ jobs:
 
     - name: Test
       run: cd server && go test -v ./...
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ultrablue-server
+        path: server/ultrablue-server
