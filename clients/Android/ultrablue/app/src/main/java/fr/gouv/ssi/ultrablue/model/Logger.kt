@@ -97,6 +97,10 @@ class Logger(private var activity: MainActivity?, private var textView: TextView
         }
     }
 
+    fun setOnErrorHandler(handler: () -> Unit) {
+        this.onError = handler
+    }
+
     override fun toString(): String {
         return logs.joinToString(separator = "<br/>", transform = {
             it.toString()
