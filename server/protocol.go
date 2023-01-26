@@ -144,7 +144,14 @@ func authentication(session *Session) error {
 		return err
 	}
 	logrus.Info("Verifying nonce")
-	if bytes.Equal(nonce.Bytes, rcvd_nonce.Bytes) == false {
+	if len(rcvd_nonce.Bytes) != 16 {
+		close(session.ch)
+		return errors.New("Authentication failure: Invalid nonce")
+	}
+	// We choosed the following tweak because it's easy to implement for most
+	// languages, and makes every bit change.
+	tweaked_nonce := append(rcvd_nonce.Bytes[8:], rcvd_nonce.Bytes[:8]...)
+	if bytes.Equal(nonce.Bytes, tweaked_nonce) == false {
 		close(session.ch)
 		return errors.New("Authentication failure: nonces differ")
 	}
