@@ -3,7 +3,7 @@
 
 [Distribution]
 Distribution=ubuntu
-Release=focal
+Release=jammy
 Repositories=main,universe
 
 [Packages]
@@ -22,5 +22,4 @@ Packages=
 	qrencode
 	strace
 	tpm2-tools
-	tpm2-tss
 	vim

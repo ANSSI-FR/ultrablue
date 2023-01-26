@@ -21,8 +21,38 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Build
+    - name: Build server
       run: cd server && go build -v ./...
 
-    - name: Test
+    - name: Test server
       run: cd server && go test -v ./...
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ultrablue-server
+        path: server/ultrablue-server
+
+  testbed:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distribution: [ 'debian', 'ubuntu' ]
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Set up mkosi
+      uses: systemd/mkosi@v14
+    - name: Build testbed
+      run: make -C server/testbed build DISTRIBUTION=${{ matrix.distribution }}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ultrablue-testbed-${{ matrix.distribution }}
+        path: |
+          server/testbed/mkosi.output/${{ matrix.distribution }}*/
+          !server/testbed/mkosi.output/${{ matrix.distribution }}*/*.cache-*
