@@ -28,6 +28,9 @@ interface DeviceDao {
     @Query("UPDATE device_table SET encodedPCRs=:newPCRs WHERE uid=:uid")
     fun setPCRs(uid: UUID, newPCRs: ByteArray)
 
+    @Query("UPDATE device_table SET lastAttestation=:ts, lastAttestationSuccess=:success WHERE uid=:uid")
+    fun update(uid: UUID, ts: Long, success: Boolean)
+
     @Delete
     suspend fun removeDevice(device: Device)
 }

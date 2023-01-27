@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
  */
 class DeviceViewModel(application: Application): AndroidViewModel(application) {
 
-    val repo: DeviceRepository
+    private val repo: DeviceRepository
     val allDevices: LiveData<List<Device>>
 
     init {
@@ -30,5 +30,9 @@ class DeviceViewModel(application: Application): AndroidViewModel(application) {
 
     fun rename(device: Device, name: String) {
         repo.setName(device, name)
+    }
+
+    fun update(device: Device) {
+        repo.update(device)
     }
 }

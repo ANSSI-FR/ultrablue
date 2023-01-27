@@ -29,6 +29,10 @@ class DeviceRepository(private val deviceDao: DeviceDao) {
         deviceDao.setName(device.uid, newName)
     }
 
+    fun update(device: Device) {
+        deviceDao.update(device.uid, device.lastAttestation, device.lastAttestationSuccess)
+    }
+
     // TODO: This function is meant to be used when values of some PCRs changed
     //  but we now it is the result of a trusted action. We want to allow the user
     //  to take the new PCR values as reference values.

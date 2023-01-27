@@ -6,6 +6,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import fr.gouv.ssi.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.model.toDateFmt
+import java.sql.Timestamp
+import java.util.Date
 
 /*
     Allows to dispatch clicks on specific ViewHolder CardView, and handle them
@@ -31,7 +34,7 @@ class DeviceAdapter(private val itemClickListener: ItemClickListener) : Recycler
 
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         var nameTextView: TextView = itemView.findViewById(R.id.device_name)
-        var addrTextView: TextView = itemView.findViewById(R.id.device_addr)
+        var lastAttestationTextView: TextView = itemView.findViewById(R.id.last_attestation)
         val attestationButton: ImageButton = itemView.findViewById(R.id.attestation_button)
         var trashButton: ImageButton = itemView.findViewById(R.id.trash_button)
     }
@@ -46,9 +49,25 @@ class DeviceAdapter(private val itemClickListener: ItemClickListener) : Recycler
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val device = deviceList[position]
-
         holder.nameTextView.text = device.name
-        holder.addrTextView.text = device.addr
+
+        val square = if (device.lastAttestation == 0L) {
+            "⬛ "
+        } else if (device.lastAttestationSuccess) {
+            "\uD83D\uDFE9 "
+        } else {
+            "\uD83D\uDFE5 "
+        }
+
+        holder.lastAttestationTextView.text =
+            // square +
+            "Last attestation:\n" +
+            square +
+            if (device.lastAttestation == 0L) {
+                "N/A"
+            } else {
+                device.lastAttestation.toDateFmt()
+            }
 
         holder.itemView.setOnClickListener {
             itemClickListener.onClick(ItemClickListener.Target.CARD_VIEW, device)
