@@ -1,6 +1,7 @@
 package fr.gouv.ssi.ultrablue.fragments
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
@@ -11,10 +12,8 @@ import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 import fr.gouv.ssi.ultrablue.MainActivity
 import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
-import fr.gouv.ssi.ultrablue.model.toDateFmt
 import fr.gouv.ssi.ultrablue.model.toDateTimeFmt
 import java.io.ByteArrayInputStream
-import java.io.InputStream
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
@@ -39,7 +38,9 @@ class DeviceFragment : Fragment() {
                 return when (item.itemId) {
                     // The + button has been clicked
                     R.id.action_edit -> {
-                        showDeviceRenamingDialog()
+                        context?.let {
+                            showDeviceRenamingDialog(it)
+                        }
                         true
                     }
                     else -> false
@@ -97,12 +98,12 @@ class DeviceFragment : Fragment() {
     }
 
     // Present a popup allowing the user to rename the device.
-    private fun showDeviceRenamingDialog() {
-        val nameField = EditText(requireContext())
+    private fun showDeviceRenamingDialog(ctx: Context) {
+        val nameField = EditText(ctx)
         nameField.hint = "name"
         nameField.width = 150
         nameField.setPadding(30, 30, 30, 30)
-        val alertDialogBuilder = AlertDialog.Builder(activity)
+        val alertDialogBuilder = AlertDialog.Builder(ctx)
         alertDialogBuilder
             .setTitle(R.string.rename_device_dialog_title)
             .setView(nameField)
