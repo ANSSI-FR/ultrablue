@@ -8,7 +8,8 @@ import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import java.security.SecureRandom
-import java.util.UUID
+import java.security.Timestamp
+import java.util.*
 
 @Serializable
 class RegistrationDataModel @OptIn(ExperimentalSerializationApi::class) constructor(
@@ -225,6 +226,9 @@ class UltrablueProtocol(
                 resume()
             }
             RESPONSE -> {
+                if (!enroll) {
+                    updateLastDeviceAttestation(device, !attestationResponse!!.Err)
+                }
                 val encodedResponse = Cbor.encodeToByteArray(attestationResponse)
                 writeMsg(activity.getString(R.string.attestation_response), encodedResponse)
                 onCompletion(attestationResponse?.Err == false)
@@ -240,7 +244,7 @@ class UltrablueProtocol(
         }
         rand.nextBytes(secret)
 
-        device.name = "device" + device.uid
+        device.name = "device-" + device.uid.toString().split("-").first()
         device.ekn = registrationData.EKPub
         device.eke = registrationData.EKExp.toInt()
         device.ekcert = registrationData.EKCert
@@ -249,6 +253,12 @@ class UltrablueProtocol(
         logger?.push(Log("Registering device"))
         activity.viewModel.insert(device)
         logger?.push(CLog("Device has been registered", true))
+    }
+
+    private fun updateLastDeviceAttestation(device: Device, success: Boolean) {
+        device.lastAttestationSuccess = success
+        device.lastAttestation = Date().time
+        activity.viewModel.update(device)
     }
 
     fun onMessageRead(message: ByteArray) {

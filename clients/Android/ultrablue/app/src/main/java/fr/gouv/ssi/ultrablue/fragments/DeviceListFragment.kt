@@ -130,7 +130,7 @@ class DeviceListFragment : Fragment(R.layout.fragment_device_list), ItemClickLis
             is QRResult.QRSuccess -> {
                 val qrObj = qrValidate(result.content.rawValue)
                 if (qrObj != null) {
-                    val device = Device(UUID.randomUUID(), "", qrObj.addr, byteArrayOf(), 0, byteArrayOf(), byteArrayOf(), byteArrayOf())
+                    val device = Device(UUID.randomUUID(), "", qrObj.addr, byteArrayOf(), 0, byteArrayOf(), byteArrayOf(), byteArrayOf(), 0, false)
                     val key = SecretKeySpec(qrObj.key.toByteArray(), "AES")
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
                     val bundle = bundleOf("device" to device, "key" to key)
