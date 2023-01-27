@@ -11,6 +11,12 @@ import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 import fr.gouv.ssi.ultrablue.MainActivity
 import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.model.toDateFmt
+import fr.gouv.ssi.ultrablue.model.toDateTimeFmt
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 /*
     This fragment displays the details about a specific Device.
@@ -64,8 +70,30 @@ class DeviceFragment : Fragment() {
 
     // Sets the view components content with the device information.
     private fun displayDeviceInformation(view: View) {
-        val tv: TextView = view.findViewById(R.id.addr_value)
-        tv.text = "${device?.addr}"
+        val addrtv: TextView = view.findViewById(R.id.addr_value)
+        val uuidtv: TextView = view.findViewById(R.id.uuid_value)
+        val latv: TextView = view.findViewById(R.id.last_attestation_value)
+        val ektv: TextView = view.findViewById(R.id.ek_certificate_value)
+
+        device?.let {
+            addrtv.text = it.addr
+            uuidtv.text = it.uid.toString()
+            latv.text = if (it.lastAttestation == 0L) {
+                "N/A"
+            } else {
+                if (it.lastAttestationSuccess) { "Succeed on " } else { "Failed on " } +
+                    it.lastAttestation.toDateTimeFmt()
+            }
+            try {
+                val certFact = CertificateFactory.getInstance("X.509")
+                val bais = ByteArrayInputStream(it.ekcert)
+                val cert = certFact.generateCertificate(bais) as X509Certificate
+                ektv.text = cert.toString().replace("    ", " ")
+            } catch (e: Exception) {
+                ektv.text = "N/A"
+            }
+        }
+
     }
 
     // Present a popup allowing the user to rename the device.

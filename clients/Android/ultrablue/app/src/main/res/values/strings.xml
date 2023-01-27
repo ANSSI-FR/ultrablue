@@ -15,7 +15,11 @@
     <string name="fragment_device_label">Device</string>
     <string name="attestation_button_desc">Attestation button</string>
     <string name="delete_button_desc">Delete button</string>
-    <string name="address_title">Address:</string>
+
+    <string name="address_title">Attester\'s MAC address:</string>
+    <string name="uuid_title">Verifier UUID:</string>
+    <string name="last_attestation_title">Last attestation:</string>
+    <string name="ek_certificate_title">Attester\'s EK certificate:</string>
 
     <string name="rename_device_dialog_title">Choose new device name</string>
     <string name="delete_device_dialog_title">Delete</string>

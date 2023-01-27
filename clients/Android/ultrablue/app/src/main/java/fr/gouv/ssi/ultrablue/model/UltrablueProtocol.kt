@@ -9,6 +9,8 @@ import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import java.security.SecureRandom
 import java.security.Timestamp
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Serializable
@@ -254,7 +256,7 @@ class UltrablueProtocol(
 
     private fun updateLastDeviceAttestation(device: Device, success: Boolean) {
         device.lastAttestationSuccess = success
-        device.lastAttestation = Date().time
+        device.lastAttestation = System.currentTimeMillis()
         activity.viewModel.update(device)
     }
 
