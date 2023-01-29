@@ -1,1 +1,0 @@
-root /dev/vda2 - tpm2-device=auto,tpm2-pcrs=9

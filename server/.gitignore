@@ -1,4 +1,2 @@
-ultrablue-server
-testbed/mkosi/
-testbed/mkosi.output/
-testbed/mkosi.extra/
+testbed/mkosi.cache/*
+testbed/mkosi.builddir/*

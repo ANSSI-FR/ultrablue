@@ -22,6 +22,7 @@ depends() {
 install() {
     inst_multiple -o \
         /usr/bin/ultrablue-server \
+        /etc/ultrablue/* \
         "${systemdsystemunitdir}"/ultrablue-server.service
 
     $SYSTEMCTL -q --root "$initdir" enable ultrablue-server.service
