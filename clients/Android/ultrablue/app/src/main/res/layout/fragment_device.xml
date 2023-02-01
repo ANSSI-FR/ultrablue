@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -26,17 +27,97 @@
             android:id="@+id/addr_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:textSize="16sp"
             android:paddingTop="5dp"
+            android:fontFamily="monospace"
             android:paddingStart="20dp"
             android:textColor="#a8a8a8"
             app:layout_constraintTop_toBottomOf="@+id/addr_title"
             app:layout_constraintLeft_toLeftOf="parent"
             tools:ignore="RtlSymmetry" />
 
+        <TextView
+            android:id="@+id/uuid_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uuid_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addr_value"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/uuid_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:paddingTop="5dp"
+            android:fontFamily="monospace"
+            android:paddingStart="20dp"
+            android:textColor="#a8a8a8"
+            app:layout_constraintTop_toBottomOf="@+id/uuid_title"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/last_attestation_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_attestation_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/uuid_value"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/last_attestation_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:paddingTop="5dp"
+            android:fontFamily="monospace"
+            android:paddingStart="20dp"
+            android:textColor="#a8a8a8"
+            app:layout_constraintTop_toBottomOf="@+id/last_attestation_title"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/ek_certificate_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ek_certificate_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/last_attestation_value"
+            tools:ignore="RtlSymmetry" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@+id/ek_certificate_title"
+            app:layout_constraintLeft_toLeftOf="parent">
+            <TextView
+                android:id="@+id/ek_certificate_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:paddingTop="5dp"
+                android:fontFamily="monospace"
+                android:paddingStart="20dp"
+                android:textColor="#a8a8a8"
+                tools:ignore="RtlSymmetry" />
+        </HorizontalScrollView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-
-</FrameLayout>
+</ScrollView>

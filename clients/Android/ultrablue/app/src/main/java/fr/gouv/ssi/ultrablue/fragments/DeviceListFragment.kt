@@ -13,10 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.gouv.ssi.ultrablue.*
 import fr.gouv.ssi.ultrablue.database.Device
 import fr.gouv.ssi.ultrablue.database.DeviceViewModel
+import fr.gouv.ssi.ultrablue.model.qrValidate
+import fr.gouv.ssi.ultrablue.model.toByteArray
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat
 import io.github.g00fy2.quickie.config.ScannerConfig
+import java.util.UUID
+import javax.crypto.spec.SecretKeySpec
 
 /*
 * This fragment displays a list of registered devices.
@@ -122,10 +126,12 @@ class DeviceListFragment : Fragment(R.layout.fragment_device_list), ItemClickLis
     private fun onQRCodeScannerResult(result: QRResult) {
         when(result) {
             is QRResult.QRSuccess -> {
-                if (isMACAddressValid(result.content.rawValue.trim())) {
-                    val device = Device(0, "", result.content.rawValue.trim(), byteArrayOf(), 0, byteArrayOf(), byteArrayOf(), byteArrayOf())
+                val qrObj = qrValidate(result.content.rawValue)
+                if (qrObj != null) {
+                    val device = Device(UUID.randomUUID(), "", qrObj.addr, byteArrayOf(), 0, byteArrayOf(), byteArrayOf(), byteArrayOf(), 0, false)
+                    val key = SecretKeySpec(qrObj.key.toByteArray(), "AES")
                     val nc = activity?.findNavController(R.id.fragmentContainerView) as NavHostController
-                    val bundle = bundleOf("device" to device)
+                    val bundle = bundleOf("device" to device, "key" to key)
                     nc.navigate(R.id.action_deviceListFragment_to_protocolFragment, bundle)
                 } else {
                     showErrorPopup(getString(R.string.qrcode_error_invalid_title), getString(R.string.qrcode_error_invalid_message))

@@ -22,6 +22,7 @@ import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
 import fr.gouv.ssi.ultrablue.model.*
 import java.util.*
+import javax.crypto.spec.SecretKeySpec
 
 const val MTU = 512
 
@@ -42,6 +43,7 @@ class ProtocolFragment : Fragment() {
     private var enroll = false
     private var logger: Logger? = null
 
+    private var cryptoManager: CryptoManager? = null
     private var protocol: UltrablueProtocol? = null
 
     // Timer related variables
@@ -158,7 +160,10 @@ class ProtocolFragment : Fragment() {
                     if (data.size < dataLen) {
                         gatt.readCharacteristic(characteristic)
                     } else {
-                        val msg = data
+                        var msg = data
+                        cryptoManager?.let { cm ->
+                            msg = cm.decrypt(msg)
+                        }
                         dataLen = 0
                         data = byteArrayOf()
                         it.onMessageRead(msg)
@@ -214,8 +219,10 @@ class ProtocolFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 		val device = requireArguments().getSerializable("device") as Device
+        var key: SecretKeySpec? = null // Must be passed at enrol time
         if (device.name.isEmpty()) {
             enroll = true
+            key = requireArguments().getSerializable("key") as SecretKeySpec?
         }
         logger = Logger(
             activity as MainActivity?,
@@ -251,7 +258,11 @@ class ProtocolFragment : Fragment() {
                     gatt.readCharacteristic(chr)
                 },
                 writeMsg = { tag, msg ->
-                    val prepended = intToByteArray(msg.size) + msg
+                    var data = msg
+                    cryptoManager?.let { cm ->
+                        data = cm.encrypt(data)
+                    }
+                    val prepended = intToByteArray(data.size) + data
                     if (prepended.size > MTU) {
                         logger?.push(
                             CLog("$tag doesn't fit in one packet: message size = ${prepended.size}", false)
@@ -269,13 +280,22 @@ class ProtocolFragment : Fragment() {
                         logger?.push(CLog("Attestation failure", false))
                     }
                     logger?.push(Log("Closing connection"))
-					// The protocol is over, thus it's no longer an error to be disconnected as we asked for it.
+                    // The protocol is over, thus it's no longer an error to be disconnected as we asked for it.
                     onDeviceDisconnectionCallback = {
                         logger?.push(CLog("Device disconnected", true))
                     }
                     gatt.disconnect()
                     if (success && (enroll || device.secret.isNotEmpty())) {
                         (activity as MainActivity).onSupportNavigateUp()
+                    }
+                },
+                enableEncryption = {
+                    cryptoManager = if (enroll) {
+                        CryptoManager(key!!).also { cm ->
+                            cm.persistKey("ultrablue-" + device.uid.toString())
+                        }
+                    } else {
+                        CryptoManager("ultrablue-" + device.uid.toString())
                     }
                 }
             )

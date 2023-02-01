@@ -1,6 +1,7 @@
 package fr.gouv.ssi.ultrablue.fragments
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
@@ -11,6 +12,10 @@ import fr.gouv.ssi.ultrablue.database.DeviceViewModel
 import fr.gouv.ssi.ultrablue.MainActivity
 import fr.gouv.ssi.ultrablue.R
 import fr.gouv.ssi.ultrablue.database.Device
+import fr.gouv.ssi.ultrablue.model.toDateTimeFmt
+import java.io.ByteArrayInputStream
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 /*
     This fragment displays the details about a specific Device.
@@ -33,7 +38,9 @@ class DeviceFragment : Fragment() {
                 return when (item.itemId) {
                     // The + button has been clicked
                     R.id.action_edit -> {
-                        showDeviceRenamingDialog()
+                        context?.let {
+                            showDeviceRenamingDialog(it)
+                        }
                         true
                     }
                     else -> false
@@ -64,17 +71,39 @@ class DeviceFragment : Fragment() {
 
     // Sets the view components content with the device information.
     private fun displayDeviceInformation(view: View) {
-        val tv: TextView = view.findViewById(R.id.addr_value)
-        tv.text = "${device?.addr}"
+        val addrtv: TextView = view.findViewById(R.id.addr_value)
+        val uuidtv: TextView = view.findViewById(R.id.uuid_value)
+        val latv: TextView = view.findViewById(R.id.last_attestation_value)
+        val ektv: TextView = view.findViewById(R.id.ek_certificate_value)
+
+        device?.let {
+            addrtv.text = it.addr
+            uuidtv.text = it.uid.toString()
+            latv.text = if (it.lastAttestation == 0L) {
+                "N/A"
+            } else {
+                if (it.lastAttestationSuccess) { "Succeed on " } else { "Failed on " } +
+                    it.lastAttestation.toDateTimeFmt()
+            }
+            try {
+                val certFact = CertificateFactory.getInstance("X.509")
+                val bais = ByteArrayInputStream(it.ekcert)
+                val cert = certFact.generateCertificate(bais) as X509Certificate
+                ektv.text = cert.toString().replace("    ", " ")
+            } catch (e: Exception) {
+                ektv.text = "N/A"
+            }
+        }
+
     }
 
     // Present a popup allowing the user to rename the device.
-    private fun showDeviceRenamingDialog() {
-        val nameField = EditText(requireContext())
+    private fun showDeviceRenamingDialog(ctx: Context) {
+        val nameField = EditText(ctx)
         nameField.hint = "name"
         nameField.width = 150
         nameField.setPadding(30, 30, 30, 30)
-        val alertDialogBuilder = AlertDialog.Builder(activity)
+        val alertDialogBuilder = AlertDialog.Builder(ctx)
         alertDialogBuilder
             .setTitle(R.string.rename_device_dialog_title)
             .setView(nameField)
