@@ -1,0 +1,862 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		260B8D0728A4096F0001DB80 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 260B8D0628A4096F0001DB80 /* Introspect */; };
+		260B8D0A28A409910001DB80 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 260B8D0928A409910001DB80 /* ConfettiSwiftUI */; };
+		260B8D0D28A409A00001DB80 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 260B8D0C28A409A00001DB80 /* CodeScanner */; };
+		260B8D0F28A41B820001DB80 /* Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B8D0E28A41B820001DB80 /* Conversion.swift */; };
+		260B8D1228A42FD90001DB80 /* SwiftCBOR in Frameworks */ = {isa = PBXBuildFile; productRef = 260B8D1128A42FD90001DB80 /* SwiftCBOR */; };
+		260B8D1428A42FFE0001DB80 /* CBOR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B8D1328A42FFE0001DB80 /* CBOR.swift */; };
+		2613854C28B3E50A0035F0A7 /* Gomobile.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */; };
+		262BE04328AFA993003E2EBA /* ContentHolderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262BE04228AFA993003E2EBA /* ContentHolderCard.swift */; };
+		263212A028807355005E6A2D /* DeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2632129F28807355005E6A2D /* DeviceCardView.swift */; };
+		263212A228820CBD005E6A2D /* DeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A128820CBD005E6A2D /* DeviceView.swift */; };
+		263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263212A328820CCD005E6A2D /* DeviceListView.swift */; };
+		265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD372882B30C001A25CD /* ProtocolView.swift */; };
+		265FCD3E28831927001A25CD /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD3D28831927001A25CD /* Name.swift */; };
+		265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD4228832BA0001A25CD /* ContentCard.swift */; };
+		266A1DDE288B32EB00A47348 /* UltrablueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */; };
+		266B102F29795B0D0089E464 /* EnrollData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B102E29795B0D0089E464 /* EnrollData.swift */; };
+		266B10312979608D0089E464 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B10302979608D0089E464 /* Data.swift */; };
+		266B10332979AFA10089E464 /* EncryptedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B10322979AFA10089E464 /* EncryptedSession.swift */; };
+		2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9F92883F18A009BBB4A /* DeviceEditView.swift */; };
+		2679B9FF288444BF009BBB4A /* Policy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9FE288444BF009BBB4A /* Policy.swift */; };
+		2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0028845A14009BBB4A /* PCREntryCard.swift */; };
+		2679BA0328845E38009BBB4A /* PCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0228845E37009BBB4A /* PCR.swift */; };
+		268B68E52889BC6600235C6A /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268B68E42889BC6600235C6A /* BLEManager.swift */; };
+		269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A32879E02900A6C399 /* ultrablueApp.swift */; };
+		269650A62879E02900A6C399 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650A52879E02900A6C399 /* ContentView.swift */; };
+		269650A82879E02E00A6C399 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 269650A72879E02E00A6C399 /* Assets.xcassets */; };
+		269650AB2879E02E00A6C399 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 269650AA2879E02E00A6C399 /* Preview Assets.xcassets */; };
+		269650AD2879E02E00A6C399 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650AC2879E02E00A6C399 /* Persistence.swift */; };
+		269650B02879E02E00A6C399 /* ultrablue.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 269650AE2879E02E00A6C399 /* ultrablue.xcdatamodeld */; };
+		269650BA2879E02E00A6C399 /* ultrablueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650B92879E02E00A6C399 /* ultrablueTests.swift */; };
+		269650C42879E02E00A6C399 /* ultrablueUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650C32879E02E00A6C399 /* ultrablueUITests.swift */; };
+		269650C62879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269650C52879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift */; };
+		26C934F328919E060064EEB7 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C934F228919E060064EEB7 /* String.swift */; };
+		26E01D2A2885CFD5003A5EA6 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01D292885CFD5003A5EA6 /* Logger.swift */; };
+		26E01D2C2885D6F3003A5EA6 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01D2B2885D6F3003A5EA6 /* LogView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		269650B62879E02E00A6C399 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 269650982879E02900A6C399 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2696509F2879E02900A6C399;
+			remoteInfo = ultrablue;
+		};
+		269650C02879E02E00A6C399 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 269650982879E02900A6C399 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2696509F2879E02900A6C399;
+			remoteInfo = ultrablue;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		267E9CBA28A446F700320228 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		260B8D0E28A41B820001DB80 /* Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversion.swift; sourceTree = "<group>"; };
+		260B8D1328A42FFE0001DB80 /* CBOR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBOR.swift; sourceTree = "<group>"; };
+		2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Gomobile.xcframework; path = "../../../go-mobile/Gomobile.xcframework"; sourceTree = "<group>"; };
+		262BE04228AFA993003E2EBA /* ContentHolderCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentHolderCard.swift; sourceTree = "<group>"; };
+		2632129F28807355005E6A2D /* DeviceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCardView.swift; sourceTree = "<group>"; };
+		263212A128820CBD005E6A2D /* DeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceView.swift; sourceTree = "<group>"; };
+		263212A328820CCD005E6A2D /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
+		265FCD372882B30C001A25CD /* ProtocolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolView.swift; sourceTree = "<group>"; };
+		265FCD3D28831927001A25CD /* Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Name.swift; sourceTree = "<group>"; };
+		265FCD4228832BA0001A25CD /* ContentCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCard.swift; sourceTree = "<group>"; };
+		266A1DDB288B2F8B00A47348 /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltrablueProtocol.swift; sourceTree = "<group>"; };
+		266B102E29795B0D0089E464 /* EnrollData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollData.swift; sourceTree = "<group>"; };
+		266B10302979608D0089E464 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		266B10322979AFA10089E464 /* EncryptedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedSession.swift; sourceTree = "<group>"; };
+		2679B9F92883F18A009BBB4A /* DeviceEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEditView.swift; sourceTree = "<group>"; };
+		2679B9FE288444BF009BBB4A /* Policy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Policy.swift; sourceTree = "<group>"; };
+		2679BA0028845A14009BBB4A /* PCREntryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCREntryCard.swift; sourceTree = "<group>"; };
+		2679BA0228845E37009BBB4A /* PCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCR.swift; sourceTree = "<group>"; };
+		268B68E42889BC6600235C6A /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		269650A02879E02900A6C399 /* ultrablue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ultrablue.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		269650A32879E02900A6C399 /* ultrablueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueApp.swift; sourceTree = "<group>"; };
+		269650A52879E02900A6C399 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		269650A72879E02E00A6C399 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		269650AA2879E02E00A6C399 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		269650AC2879E02E00A6C399 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		269650AF2879E02E00A6C399 /* ultrablue.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ultrablue.xcdatamodel; sourceTree = "<group>"; };
+		269650B52879E02E00A6C399 /* ultrablueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ultrablueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		269650B92879E02E00A6C399 /* ultrablueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueTests.swift; sourceTree = "<group>"; };
+		269650BF2879E02E00A6C399 /* ultrablueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ultrablueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		269650C32879E02E00A6C399 /* ultrablueUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueUITests.swift; sourceTree = "<group>"; };
+		269650C52879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ultrablueUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		26C934F228919E060064EEB7 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = String.swift; path = ../../String.swift; sourceTree = "<group>"; };
+		26E01D292885CFD5003A5EA6 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		26E01D2B2885D6F3003A5EA6 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2696509D2879E02900A6C399 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				260B8D1228A42FD90001DB80 /* SwiftCBOR in Frameworks */,
+				260B8D0A28A409910001DB80 /* ConfettiSwiftUI in Frameworks */,
+				2613854C28B3E50A0035F0A7 /* Gomobile.xcframework in Frameworks */,
+				260B8D0728A4096F0001DB80 /* Introspect in Frameworks */,
+				260B8D0D28A409A00001DB80 /* CodeScanner in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650B22879E02E00A6C399 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650BC2879E02E00A6C399 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		263212A528820CD7005E6A2D /* View */ = {
+			isa = PBXGroup;
+			children = (
+				269650A52879E02900A6C399 /* ContentView.swift */,
+				263212A128820CBD005E6A2D /* DeviceView.swift */,
+				263212A328820CCD005E6A2D /* DeviceListView.swift */,
+				265FCD372882B30C001A25CD /* ProtocolView.swift */,
+				2679B9F92883F18A009BBB4A /* DeviceEditView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		263212A628820D2A005E6A2D /* Component */ = {
+			isa = PBXGroup;
+			children = (
+				2632129F28807355005E6A2D /* DeviceCardView.swift */,
+				265FCD4228832BA0001A25CD /* ContentCard.swift */,
+				2679BA0028845A14009BBB4A /* PCREntryCard.swift */,
+				26E01D2B2885D6F3003A5EA6 /* LogView.swift */,
+				262BE04228AFA993003E2EBA /* ContentHolderCard.swift */,
+			);
+			path = Component;
+			sourceTree = "<group>";
+		};
+		265FCD3C288318D9001A25CD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				26C934F228919E060064EEB7 /* String.swift */,
+				265FCD3D28831927001A25CD /* Name.swift */,
+				2679B9FE288444BF009BBB4A /* Policy.swift */,
+				2679BA0228845E37009BBB4A /* PCR.swift */,
+				26E01D292885CFD5003A5EA6 /* Logger.swift */,
+				268B68E42889BC6600235C6A /* BLEManager.swift */,
+				266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */,
+				260B8D0E28A41B820001DB80 /* Conversion.swift */,
+				260B8D1328A42FFE0001DB80 /* CBOR.swift */,
+				266B102E29795B0D0089E464 /* EnrollData.swift */,
+				266B10302979608D0089E464 /* Data.swift */,
+				266B10322979AFA10089E464 /* EncryptedSession.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		267E9CB528A4461400320228 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2613854B28B3E50A0035F0A7 /* Gomobile.xcframework */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		269650972879E02900A6C399 = {
+			isa = PBXGroup;
+			children = (
+				269650A22879E02900A6C399 /* ultrablue */,
+				269650B82879E02E00A6C399 /* ultrablueTests */,
+				269650C22879E02E00A6C399 /* ultrablueUITests */,
+				269650A12879E02900A6C399 /* Products */,
+				26C934F42891A0520064EEB7 /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		269650A12879E02900A6C399 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				269650A02879E02900A6C399 /* ultrablue.app */,
+				269650B52879E02E00A6C399 /* ultrablueTests.xctest */,
+				269650BF2879E02E00A6C399 /* ultrablueUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		269650A22879E02900A6C399 /* ultrablue */ = {
+			isa = PBXGroup;
+			children = (
+				267E9CB528A4461400320228 /* Frameworks */,
+				265FCD3C288318D9001A25CD /* Model */,
+				263212A628820D2A005E6A2D /* Component */,
+				263212A528820CD7005E6A2D /* View */,
+				269650A32879E02900A6C399 /* ultrablueApp.swift */,
+				269650A72879E02E00A6C399 /* Assets.xcassets */,
+				269650AC2879E02E00A6C399 /* Persistence.swift */,
+				269650AE2879E02E00A6C399 /* ultrablue.xcdatamodeld */,
+				269650A92879E02E00A6C399 /* Preview Content */,
+			);
+			path = ultrablue;
+			sourceTree = "<group>";
+		};
+		269650A92879E02E00A6C399 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				269650AA2879E02E00A6C399 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		269650B82879E02E00A6C399 /* ultrablueTests */ = {
+			isa = PBXGroup;
+			children = (
+				269650B92879E02E00A6C399 /* ultrablueTests.swift */,
+			);
+			path = ultrablueTests;
+			sourceTree = "<group>";
+		};
+		269650C22879E02E00A6C399 /* ultrablueUITests */ = {
+			isa = PBXGroup;
+			children = (
+				269650C32879E02E00A6C399 /* ultrablueUITests.swift */,
+				269650C52879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift */,
+			);
+			path = ultrablueUITests;
+			sourceTree = "<group>";
+		};
+		26C934F42891A0520064EEB7 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				266A1DDB288B2F8B00A47348 /* String.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2696509F2879E02900A6C399 /* ultrablue */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 269650C92879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablue" */;
+			buildPhases = (
+				2696509C2879E02900A6C399 /* Sources */,
+				2696509D2879E02900A6C399 /* Frameworks */,
+				2696509E2879E02900A6C399 /* Resources */,
+				267E9CBA28A446F700320228 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ultrablue;
+			packageProductDependencies = (
+				260B8D0628A4096F0001DB80 /* Introspect */,
+				260B8D0928A409910001DB80 /* ConfettiSwiftUI */,
+				260B8D0C28A409A00001DB80 /* CodeScanner */,
+				260B8D1128A42FD90001DB80 /* SwiftCBOR */,
+			);
+			productName = ultrablue;
+			productReference = 269650A02879E02900A6C399 /* ultrablue.app */;
+			productType = "com.apple.product-type.application";
+		};
+		269650B42879E02E00A6C399 /* ultrablueTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 269650CC2879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablueTests" */;
+			buildPhases = (
+				269650B12879E02E00A6C399 /* Sources */,
+				269650B22879E02E00A6C399 /* Frameworks */,
+				269650B32879E02E00A6C399 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				269650B72879E02E00A6C399 /* PBXTargetDependency */,
+			);
+			name = ultrablueTests;
+			productName = ultrablueTests;
+			productReference = 269650B52879E02E00A6C399 /* ultrablueTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		269650BE2879E02E00A6C399 /* ultrablueUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 269650CF2879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablueUITests" */;
+			buildPhases = (
+				269650BB2879E02E00A6C399 /* Sources */,
+				269650BC2879E02E00A6C399 /* Frameworks */,
+				269650BD2879E02E00A6C399 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				269650C12879E02E00A6C399 /* PBXTargetDependency */,
+			);
+			name = ultrablueUITests;
+			productName = ultrablueUITests;
+			productReference = 269650BF2879E02E00A6C399 /* ultrablueUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		269650982879E02900A6C399 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1340;
+				LastUpgradeCheck = 1340;
+				TargetAttributes = {
+					2696509F2879E02900A6C399 = {
+						CreatedOnToolsVersion = 13.4.1;
+					};
+					269650B42879E02E00A6C399 = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = 2696509F2879E02900A6C399;
+					};
+					269650BE2879E02E00A6C399 = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = 2696509F2879E02900A6C399;
+					};
+				};
+			};
+			buildConfigurationList = 2696509B2879E02900A6C399 /* Build configuration list for PBXProject "ultrablue" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 269650972879E02900A6C399;
+			packageReferences = (
+				2632129A287DD6FF005E6A2D /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				2679B9FB2884200F009BBB4A /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				2603602A288C0992005DCD89 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				260B8D0528A4096F0001DB80 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				260B8D0828A409910001DB80 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				260B8D0B28A409A00001DB80 /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				260B8D1028A42FD90001DB80 /* XCRemoteSwiftPackageReference "SwiftCBOR" */,
+			);
+			productRefGroup = 269650A12879E02900A6C399 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2696509F2879E02900A6C399 /* ultrablue */,
+				269650B42879E02E00A6C399 /* ultrablueTests */,
+				269650BE2879E02E00A6C399 /* ultrablueUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2696509E2879E02900A6C399 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				269650AB2879E02E00A6C399 /* Preview Assets.xcassets in Resources */,
+				269650A82879E02E00A6C399 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650B32879E02E00A6C399 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650BD2879E02E00A6C399 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2696509C2879E02900A6C399 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				26C934F328919E060064EEB7 /* String.swift in Sources */,
+				260B8D0F28A41B820001DB80 /* Conversion.swift in Sources */,
+				268B68E52889BC6600235C6A /* BLEManager.swift in Sources */,
+				2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */,
+				2679BA0328845E38009BBB4A /* PCR.swift in Sources */,
+				266B10332979AFA10089E464 /* EncryptedSession.swift in Sources */,
+				265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */,
+				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
+				266B10312979608D0089E464 /* Data.swift in Sources */,
+				269650AD2879E02E00A6C399 /* Persistence.swift in Sources */,
+				26E01D2A2885CFD5003A5EA6 /* Logger.swift in Sources */,
+				265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */,
+				265FCD3E28831927001A25CD /* Name.swift in Sources */,
+				26E01D2C2885D6F3003A5EA6 /* LogView.swift in Sources */,
+				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
+				2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */,
+				266B102F29795B0D0089E464 /* EnrollData.swift in Sources */,
+				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
+				269650A62879E02900A6C399 /* ContentView.swift in Sources */,
+				269650B02879E02E00A6C399 /* ultrablue.xcdatamodeld in Sources */,
+				266A1DDE288B32EB00A47348 /* UltrablueProtocol.swift in Sources */,
+				260B8D1428A42FFE0001DB80 /* CBOR.swift in Sources */,
+				2679B9FF288444BF009BBB4A /* Policy.swift in Sources */,
+				269650A42879E02900A6C399 /* ultrablueApp.swift in Sources */,
+				262BE04328AFA993003E2EBA /* ContentHolderCard.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650B12879E02E00A6C399 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				269650BA2879E02E00A6C399 /* ultrablueTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		269650BB2879E02E00A6C399 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				269650C42879E02E00A6C399 /* ultrablueUITests.swift in Sources */,
+				269650C62879E02E00A6C399 /* ultrablueUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		269650B72879E02E00A6C399 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2696509F2879E02900A6C399 /* ultrablue */;
+			targetProxy = 269650B62879E02E00A6C399 /* PBXContainerItemProxy */;
+		};
+		269650C12879E02E00A6C399 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2696509F2879E02900A6C399 /* ultrablue */;
+			targetProxy = 269650C02879E02E00A6C399 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		269650C72879E02E00A6C399 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		269650C82879E02E00A6C399 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		269650CA2879E02E00A6C399 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ultrablue/Preview Content\"";
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Ultrablue needs to use Bluetooth to interact with the devices you wish to attest.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Ultrablue needs to access the camera in order to scan the registration QR codes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablue;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		269650CB2879E02E00A6C399 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ultrablue/Preview Content\"";
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Ultrablue needs to use Bluetooth to interact with the devices you wish to attest.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Ultrablue needs to access the camera in order to scan the registration QR codes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablue;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		269650CD2879E02E00A6C399 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablueTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ultrablue.app/ultrablue";
+			};
+			name = Debug;
+		};
+		269650CE2879E02E00A6C399 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablueTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ultrablue.app/ultrablue";
+			};
+			name = Release;
+		};
+		269650D02879E02E00A6C399 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablueUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ultrablue;
+			};
+			name = Debug;
+		};
+		269650D12879E02E00A6C399 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4FQ8TYCN3L;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ANSSI.ultrablueUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ultrablue;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2696509B2879E02900A6C399 /* Build configuration list for PBXProject "ultrablue" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				269650C72879E02E00A6C399 /* Debug */,
+				269650C82879E02E00A6C399 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		269650C92879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablue" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				269650CA2879E02E00A6C399 /* Debug */,
+				269650CB2879E02E00A6C399 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		269650CC2879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablueTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				269650CD2879E02E00A6C399 /* Debug */,
+				269650CE2879E02E00A6C399 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		269650CF2879E02E00A6C399 /* Build configuration list for PBXNativeTarget "ultrablueUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				269650D02879E02E00A6C399 /* Debug */,
+				269650D12879E02E00A6C399 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2603602A288C0992005DCD89 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		260B8D0528A4096F0001DB80 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		260B8D0828A409910001DB80 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		260B8D0B28A409A00001DB80 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		260B8D1028A42FD90001DB80 /* XCRemoteSwiftPackageReference "SwiftCBOR" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/unrelentingtech/SwiftCBOR.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		2632129A287DD6FF005E6A2D /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		2679B9FB2884200F009BBB4A /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		260B8D0628A4096F0001DB80 /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 260B8D0528A4096F0001DB80 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
+		};
+		260B8D0928A409910001DB80 /* ConfettiSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2603602A288C0992005DCD89 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			productName = ConfettiSwiftUI;
+		};
+		260B8D0C28A409A00001DB80 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2632129A287DD6FF005E6A2D /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
+		};
+		260B8D1128A42FD90001DB80 /* SwiftCBOR */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 260B8D1028A42FD90001DB80 /* XCRemoteSwiftPackageReference "SwiftCBOR" */;
+			productName = SwiftCBOR;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		269650AE2879E02E00A6C399 /* ultrablue.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				269650AF2879E02E00A6C399 /* ultrablue.xcdatamodel */,
+			);
+			currentVersion = 269650AF2879E02E00A6C399 /* ultrablue.xcdatamodel */;
+			path = ultrablue.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 269650982879E02900A6C399 /* Project object */;
+}

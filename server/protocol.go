@@ -9,6 +9,7 @@ import (
 	"errors"
 	"os"
 	"reflect"
+	"time"
 
 	"github.com/google/go-attestation/attest"
 	"github.com/google/uuid"
@@ -286,5 +287,6 @@ func ultrablueProtocol(ch chan []byte) {
 		logrus.Error(err)
 		os.Exit(1)
 	}
+	time.Sleep(time.Second)
 	os.Exit(0)
 }

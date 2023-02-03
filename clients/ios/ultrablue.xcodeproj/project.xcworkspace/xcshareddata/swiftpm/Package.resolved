@@ -1,0 +1,41 @@
+{
+  "pins" : [
+    {
+      "identity" : "codescanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/twostraws/CodeScanner",
+      "state" : {
+        "branch" : "main",
+        "revision" : "04ea970273e83d8152e8a1c59a7d45f88cdadfee"
+      }
+    },
+    {
+      "identity" : "confettiswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/simibac/ConfettiSwiftUI.git",
+      "state" : {
+        "revision" : "8d3a15d0aa2991e0761749b767ef8d89bca6275a",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "swiftcbor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/unrelentingtech/SwiftCBOR.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "d84829daa57c109ab666944f2acadb57ca80fa61"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "d3cbf32788250741d397cfb5bcd532c37aa1096d"
+      }
+    }
+  ],
+  "version" : 2
+}
