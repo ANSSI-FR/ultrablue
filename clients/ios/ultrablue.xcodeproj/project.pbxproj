@@ -22,6 +22,9 @@
 		265FCD3E28831927001A25CD /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD3D28831927001A25CD /* Name.swift */; };
 		265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FCD4228832BA0001A25CD /* ContentCard.swift */; };
 		266A1DDE288B32EB00A47348 /* UltrablueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */; };
+		266B102F29795B0D0089E464 /* EnrollData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B102E29795B0D0089E464 /* EnrollData.swift */; };
+		266B10312979608D0089E464 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B10302979608D0089E464 /* Data.swift */; };
+		266B10332979AFA10089E464 /* EncryptedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B10322979AFA10089E464 /* EncryptedSession.swift */; };
 		2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9F92883F18A009BBB4A /* DeviceEditView.swift */; };
 		2679B9FF288444BF009BBB4A /* Policy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679B9FE288444BF009BBB4A /* Policy.swift */; };
 		2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2679BA0028845A14009BBB4A /* PCREntryCard.swift */; };
@@ -84,6 +87,9 @@
 		265FCD4228832BA0001A25CD /* ContentCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCard.swift; sourceTree = "<group>"; };
 		266A1DDB288B2F8B00A47348 /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltrablueProtocol.swift; sourceTree = "<group>"; };
+		266B102E29795B0D0089E464 /* EnrollData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollData.swift; sourceTree = "<group>"; };
+		266B10302979608D0089E464 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		266B10322979AFA10089E464 /* EncryptedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedSession.swift; sourceTree = "<group>"; };
 		2679B9F92883F18A009BBB4A /* DeviceEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEditView.swift; sourceTree = "<group>"; };
 		2679B9FE288444BF009BBB4A /* Policy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Policy.swift; sourceTree = "<group>"; };
 		2679BA0028845A14009BBB4A /* PCREntryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCREntryCard.swift; sourceTree = "<group>"; };
@@ -172,6 +178,9 @@
 				266A1DDD288B32EB00A47348 /* UltrablueProtocol.swift */,
 				260B8D0E28A41B820001DB80 /* Conversion.swift */,
 				260B8D1328A42FFE0001DB80 /* CBOR.swift */,
+				266B102E29795B0D0089E464 /* EnrollData.swift */,
+				266B10302979608D0089E464 /* Data.swift */,
+				266B10322979AFA10089E464 /* EncryptedSession.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -405,8 +414,10 @@
 				268B68E52889BC6600235C6A /* BLEManager.swift in Sources */,
 				2679B9FA2883F18A009BBB4A /* DeviceEditView.swift in Sources */,
 				2679BA0328845E38009BBB4A /* PCR.swift in Sources */,
+				266B10332979AFA10089E464 /* EncryptedSession.swift in Sources */,
 				265FCD382882B30C001A25CD /* ProtocolView.swift in Sources */,
 				263212A028807355005E6A2D /* DeviceCardView.swift in Sources */,
+				266B10312979608D0089E464 /* Data.swift in Sources */,
 				269650AD2879E02E00A6C399 /* Persistence.swift in Sources */,
 				26E01D2A2885CFD5003A5EA6 /* Logger.swift in Sources */,
 				265FCD4328832BA0001A25CD /* ContentCard.swift in Sources */,
@@ -414,6 +425,7 @@
 				26E01D2C2885D6F3003A5EA6 /* LogView.swift in Sources */,
 				263212A428820CCD005E6A2D /* DeviceListView.swift in Sources */,
 				2679BA0128845A14009BBB4A /* PCREntryCard.swift in Sources */,
+				266B102F29795B0D0089E464 /* EnrollData.swift in Sources */,
 				263212A228820CBD005E6A2D /* DeviceView.swift in Sources */,
 				269650A62879E02900A6C399 /* ContentView.swift in Sources */,
 				269650B02879E02E00A6C399 /* ultrablue.xcdatamodeld in Sources */,

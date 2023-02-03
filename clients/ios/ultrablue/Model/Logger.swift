@@ -72,6 +72,13 @@ class Log: Identifiable, ObservableObject {
         }
     }
     
+    func fill() {
+        if kind == .progress {
+            success = true
+            state!.progress = state!.total
+        }
+    }
+    
     private func drawProgressBar(_ state: (progress: UInt, total: UInt)) -> String {
         let barLength = 23
         let percent = Float(state.progress) / Float(state.total)
@@ -114,6 +121,10 @@ class Logger: ObservableObject {
     
     func updateLast(delta: UInt) {
         self.logs.last?.update(delta: delta)
+    }
+    
+    func fillLast() {
+        self.logs.last?.fill()
     }
     
     func completeLast(success: Bool) {

@@ -187,14 +187,13 @@ extension BLEManager: CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         // Error checking
-        if error != nil || characteristic.value == nil {
+        if error != nil {
             logger?.completeLast(success: false)
             return
         }
-        let data = characteristic.value!
         
         // We don't handle chunking, so return as soon as we wrote a message. We can do that because the client isn't supposed to send messages longer than MTU.
-        logger?.updateLast(progress: UInt(data.count))
+        logger?.fillLast()
         self.onMsgWriteCallback?()
     }
     

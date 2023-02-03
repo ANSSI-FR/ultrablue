@@ -11,7 +11,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Device.id, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Device.uid, ascending: true)],
         animation: .default)
     private var devices: FetchedResults<Device>
 

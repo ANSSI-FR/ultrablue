@@ -8,10 +8,10 @@
 import Foundation
 import SwiftCBOR
 
-struct EnrollDataModel: Codable {
-    let Cert: Data
-    let N: Data
-    let E: UInt
+struct EkModel: Codable {
+    let EKCert: Data
+    let EKPub: Data
+    let EKExp: UInt
     let PCRExtend: Bool
 }
 

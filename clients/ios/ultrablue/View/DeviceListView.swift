@@ -8,13 +8,14 @@
 import SwiftUI
 import CodeScanner
 import CoreData
+import CryptoKit
 
 struct DeviceListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [SortDescriptor(\.last_attestation_time, order: .reverse)])
     var devices: FetchedResults<Device>
+    @State private var enrollData: EnrollData? = nil
     @State private var isShowingScanner = false
-    @State private var showProtocolView = false
     @State private var bleManager = BLEManager()
     
     var body: some View {
@@ -46,9 +47,9 @@ struct DeviceListView: View {
                     .sheet(isPresented: $isShowingScanner) {
                         CodeScannerView(codeTypes: [.qr], showViewfinder: true, completion: self.handleScan)
                     }
-                    .sheet(isPresented: $showProtocolView, content: {
-                        ProtocolView(device: nil, bleManager: bleManager)
-                    })
+                    .sheet(item: $enrollData) { qr in
+                        ProtocolView(enrollData: qr, bleManager: bleManager)
+                    }
                 }
             }
             .navigationTitle("Devices")
@@ -59,11 +60,11 @@ struct DeviceListView: View {
         self.isShowingScanner = false
         switch result {
         case .success(let result):
-            if isValidRegistrationData(data: result.string) {
-                showProtocolView = true
-            } else {
+            do {
+                enrollData = try EnrollData(Data(result.string.utf8))
+            } catch {
                 // TODO: Show an alert
-                print("Invalid registration QR code")
+                print("Invalid registration QR code: \(error)")
             }
         case .failure(let err):
             // TODO: Show an alert
@@ -71,10 +72,6 @@ struct DeviceListView: View {
         }
     }
     
-    private func isValidRegistrationData(data: String) -> Bool {
-        // TODO: Parse MAC address
-        return data.count == 18
-    }
 }
 
 struct DeviceListView_Previews: PreviewProvider {

@@ -9,36 +9,7 @@ import Foundation
 import SwiftCBOR
 import Gomobile
 import CoreData
-
-let hardcodeddiff = """
-@@ l. 194:205 @@
-  Event:
-    BlobBase: 0xf9c00000
-    BlobLength: 0x400000
-- - EventNum: 17
--   PCRIndex: 0
--   EventType: EV_EFI_PLATFORM_FIRMWARE_BLOB
--   DigestCount: 1
--   Digests:
--   - AlgorithmId: sha256
--     Digest: "9f9fb81e54492ab392dc64c20704d3ed5b24e17917f5c2d272197e7400f5392c"
--   EventSize: 16
--   Event:
--     BlobBase: 0xff250000
--     BlobLength: 0x320000
-- EventNum: 18
-  PCRIndex: 0
-  EventType: EV_EFI_PLATFORM_FIRMWARE_BLOB
-@@ l. 721:723 @@
-  DigestCount: 1
-  Digests:
-  - AlgorithmId: sha256
--     Digest: "5cb1940732fcc7bbf6b6c61a1d74cf6158f370535a68f0b9764e6e8ebdcc687c"
-+     Digest: "3180280dfe10480facb98098ab0899a0b80a7ba0b78a098bab07a0b8a67678ab"
-  EventSize: 31
-  Event:
-    String: |-
-"""
+import CryptoKit
 
 struct BootStateDiff {
     let PCRs: [IdentifiablePCR]
@@ -55,10 +26,13 @@ extension CaseIterable where Self: Equatable {
 }
 
 enum ProtoState: CaseIterable {
-    case enroll,
-         enroll_handle,
+    case uuid,
+         start_encrypted_session,
          auth_read,
          auth_write,
+         after_auth,
+         enroll,
+         enroll_handle,
          ak_read,
          make_credential,
          activate_credential_read,
@@ -80,15 +54,18 @@ enum ProtoState: CaseIterable {
 
 class UltrablueProtocol {
     private var logger: Logger
-    private var currentState: ProtoState
+    private var currentState: ProtoState = .uuid
     private var bleManager: BLEManager
     private var onCompletion: (Bool) -> Void
     private var onPCRChanged: (BootStateDiff) -> Void
 
+    private var cipher: EncryptedSession? = nil
+
     private var context: NSManagedObjectContext
-    private var device: Device?
+    private var enrollData: EnrollData? = nil
+    private var device: Device? = nil
     private var enroll: Bool
-    private var enrollData: EnrollDataModel? = nil
+    private var ek: EkModel? = nil
     private var authNonce: Data? = nil
     private var encodedak: Data? = nil
     private var encodedpp: Data? = nil
@@ -99,18 +76,30 @@ class UltrablueProtocol {
     private var secret: Data = Data()
     private var attestationResponse: AttestationResponse? = nil
     
-    init(device: Device?, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void, onPCRChanged: @escaping (BootStateDiff) -> Void) {
-        self.context = context
+    init(device: Device, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void, onPCRChanged: @escaping (BootStateDiff) -> Void) {
         self.device = device
-        self.enroll = device == nil
-        self.currentState = enroll ? .enroll : .auth_read
+        self.context = context
+        self.enroll = false
         self.bleManager = bleManager
         self.logger = logger
         self.onCompletion = onCompletion
         self.onPCRChanged = onPCRChanged
-        if enroll == false {
-            enrollData = EnrollDataModel(Cert: device!.cert ?? Data(), N: device!.n!, E: UInt(device!.e), PCRExtend: device!.secret != nil)
-        }
+        
+        ek = EkModel(EKCert: device.cert ?? Data(), EKPub: device.n!, EKExp: UInt(device.e), PCRExtend: device.secret != nil)
+        bleManager.setOnMsgReadCallback(callback: self.onMsgRead)
+        bleManager.setOnMsgWriteCallback(callback: self.onMsgWrite)
+        startProtocol()
+    }
+    
+    init(enrollData: EnrollData, context: NSManagedObjectContext, bleManager: BLEManager, logger: Logger, onCompletion: @escaping (Bool) -> Void, onPCRChanged: @escaping (BootStateDiff) -> Void) {
+        self.enrollData = enrollData
+        self.context = context
+        self.enroll = true
+        self.bleManager = bleManager
+        self.logger = logger
+        self.onCompletion = onCompletion
+        self.onPCRChanged = onPCRChanged
+
         bleManager.setOnMsgReadCallback(callback: self.onMsgRead)
         bleManager.setOnMsgWriteCallback(callback: self.onMsgWrite)
         startProtocol()
@@ -125,27 +114,53 @@ class UltrablueProtocol {
             currentState = s
         }
         switch currentState {
+        case .uuid:
+            do {
+                let encoder = CodableCBOREncoder()
+                let uid: UUID = enroll ? enrollData!.id : device!.uid!
+                let encoded = try encoder.encode(ByteString(Bytes: Data.fromUUID(uid)))
+                writeMsg(tag: "UUID", msg: encoded)
+            }
+            catch {
+                print("An error occured while encoding CBOR: \(error)")
+                return
+            }
+        case .start_encrypted_session:
+            if let enrollData {
+                cipher = EncryptedSession(key: enrollData.key)
+            } else {
+                do {
+                    cipher = try EncryptedSession(for: device!.uid!)
+                }
+                catch {
+                    print("An error occured while fetching encryption key from keychain: \(error)")
+                    return
+                }
+            }
+            resumeProtocol(at: .auth_read)
+        case .auth_read:
+            readMsg(tag: "auth nonce")
+        case .auth_write:
+            writeMsg(tag: "tweaked auth nonce", msg: msg!)
+        case .after_auth:
+            resumeProtocol(at: enroll ? .enroll : .ak_read)
         case .enroll:
             readMsg(tag: "EK pub and certificate")
         case .enroll_handle:
             do {
                 let decoder = CodableCBORDecoder()
-                enrollData = try decoder.decode(EnrollDataModel.self, from: msg!)
+                ek = try decoder.decode(EkModel.self, from: msg!)
             }
             catch {
                 print("An error occured while decoding CBOR: \(error)")
             }
-            resumeProtocol(at: .auth_read)
-        case .auth_read:
-            readMsg(tag: "encrypted auth nonce")
-        case .auth_write:
-            writeMsg(tag: "decrypted auth nonce", msg: msg!)
+            resumeProtocol(at: .ak_read)
         case .ak_read:
             readMsg(tag: "attestation key")
         case .make_credential:
             logger.push(log: Log("Generating activation credential"))
             encodedak = msg!
-            let credentialBlob = Gomobile.GomobileMakeCredential(enrollData!.N, Int(enrollData!.E), encodedak, nil)
+            let credentialBlob = Gomobile.GomobileMakeCredential(ek!.EKPub, Int(ek!.EKExp), encodedak, nil)
             guard let cb = credentialBlob else {
                 logger.completeLast(success: false)
                 return
@@ -229,7 +244,7 @@ class UltrablueProtocol {
             encodedPCRs = wp.data
             logger.completeLast(success: true)
             if enroll {
-                if enrollData?.PCRExtend == true {
+                if ek?.PCRExtend == true {
                     logger.push(log: Log("Generating new attester secret"))
                     guard let s = generateSecret() else {
                         logger.completeLast(success: false)
@@ -338,20 +353,27 @@ class UltrablueProtocol {
     
     private func saveNewDevice() {
         logger.push(log: Log("Saving new attester entry"))
+        do {
+            try cipher?.storeKey(for: enrollData!.id)
+        } catch {
+            print(error.localizedDescription)
+            logger.completeLast(success: false)
+            return
+        }
         device = Device(context: context)
         guard let d = device else {
             logger.completeLast(success: false)
             return
         }
-        d.id = UUID()
+        d.uid = enrollData!.id
         d.creation_time = Date.now
         d.last_attestation_time = d.creation_time
         d.name = Name.generate()
         d.pcrpolicy = Policy(.strict).value
-        d.e = Int64(enrollData!.E)
+        d.e = Int64(ek!.EKExp)
         d.encoded_pcrs = encodedPCRs
-        d.n = enrollData!.N
-        d.cert = enrollData!.Cert
+        d.n = ek!.EKPub
+        d.cert = ek!.EKCert
         d.secret = secret
         d.eventlog = eventlog
         d.addr = "\(bleManager.getAttesterUUID()!)"
@@ -378,13 +400,21 @@ class UltrablueProtocol {
     }
     
     private func writeMsg(tag: String, msg: Data) {
+        var data = msg
+        if let c = cipher {
+            data = try! c.encrypt(msg)
+        }
         bleManager.setMessageTag(tag)
-        bleManager.sendMsg(msg: msg)
+        bleManager.sendMsg(msg: data)
     }
     
     private func onMsgRead(msg: Data) {
+        var data = msg
+        if let c = cipher {
+            data = try! c.decrypt(cipher: msg)
+        }
         currentState = currentState.next()
-        resumeProtocol(with: msg)
+        resumeProtocol(with: data)
     }
     
     private func onMsgWrite() {

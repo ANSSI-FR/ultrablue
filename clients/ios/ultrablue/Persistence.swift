@@ -15,8 +15,8 @@ struct PersistenceController {
         let viewContext = result.container.viewContext
         for _ in 0..<10 {
             let newDevice = Device(context: viewContext)
-            newDevice.id = UUID()
-            newDevice.name = "PC de papi}"
+            newDevice.uid = UUID()
+            newDevice.name = "PC de papi"
             newDevice.addr = "66:66:66:66:66:66"
         }
         do {

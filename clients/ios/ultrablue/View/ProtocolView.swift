@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 import CoreBluetooth
 import ConfettiSwiftUI
+import CryptoKit
 
 struct ProtocolView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
@@ -22,9 +23,22 @@ struct ProtocolView: View {
     @State private var bootStateDiff: BootStateDiff? = nil
     @StateObject var logger = Logger()
     var device: Device?
+    var enrollData: EnrollData?
     @State var bleManager: BLEManager
     
     @Namespace var bottomID
+    
+    init(device: Device, bleManager: BLEManager) {
+        self.device = device
+        self.enrollData = nil
+        _bleManager = State(initialValue: bleManager)
+    }
+    
+    init(enrollData: EnrollData, bleManager: BLEManager) {
+        self.device = nil
+        self.enrollData = enrollData
+        _bleManager = State(initialValue: bleManager)
+    }
         
     var body: some View {
         NavigationView {
@@ -186,7 +200,7 @@ struct ProtocolView: View {
     func runAttestation() {
         protocolSuccess = nil
         bleManager.searchForAttestingDevice(onAttesterFound: {
-            ubProtocol = UltrablueProtocol(device: device, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: { success in
+            let onCompletion: (Bool) -> () = { success in
                 bleManager.shutdown()
                 protocolSuccess = success
                 if success {
@@ -202,11 +216,18 @@ struct ProtocolView: View {
                 } catch {
                     print("Error while updating device: \(error)")
                 }
-            },
-            onPCRChanged: { diff in
+            }
+            let onPCRChanged: (BootStateDiff) -> () = { diff in
                 PCRPolicyError = true
                 bootStateDiff = diff
-            })
+            }
+            
+            if device != nil {
+                ubProtocol = UltrablueProtocol(device: device!, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: onCompletion, onPCRChanged: onPCRChanged)
+            } else {
+                ubProtocol = UltrablueProtocol(enrollData: enrollData!, context: viewContext, bleManager: bleManager, logger: logger, onCompletion: onCompletion, onPCRChanged: onPCRChanged)
+            }
+                
         })
     }
     
